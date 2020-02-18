@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Statistics for International Relations Research II</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="James Hollway" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://raw.githack.com/jhollway/iheidmyninja/master/iheid-xaringan-style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistics for International Relations Research II
+## 1. Refresher
+### <large>James Hollway</large>
+
+---
+
+class: center, middle
+
+.pull-1[.circleon[![](https://graduateinstitute.ch/sites/default/files/styles/medium/public/2019-01/James%20Hollway.jpg?itok=1Yw0keum)]]
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.istockphoto.com%2Fvectors%2Fgrade-a-plus-result-vector-icon-school-red-mark-handwriting-a-plus-in-vector-id1136966571%3Fk%3D6%26m%3D1136966571%26s%3D612x612%26w%3D0%26h%3DS3pDI_xutxq1nLoWAW_D3h5j9wfwkVhWe7LSoVJRA00%3D&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fc%2Fcf%2FRewind_button.svg%2F240px-Rewind_button.svg.png&amp;f=1&amp;nofb=1)]]
+
+
+
+---
+class: center, middle
+# Introductions
+
+.pull-1[.circleon[![](https://graduateinstitute.ch/sites/default/files/styles/medium/public/2019-01/James%20Hollway.jpg?itok=1Yw0keum)]]
+.pull-1[.circleoff[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.istockphoto.com%2Fvectors%2Fgrade-a-plus-result-vector-icon-school-red-mark-handwriting-a-plus-in-vector-id1136966571%3Fk%3D6%26m%3D1136966571%26s%3D612x612%26w%3D0%26h%3DS3pDI_xutxq1nLoWAW_D3h5j9wfwkVhWe7LSoVJRA00%3D&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleoff[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fc%2Fcf%2FRewind_button.svg%2F240px-Rewind_button.svg.png&amp;f=1&amp;nofb=1)]]
+
+---
+class: center, middle, inverse, iheid-red
+
+## Us
+
+.center[
+.pull-left[
+.polaroid[![](https://graduateinstitute.ch/sites/default/files/styles/medium/public/2019-01/James%20Hollway.jpg?itok=1Yw0keum)]
+
+James Hollway (Instructor)
+
+james.hollway@ graduateinstitute.ch
+
+Office hours: Fridays, 13–15
+]
+
+.pull-left[
+.polaroid[![](https://0.academia-photos.com/13004503/4247925/4942167/s200_juliette.ganne.jpg_oh_dbe60a07890a3ced925fd1a9f71769fc_oe_54811513___gda___1415625964_87641a50172edbca992e61c6c445d7c3)]
+
+Juliette Ganne (TA)
+
+juliette.ganne@ graduateinstitute.ch
+
+Office hours: Wednesdays, 14-16
+]
+]
+
+---
+## You
+
+.pull-left[
+![](https://owl.excelsior.edu/wp-content/uploads/sites/2/2018/07/Name-Tag-1.png)
+]
+
+.pull-right[
+- Your name
+- Your area of research interest
+- One thing you remembered from Stats I
+- One thing you are looking forward to in this class
+- One surprising thing about you
+]
+
+
+---
+class: center, middle
+# Course
+
+.pull-1[.circleoff[![](https://graduateinstitute.ch/sites/default/files/styles/medium/public/2019-01/James%20Hollway.jpg?itok=1Yw0keum)]]
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.istockphoto.com%2Fvectors%2Fgrade-a-plus-result-vector-icon-school-red-mark-handwriting-a-plus-in-vector-id1136966571%3Fk%3D6%26m%3D1136966571%26s%3D612x612%26w%3D0%26h%3DS3pDI_xutxq1nLoWAW_D3h5j9wfwkVhWe7LSoVJRA00%3D&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleoff[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fc%2Fcf%2FRewind_button.svg%2F240px-Rewind_button.svg.png&amp;f=1&amp;nofb=1)]]
+
+---
+## Course Aims
+Primary goals are to:
+- identify, explain, and evaluate model choices in terms of questions
+- recognise key inferential assumptions and strategies for if they are not met 
+- apply statistical terms, concepts, and programming
+- generate, interpret, and communicate statistical findings verbally and in writing
+- use data to make evidence-based decisions
+- think critically about contemporary methodological issues
+
+Basically I want to help with a more general problem researchers have:
+1. recognise what you could do with the data around you
+1. recognise what data you would need to answer the questions that you have
+
+Usually people talk about the first, but actually the second is more important...
+
+---
+class: left, middle
+
+.blockquote[99% of statistics only tell 49% of the story.
+
+~ Ron Delegge II]
+
+---
+## Stats II in one slide!
+
+.pull-left[
+.full-width[.content-box-blue[1: Refresher]]
+
+.full-width[.content-box-blue[2: Modelling]]
+
+.full-width[.content-box-blue[3: Assumptions]]
+
+.full-width[.content-box-blue[4: MLE]]
+
+.full-width[.content-box-blue[5: Binary]]
+
+.full-width[.content-box-yellow[6: no class]]
+
+.full-width[.content-box-blue[7: Multinomial]]
+]
+.pull-left[
+.full-width[.content-box-blue[8: Count]]
+
+.full-width[.content-box-blue[9: Mixed]]
+
+.full-width[.content-box-blue[10: Duration]]
+
+.full-width[.content-box-blue[11: Advanced]]
+
+.full-width[.content-box-orange[12: Consultancies]]
+
+.full-width[.content-box-red[13: Projects]]
+
+.full-width[.content-box-red[14: Projects]]
+]
+
+---
+## Course sessions
+
+.pull-left[
+**Lectures**, James Hollway
+
+Room: P3-506
+
+Tuesdays, 4.15-6pm
+
+1. Mix of conceptual and practical 
+
+1. Complementary to readings
+]
+--
+.pull-left[
+**Lab sessions**, Juliette Ganne
+
+Room: S8
+
+Wednesdays, 12.15-2pm
+
+1. Deepening comprehension
+
+1. DIY experience
+]
+
+---
+## Course evaluation
+
+**15% Discussant** 
+- Discuss a contemporary paper and defend author/s’ choices
+- 10% your discussion, 5% questions asked other weeks
+
+**30% Exercises** 
+- Submit 6/8 weekly exercises
+
+**50% Project**
+- At the end of Easter, submit a data report describing the data you are interested in investigating
+- At the end of semester, present (first) analyses using one of the methods discussed during the seminar
+- Also submit replication materials (data and script)
+
+**10% Participation**
+- To reward those who put the extra effort in to understand/help others understand
+- Will be based off of interventions on Moodle on conceptual or practical matters
+
+---
+##  Books
+
+No single textbook for this course, but some good starting points...
+
+.center[
+
+&lt;img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fimages-na.ssl-images-amazon.com%2Fimages%2FI%2F51SCXZSsH4L._SX218_BO1%2C204%2C203%2C200_QL40_.jpg&amp;f=1&amp;nofb=1" height="250" /&gt;&lt;img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwordery.com%2Fjackets%2Faa506f70%2Fm%2Fmaximum-likelihood-for-social-science-michael-d-ward-9781316636824.jpg&amp;f=1&amp;nofb=1" height="250" /&gt;&lt;img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fbilder.buecher.de%2Fprodukte%2F38%2F38407%2F38407610z.jpg&amp;f=1&amp;nofb=1" height="250" /&gt;&lt;img src="https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fprodimage.images-bn.com%2Fpimages%2F9780691175461_p0_v2_s1200x630.jpg&amp;f=1&amp;nofb=1" height="250" /&gt;&lt;img src="https://images-na.ssl-images-amazon.com/images/I/818Hc6nXN%2BL.jpg" height="250" /&gt;
+
+]
+
+All additional required and recommended readings are provided in electronic format on Moodle or will be available on reserve in the library.
+
+---
+## Software
+
+The software used in the class is `\(\mathcal{R}\)`. It is free. And very powerful.
+
+.center[
+
+&lt;img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2F1%2F1b%2FR_logo.svg%2F1200px-R_logo.svg.png&amp;f=1&amp;nofb=1" height="250" /&gt;&lt;img src="https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fwww.rstudio.com%2Fwp-content%2Fuploads%2F2014%2F06%2FRStudio-Ball.png&amp;f=1&amp;nofb=1" height="250" /&gt;
+
+]
+
+There are many highly recommended resources for learning `\(\mathcal{R}\)` which I will share with you on Moodle.
+
+In the meantime, please download and install the most recent versions of both `\(\mathcal{R}\)` (the statistical software) and RStudio (a front-end which makes using R much easier).
+
+---
+## Suggested approach
+
+Learning statistics is all about:
+- *repetition*
+
+--
+
+- *repetition*
+
+--
+
+- *repetition*
+
+--
+
+- and application.
+
+--
+
+In this sense, it is very much like learning a language.
+
+Some are going to be better than others, have a different familiarity or affinity with the material.
+
+That's fine -- you do you! -- but statistics is still an extraordinarily useful quiver of arrows and so it's worth leaning into it and getting out what you can.
+
+---
+class: center, middle
+# Recap
+
+.pull-1[.circleoff[![](https://graduateinstitute.ch/sites/default/files/styles/medium/public/2019-01/James%20Hollway.jpg?itok=1Yw0keum)]]
+.pull-1[.circleoff[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.istockphoto.com%2Fvectors%2Fgrade-a-plus-result-vector-icon-school-red-mark-handwriting-a-plus-in-vector-id1136966571%3Fk%3D6%26m%3D1136966571%26s%3D612x612%26w%3D0%26h%3DS3pDI_xutxq1nLoWAW_D3h5j9wfwkVhWe7LSoVJRA00%3D&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fc%2Fcf%2FRewind_button.svg%2F240px-Rewind_button.svg.png&amp;f=1&amp;nofb=1)]]
+
+---
+## Stats I in one slide!
+
+.pull-left[
+.full-width[.content-box-blue[1: Introduction]]
+
+.full-width[.content-box-blue[2: Sampling and Measurement]]
+
+.full-width[.content-box-blue[3: Descriptive Statistics]]
+
+.full-width[.content-box-blue[4: Probability Distributions]]
+
+.full-width[.content-box-blue[5: Confidence Intervals]]
+
+.full-width[.content-box-orange[6: Mock Exam]]
+
+.full-width[.content-box-red[7: Midterm]]
+]
+.pull-left[
+.full-width[.content-box-yellow[8: no class]]
+
+.full-width[.content-box-blue[9: Significance Testing]]
+
+.full-width[.content-box-blue[10: Bivariate Analysis]]
+
+.full-width[.content-box-blue[11: Linear Regression]]
+
+.full-width[.content-box-blue[12: Multiple Regression]]
+
+.full-width[.content-box-orange[13: Review Week]]
+
+.full-width[.content-box-red[14: Take-Home Exam]]
+]
+
+---
+## Modelling
+
+Let me try and pick up more or less where you left off,
+and talk a bit about statistical **modelling**.
+
+--
+
+The goal of a model is to provide a *simple low-dimensional summary* of a dataset.
+
+Here we're going to use models to partition data into patterns and residuals.
+
+&lt;!-- Strong patterns will hide subtler trends, so we’ll use models to help peel back layers of structure as we explore a dataset. --&gt;
+
+---
+class: left, middle
+
+.blockquote[All models are wrong, some are useful.
+
+~ George E. P. Box]
+
+&lt;!-- It’s worth reading the fuller context of the quote: --&gt;
+
+&lt;!-- Now it would be very remarkable if any system existing in the real world could be exactly represented by any simple model. However, cunningly chosen parsimonious models often do provide remarkably useful approximations. For example, the law PV = RT relating pressure P, volume V and temperature T of an “ideal” gas via a constant R is not exactly true for any real gas, but it frequently provides a useful approximation and furthermore its structure is informative since it springs from a physical view of the behavior of gas molecules. --&gt;
+
+&lt;!-- For such a model there is no need to ask the question “Is the model true?”. If “truth” is to be the “whole truth” the answer must be “No”. The only question of interest is “Is the model illuminating and useful?”. --&gt;
+
+&lt;!-- The goal of a model is not to uncover truth, but to discover a simple approximation that is still useful. --&gt;
+
+---
+class: left, middle
+
+.blockquote[A map is not the territory it represents, but, if correct, it has a similar structure to the territory, which accounts for its usefulness.
+
+~ Alfred Korzybski]
+
+---
+## Why model?
+
+--
+My favourite answer to this important question is from Joshua Epstein (2008), who provides at least 16 reasons:
+
+1. Explain (very distinct from predict) 
+1. Guide data collection
+1. Illuminate core dynamics
+1. Suggest dynamical analogies
+1. Discover new questions
+1. Promote a scientific habit of mind
+1. Bound (bracket) outcomes to plausible ranges 
+1. Illuminate core uncertainties.
+1. Offer crisis options in near-real time
+1. Demonstrate tradeoffs / suggest efficiencies
+1. Challenge the robustness of prevailing theory through perturbations 
+1. Expose prevailing wisdom as incompatible with available data
+1. Train practitioners
+1. Discipline the policy dialogue
+1. Educate the general public
+1. Reveal the apparently simple (complex) to be complex (simple)
+
+&lt;!-- - We do statistics because cherry picked examples can lead to faulty reasoning. We live in cases but we decide on populations --&gt;
+&lt;!-- - models are like the lenses through which we observe social reality --&gt;
+&lt;!--  The choice, then, is not whether to build models; it's whether to build explicit ones. In explicit models, assumptions are laid out in detail, so we can study exactly what they entail. On these assumptions, this sort of thing happens. When you alter the assumptions that is what happens. By writing explicit models, you let others replicate your results. --&gt;
+&lt;!-- You can in fact calibrate to historical cases if there are data, and can test against current data to the extent that exists. And, importantly, you can incorporate the best domain (e.g., biomedical, ethnographic) expertise in a rigorous way. Indeed, models can be the focal points of teams involving experts from many disciplines. --&gt;
+&lt;!-- Another advantage of explicit models is the feasibility of sensitivity analysis. One can sweep a huge range of parameters over a vast range of possible scenarios to identify the most salient uncertainties, regions of robustness, and important thresholds. I don't see how to do that with an implicit mental model. It is important to note that in the policy sphere (if not in particle physics) models do not obviate the need for judgment. However, by revealing tradeoffs, uncertainties, and sensitivities, models can discipline the dialogue about options and make unavoidable judgments more considered. --&gt;
+
+---
+## Three "models"
+
+The term "model" can sometimes be confusing, because it can mean different things:
+
+1. a **theoretical model** captures how we think concepts relate to one another, e.g.
+$$y = \alpha + \beta_1 x_1 - \beta_2 x_2 $$
+
+1. a **family of models** express a precise but generic pattern, e.g.
+`$$y = \alpha + \beta_1 x_1 - \beta_2 x_2 + \varepsilon$$`
+  &lt;!-- - e.g. y = a_1 * x + a_2 or y = a_1 * x ^ a_2 --&gt;
+&lt;!-- First, you define a family of models that express a precise, but generic, pattern that you want to capture. For example, the pattern might be a straight line, or a quadratic curve. You will express the model family as an equation like y = a_1 * x + a_2 or y = a_1 * x ^ a_2. Here, x and y are known variables from your data, and a_1 and a_2 are parameters that can vary to capture different patterns. --&gt;
+
+1. a **fitted model** finds the model from the family that is closest to your data, e.g.
+`$$y = 7 + 3x_1 - 2x_2$$`
+&lt;!-- Next, you generate a fitted model by finding the model from the family that is the closest to your data. This takes the generic model family and makes it specific, like . --&gt;
+
+It’s important to understand that a fitted model is just the closest model from a family of models. 
+
+That implies that you have the “best” model (according to some criteria); it doesn’t imply that you have a good model and it certainly doesn’t imply that the model is “true”.
+
+---
+## Form and notation for linear models
+
+Note that the model family expressed in the previous slide is a common one.
+It is called a *linear model*, and the general form of the multiple regression model reads:
+
+$$ Y = \alpha + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_k x_k + \varepsilon  $$
+
+where `\(Y\)` is the dependent or response variable, and `\(x_{1}, x_{2}, ..., x_{k}\)` represent a set of explanatory variables.
+
+--
+
+It is a pretty straightforward model, which is why it is so commonly used.
+- we can express a direct, linear relationship between the left-hand side (LHS) and right-hand side (RHS) variables
+- we can include numerous independent variables
+- we can interpret coefficients as indicating the change of the dependent variable associated with a one unit increase/decrease of the independent variable holding all other variables constant
+
+That is:
+
+$$ E(Y) =  \alpha + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_k x_k  $$
+
+---
+## Some totally made-up data
+
+Before we start using models on real, interesting datasets, let's explore the basics of how models work.
+
+.pull-left[Lets use the simulated dataset `sim1`, included with the `modelr` package. 
+
+Let's plot its two continuous variables, *x* and *y*, to see how they’re related.
+
+
+```r
+library(modelr)
+library(ggplot2)
+ggplot(sim1, aes(x, y)) + geom_point()
+```
+
+You can see a strong (linear) pattern in the data: the more *x* the same amount more/less *y* and vice versa.
+
+What do you think this data could be??
+
+Let’s use a model to capture that pattern and make it explicit...
+]
+
+.pull-left[
+![](STAT_L1_Refresher_files/figure-html/simulatedData-1.png)&lt;!-- --&gt;
+]
+
+---
+## Lots of models
+
+.pull-left[
+Let’s start by getting a feel for what models from that family look like 
+by randomly generating a few and overlaying them on the data.
+
+
+```r
+models &lt;- tibble(a1 = runif(250, -20, 40), 
+                 a2 = runif(250, -5, 5))
+
+ggplot(sim1, aes(x, y)) + 
+  geom_abline(aes(intercept = a1, slope = a2), 
+              data = models, alpha = 1/4) +
+  geom_point()
+```
+
+There are 250 models on this plot, but a lot are *really* bad!
+
+.red[What does that *mean*?]
+
+We need a way to measure the distance/closeness between the data and the model
+so that we can work out which ones are good, bad, and ugly.
+]
+
+.pull-left[
+![](STAT_L1_Refresher_files/figure-html/lotsOfModels-1.png)&lt;!-- --&gt;
+]
+
+---
+## Throwing shapes
+
+.pull-left[
+A good place to start is to consider the vertical distance between each observed point and the value the model would predict based on one of the dimensions 
+
+OLS does this for all observations, not just the one we selected. It collapses them all into a single number: the “root-mean-squared deviation”.
+
+RMSE calculates the difference between all actual and predicted observations, squares them, averages them, and then takes the square root:
+
+$$ RMSE = \sqrt{\frac{1}{n} \sum\limits_{i=1}^{n} (Y_i - \hat{Y}_i)^2}   $$
+
+RMSE has lots of appealing mathematical properties, which we’re not going to talk about here...
+]
+
+.pull-left[
+
+![](STAT_L1_Refresher_files/figure-html/twoModels-1.png)&lt;!-- --&gt;
+
+]
+
+---
+## The better models
+
+.pull-left[
+We could iterate over all the 250 (random) models we created and calculate the RMSE for each one.
+
+Then we just highlight the candidate model that comes closest to (or, least far from) all the points.
+
+Let's overlay the 10 best models from our random selection on to the data.
+
+I’ve coloured the models by -dist: this is an easy way to make sure that the best models (i.e. the ones with the smallest distance) get the brighest colours.
+]
+
+.pull-left[
+![](STAT_L1_Refresher_files/figure-html/bestModels-1.png)&lt;!-- --&gt;
+]
+
+---
+## The best model
+
+.pull-left[
+However, since these belong to the family of *linear models* we can exploit some connections between geometry, calculus, and linear algebra to quickly identify the single best solution. So instead of trying lots of random models, R has a tool specifically designed for fitting linear models called `lm()`:
+
+
+```r
+sim1_mod &lt;- lm(y ~ x, data = sim1)
+coef(sim1_mod)
+```
+
+```
+## (Intercept)           x 
+##    4.220822    2.051533
+```
+
+`lm()` has a special way to specify the model family: formulas. Formulas look like y ~ x, which `lm()` will translate to a function like 
+
+$$ y = a + b_1 x $$
+]
+
+.pull-left[
+![](STAT_L1_Refresher_files/figure-html/linearRegression-1.png)&lt;!-- --&gt;
+]
+
+---
+## Interpretation
+
+Cool, so we have a line. 
+--
+Now what?
+
+--
+
+Well, we can use this 'line' (our model) to think about the relationship between variable _x_ (whatever that is) and variable _y_ (whatever that is)
+- the constant/intercept _a_ tells us what _y_ should be at _x=0_
+
+$$ E(Y) = a + b_10 $$
+- the parameter coefficient/estimate _b1_ tells us how _y_ changes with each unit increase in _x_
+
+$$ (a + b_11) - (a + b_10) = b_1 $$
+
+We talk about this being a 'one unit change', but you can also give it a substantive interpretation...
+
+---
+## Simple linear regression
+
+.pull-left[
+But how sure should we be that we couldn't have just gotten this particular slope by chance,
+and that actually it doesn't tell us much beyond this particular sample?
+
+That's a trickier thing, but we can say something about how likely we are to get a slope
+this steep or greater if actually there isn't any relationship in the population...
+
+Let's run the simple linear regression again, but this time give a bit more output
+
+What can we say about our 'hypothesis' that _y_ is significantly related to _x_?
+]
+
+.pull-left[
+
+```r
+summary(sim1_mod)
+```
+
+```
+## 
+## Call:
+## lm(formula = y ~ x, data = sim1)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.1469 -1.5197  0.1331  1.4670  4.6516 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   4.2208     0.8688   4.858 4.09e-05 ***
+## x             2.0515     0.1400  14.651 1.17e-14 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 2.203 on 28 degrees of freedom
+## Multiple R-squared:  0.8846,	Adjusted R-squared:  0.8805 
+## F-statistic: 214.7 on 1 and 28 DF,  p-value: 1.173e-14
+```
+]
+
+---
+## Extra features
+
+The linear model is extensible to an arbitrary number of explanatory/independent variables/features.
+
+But then (well, always) we need to interpret the coefficients carefully.
+
+For example, consider the prediction equation of _k=2_ explanatory variables:
+
+$$ E(Y) = a + b_1 x_1 + b_2 x_2 $$
+
+_b1, b2, ..., bk_ are partial regression coefficients. That is, there is a linear relationship between _E(Y)_ and _x1_ with the slope _b1_, __controlling for other predictors in the model__.
+
+If x1 goes up 1 unit with x2 held constant, the change in E(Y) is:
+
+$$ (a + b_1 (x_1 + 1) + b_2 x_2) -  (a + b_1 x_1 + b_2 x_2) = b_1$$
+
+The effect of each independent variable is the slope controlling for the effects of (all) other variables.
+
+Thus, the best way of thinking about regression with more than one independent variable is to imagine a separate regression line for age at each value of religiosity, and vice versa.
+
+---
+## Residuals
+
+We’re trying to predict Y, but we’re never going to be spot on. Remember: all models are wrong...
+
+--
+
+But how wrong they are and how they are wrong can tell us a lot about whether we can improve our model or whether we are using the right family of models.
+
+The main way to explore this is by examining the *residuals*: the remaining deviation between model predictions and the actual observations
+(the _e_ in our model equation).
+
+![](STAT_L1_Refresher_files/figure-html/residuals-1.png)&lt;!-- --&gt;![](STAT_L1_Refresher_files/figure-html/residuals-2.png)&lt;!-- --&gt;![](STAT_L1_Refresher_files/figure-html/residuals-3.png)&lt;!-- --&gt;![](STAT_L1_Refresher_files/figure-html/residuals-4.png)&lt;!-- --&gt;
+
+---
+## Some final points on data
+
+All this depends on some important *assumptions*: "a hammer works best for nailing problems".
+
+--
+
+We'll cover several assumptions over the next 2 weeks,
+but to conclude today I want to highlight three extra conditions concerning the **data** we are using here:
+
+--
+
+1. Random sample
+  - Sampling theory vs stochastic theory
+  - SRS
+  
+--
+
+1. Size: `dim()`
+  - `\(n &gt; k\)`
+  - CLT says `\(n&gt;30\)` will provide normal sampling distribution even if population distribution not normal
+  
+--
+
+1. Variance: `var()`
+  - There must be some variance in the features
+  - What is the opposite of a variable?
+
+---
+class: center, middle
+# Summary
+
+.pull-1[.circleon[![](https://graduateinstitute.ch/sites/default/files/styles/medium/public/2019-01/James%20Hollway.jpg?itok=1Yw0keum)]]
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.istockphoto.com%2Fvectors%2Fgrade-a-plus-result-vector-icon-school-red-mark-handwriting-a-plus-in-vector-id1136966571%3Fk%3D6%26m%3D1136966571%26s%3D612x612%26w%3D0%26h%3DS3pDI_xutxq1nLoWAW_D3h5j9wfwkVhWe7LSoVJRA00%3D&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fc%2Fcf%2FRewind_button.svg%2F240px-Rewind_button.svg.png&amp;f=1&amp;nofb=1)]]
+
+What questions do you have for me?
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>`"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
