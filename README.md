@@ -1,4 +1,8 @@
 Statistics for International Relations Research II
 ===============================
 
-The course is hosted at http://jhollway.github.io/statsII
+RISP062 - Spring 2020
+
+The course is hosted at https://jhollway.github.io/statsII/
+
+[Lecture 1](https://jhollway.github.io/statsII/STAT_L1_Refresher.html)
