@@ -85,7 +85,14 @@ class: center, middle
 .pull-1[.circleoff[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fc%2Fcf%2FRewind_button.svg%2F240px-Rewind_button.svg.png&amp;f=1&amp;nofb=1)]]
 
 ---
-## Course Aims
+## Course aims
+
+--
+
+This is an intermediate statistics course for applied researchers...
+
+--
+
 Primary goals are to:
 - identify, explain, and evaluate model choices in terms of questions
 - recognise key inferential assumptions and strategies for if they are not met 
@@ -94,11 +101,13 @@ Primary goals are to:
 - use data to make evidence-based decisions
 - think critically about contemporary methodological issues
 
-Basically I want to help with a more general problem researchers have:
-1. recognise what you could do with the data around you
+--
+
+Basically I want to help with two more general problems researchers have:
+1. recognise what questions you could answer with available data
 1. recognise what data you would need to answer the questions that you have
 
-Usually people talk about the first, but actually the second is more important...
+This course is about developing this knowledge.
 
 ---
 class: left, middle
@@ -117,7 +126,7 @@ class: left, middle
 
 .full-width[.content-box-blue[3: Assumptions]]
 
-.full-width[.content-box-blue[4: MLE]]
+.full-width[.content-box-purple[4: MLE]]
 
 .full-width[.content-box-blue[5: Binary]]
 
@@ -132,7 +141,7 @@ class: left, middle
 
 .full-width[.content-box-blue[10: Duration]]
 
-.full-width[.content-box-blue[11: Advanced]]
+.full-width[.content-box-purple[11: Advanced]]
 
 .full-width[.content-box-orange[12: Consultancies]]
 
@@ -176,9 +185,9 @@ Wednesdays, 12.15-2pm
 - 10% your discussion, 5% questions asked other weeks
 
 **30% Exercises** 
-- Submit 6/8 weekly exercises
+- Submit 6/8 weekly exercises, 20 points each
 
-**50% Project**
+**45% Project**
 - At the end of Easter, submit a data report describing the data you are interested in investigating
 - At the end of semester, present (first) analyses using one of the methods discussed during the seminar
 - Also submit replication materials (data and script)
@@ -218,11 +227,9 @@ In the meantime, please download and install the most recent versions of both `\
 ---
 ## Suggested approach
 
-Learning statistics is all about:
-- *repetition*
-
 --
 
+Learning statistics is all about:
 - *repetition*
 
 --
@@ -235,11 +242,13 @@ Learning statistics is all about:
 
 --
 
-In this sense, it is very much like learning a language.
+In this sense, learning statistics is very much like learning a language.
 
-Some are going to be better than others, have a different familiarity or affinity with the material.
+Some are going to have a different familiarity or affinity with the material, have a stronger vocabulary or 'pronunication', etc.
 
-That's fine -- you do you! -- but statistics is still an extraordinarily useful quiver of arrows and so it's worth leaning into it and getting out what you can.
+That's fine -- you do you! -- but statistics is still an extraordinarily useful toolbelt (more later) and so it's worth leaning into it and getting out what you can. This is your chance.
+
+So read, listen, do exercises, ask questions, play with ideas, get things wrong, ask for advice, etc...
 
 ---
 class: center, middle
@@ -293,31 +302,7 @@ and talk a bit about statistical **modelling**.
 
 The goal of a model is to provide a *simple low-dimensional summary* of a dataset.
 
-Here we're going to use models to partition data into patterns and residuals.
-
-&lt;!-- Strong patterns will hide subtler trends, so we’ll use models to help peel back layers of structure as we explore a dataset. --&gt;
-
----
-class: left, middle
-
-.blockquote[All models are wrong, some are useful.
-
-~ George E. P. Box]
-
-&lt;!-- It’s worth reading the fuller context of the quote: --&gt;
-
-&lt;!-- Now it would be very remarkable if any system existing in the real world could be exactly represented by any simple model. However, cunningly chosen parsimonious models often do provide remarkably useful approximations. For example, the law PV = RT relating pressure P, volume V and temperature T of an “ideal” gas via a constant R is not exactly true for any real gas, but it frequently provides a useful approximation and furthermore its structure is informative since it springs from a physical view of the behavior of gas molecules. --&gt;
-
-&lt;!-- For such a model there is no need to ask the question “Is the model true?”. If “truth” is to be the “whole truth” the answer must be “No”. The only question of interest is “Is the model illuminating and useful?”. --&gt;
-
-&lt;!-- The goal of a model is not to uncover truth, but to discover a simple approximation that is still useful. --&gt;
-
----
-class: left, middle
-
-.blockquote[A map is not the territory it represents, but, if correct, it has a similar structure to the territory, which accounts for its usefulness.
-
-~ Alfred Korzybski]
+That is, answer the question: "what basically seems to be happening here?"
 
 ---
 ## Why model?
@@ -342,32 +327,34 @@ My favourite answer to this important question is from Joshua Epstein (2008), wh
 1. Educate the general public
 1. Reveal the apparently simple (complex) to be complex (simple)
 
-&lt;!-- - We do statistics because cherry picked examples can lead to faulty reasoning. We live in cases but we decide on populations --&gt;
-&lt;!-- - models are like the lenses through which we observe social reality --&gt;
-&lt;!--  The choice, then, is not whether to build models; it's whether to build explicit ones. In explicit models, assumptions are laid out in detail, so we can study exactly what they entail. On these assumptions, this sort of thing happens. When you alter the assumptions that is what happens. By writing explicit models, you let others replicate your results. --&gt;
-&lt;!-- You can in fact calibrate to historical cases if there are data, and can test against current data to the extent that exists. And, importantly, you can incorporate the best domain (e.g., biomedical, ethnographic) expertise in a rigorous way. Indeed, models can be the focal points of teams involving experts from many disciplines. --&gt;
-&lt;!-- Another advantage of explicit models is the feasibility of sensitivity analysis. One can sweep a huge range of parameters over a vast range of possible scenarios to identify the most salient uncertainties, regions of robustness, and important thresholds. I don't see how to do that with an implicit mental model. It is important to note that in the policy sphere (if not in particle physics) models do not obviate the need for judgment. However, by revealing tradeoffs, uncertainties, and sensitivities, models can discipline the dialogue about options and make unavoidable judgments more considered. --&gt;
+???
+
+The choice, then, is not whether to build models; it's whether to build explicit ones. 
+
+First, cherry picked examples is a terrible bias. We live cases but (should) decide on populations.
+
+In explicit models, assumptions are laid out in detail, so we can study exactly what they entail. On these assumptions, this sort of thing happens. When you alter the assumptions that is what happens. 
+
+One can sweep a huge range of parameters over a vast range of possible scenarios to identify the most salient uncertainties, regions of robustness, and important thresholds, which is difficult to do with only an implicit model. 
+
+Note this does not obviate the need for judgment. But by revealing tradeoffs, uncertainties, and sensitivities, models can discipline the dialogue about options and make unavoidable judgments more considered.
 
 ---
-## Three "models"
+## Three “models”
 
-The term "model" can sometimes be confusing, because it can mean different things:
+The term “model” can sometimes be confusing, because it can mean different things:
 
-1. a **theoretical model** captures how we think concepts relate to one another, e.g.
+1. a **theoretical model** captures how we think concepts relate to one another such that it _can_ be written as an equation, e.g.
 $$y = \alpha + \beta_1 x_1 - \beta_2 x_2 $$
 
-1. a **family of models** express a precise but generic pattern, e.g.
-`$$y = \alpha + \beta_1 x_1 - \beta_2 x_2 + \varepsilon$$`
-  &lt;!-- - e.g. y = a_1 * x + a_2 or y = a_1 * x ^ a_2 --&gt;
-&lt;!-- First, you define a family of models that express a precise, but generic, pattern that you want to capture. For example, the pattern might be a straight line, or a quadratic curve. You will express the model family as an equation like y = a_1 * x + a_2 or y = a_1 * x ^ a_2. Here, x and y are known variables from your data, and a_1 and a_2 are parameters that can vary to capture different patterns. --&gt;
+1. a **family of models** express a precise but generic pattern like a straight line or quadratic curve as an equation, e.g.
+`$$y = a + b_1 x_1 - b_2 x_2 + e$$`
 
-1. a **fitted model** finds the model from the family that is closest to your data, e.g.
+1. a **fitted model** finds the specific model from the family that is closest to your data, e.g.
 `$$y = 7 + 3x_1 - 2x_2$$`
-&lt;!-- Next, you generate a fitted model by finding the model from the family that is the closest to your data. This takes the generic model family and makes it specific, like . --&gt;
 
-It’s important to understand that a fitted model is just the closest model from a family of models. 
-
-That implies that you have the “best” model (according to some criteria); it doesn’t imply that you have a good model and it certainly doesn’t imply that the model is “true”.
+Note a fitted model is just the closest model from a family of models.
+It implies that you have the “best” model (according to some criteria); it doesn’t imply that you have a “good” model and it certainly doesn’t imply that the model is “true”.
 
 ---
 ## Form and notation for linear models
@@ -435,7 +422,7 @@ ggplot(sim1, aes(x, y)) +
   geom_point()
 ```
 
-There are 250 models on this plot, but a lot are *really* bad!
+There are 250 models on this plot, but lots are *really* bad!
 
 .red[What does that *mean*?]
 
@@ -524,6 +511,9 @@ Well, we can use this 'line' (our model) to think about the relationship between
 - the constant/intercept _a_ tells us what _y_ should be at _x=0_
 
 $$ E(Y) = a + b_10 $$
+
+--
+
 - the parameter coefficient/estimate _b1_ tells us how _y_ changes with each unit increase in _x_
 
 $$ (a + b_11) - (a + b_10) = b_1 $$
@@ -597,9 +587,39 @@ Thus, the best way of thinking about regression with more than one independent v
 ---
 ## Residuals
 
-We’re trying to predict Y, but we’re never going to be spot on. Remember: all models are wrong...
+The other thing to note here is that what we're really doing is using models to partition data into _patterns_ and _residuals_.
+
+We’re trying to predict Y, but we’re never going to be spot on. Remember...
+
+---
+class: left, middle
+
+.blockquote[All models are wrong, some are useful.
+
+~ George E. P. Box]
 
 --
+
+.blockquote[A map is not the territory it represents, but, if correct, it has a similar structure to the territory, which accounts for its usefulness.
+
+~ Alfred Korzybski]
+
+???
+
+It’s worth reading the fuller context of the quote:
+
+Now it would be very remarkable if any system existing in the real world could be exactly represented by any simple model. However, cunningly chosen parsimonious models often do provide remarkably useful approximations. For example, the law PV = RT relating pressure P, volume V and temperature T of an “ideal” gas via a constant R is not exactly true for any real gas, but it frequently provides a useful approximation and furthermore its structure is informative since it springs from a physical view of the behavior of gas molecules. --&gt;
+
+For such a model there is no need to ask the question “Is the model true?”. If “truth” is to be the “whole truth” the answer must be “No”. The only question of interest is “Is the model illuminating and useful?”.
+
+The goal of a model is not to uncover truth, but to discover a simple approximation that is still useful.
+
+---
+## Residuals
+
+The other thing to note here is that what we're really doing is using models to partition data into _patterns_ and _residuals_.
+
+We’re trying to predict Y, but we’re never going to be spot on. 
 
 But how wrong they are and how they are wrong can tell us a lot about whether we can improve our model or whether we are using the right family of models.
 
