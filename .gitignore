@@ -1,1 +1,11 @@
 *.Rmd
+*.RData
+*.rdb
+*.rdx
+STAT_L2_Modelling_cache/html/__globals
+STAT_L2_Modelling_cache/*
+STAT_L1_Refresher_cache/*
+
+STAT_L1_Refresher_cache/*
+STAT_L1_Refresher_cache/html/__globals
+STAT_L1_Refresher_cache/*

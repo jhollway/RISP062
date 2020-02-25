@@ -12,3 +12,6 @@ forcats
 modelr
 lattice
 caret
+finalfit
+sjPlot
+sjmisc

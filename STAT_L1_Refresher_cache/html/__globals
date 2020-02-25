@@ -20,5 +20,5 @@ unnamed-chunk-13	~	coef	lm	sim1
 unnamed-chunk-14	apply	data	iris	library	nearZeroVar	var
 bestModels	::	%>%	^	<=	$	a1	a2	aes	c	dist	filter	geom_abline	geom_point	ggplot	mean	mutate	rank	sim1	sqrt	x	y
 linearRegression	~	$	aes	best	geom_abline	geom_point	ggplot	lm	sim1	x	y
-regressionResults	sim1_mod	summary
+regressionResults	%>%	~	library	lm	sim1	tab_model
 residuals	plot	sim1_mod
