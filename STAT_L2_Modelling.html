@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Statistics for International Relations Research II</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="James Hollway" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/table1/table1_defaults.css" rel="stylesheet" />
+    <script src="libs/htmlwidgets/htmlwidgets.js"></script>
+    <script src="libs/viz/viz.js"></script>
+    <link href="libs/DiagrammeR-styles/styles.css" rel="stylesheet" />
+    <script src="libs/grViz-binding/grViz.js"></script>
+    <link rel="stylesheet" href="https://raw.githack.com/jhollway/iheidmyninja/master/iheid-xaringan-style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistics for International Relations Research II
+## Modelling
+### <large>James Hollway</large>
+
+---
+
+class: center, middle
+
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.encyclopediaofmath.org%2Flegacyimages%2Fcommon_img%2Fe036910a.gif&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn4.iconfinder.com%2Fdata%2Ficons%2Fevil-icons-user-interface%2F64%2Fdownload-512.png&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fd%2Fdf%2FTwo_Parallel_lines.svg%2F200px-Two_Parallel_lines.svg.png&amp;f=1&amp;nofb=1)]]
+
+
+
+---
+background-image: url(https://upload.wikimedia.org/wikipedia/commons/d/d1/Swiss_children.jpg)
+background-size: 105% 105%
+
+---
+class: center
+
+
+```r
+library(table1)
+data("swiss", package = 'Zelig')
+table1::table1(~. , swiss)
+```
+
+<div class="Rtable1"><table class="Rtable1">
+<thead>
+<tr>
+<th class='rowlabel firstrow lastrow'></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Overall<br><span class='stratn'>(n=47)</span></span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>Fertility</span></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>70.1 (12.5)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Median [Min, Max]</td>
+<td class='lastrow'>70.4 [35.0, 92.5]</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>Agriculture</span></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>50.7 (22.7)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Median [Min, Max]</td>
+<td class='lastrow'>54.1 [1.20, 89.7]</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>Examination</span></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>16.5 (7.98)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Median [Min, Max]</td>
+<td class='lastrow'>16.0 [3.00, 37.0]</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>Education</span></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>11.0 (9.62)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Median [Min, Max]</td>
+<td class='lastrow'>8.00 [1.00, 53.0]</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>Catholic</span></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>41.1 (41.7)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Median [Min, Max]</td>
+<td class='lastrow'>15.1 [2.15, 100]</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>Infant.Mortality</span></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>19.9 (2.91)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Median [Min, Max]</td>
+<td class='lastrow'>20.0 [10.8, 26.6]</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+---
+class: center, middle
+# Nonlinearity
+
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.encyclopediaofmath.org%2Flegacyimages%2Fcommon_img%2Fe036910a.gif&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleoff[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn4.iconfinder.com%2Fdata%2Ficons%2Fevil-icons-user-interface%2F64%2Fdownload-512.png&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleoff[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fd%2Fdf%2FTwo_Parallel_lines.svg%2F200px-Two_Parallel_lines.svg.png&amp;f=1&amp;nofb=1)]]
+
+---
+## Defining nonlinearity
+
+Recall that ordinary least squares (OLS) regression is a *linear* regression model.
+
+`$$Y =\alpha + \beta _{1}X_{1} + \beta _{2}X_{2} + \cdots + \beta _{k}X_{k} + \varepsilon$$`
+
+In statistics, the functional form (defining characteristic) of a regression model is *linear* when:
+- all terms in the model are either the constant or an independent variable multiplied by a parameter
+- the coefficients \\(\beta\\)s and the error term \\(\varepsilon\\) are only added together 
+
+This makes \\(Y\\) a linear function of \\(X\\) and \\(\varepsilon\\), or “linear in its parameters”, thus allowing relatively straightforward estimation of the parameters.
+
+Obvs linear regression is therefore not appropriate when the relationship between variables is *nonlinear*.
+
+Note that we are _not_ saying that the dependent variable must be linear. It is the relationship between dependent variable on the one hand and independent variables and error term on the other hand that must be linear.
+
+&lt;!-- Related: The Difference Between Linear and Nonlinear Regression and How to Specify a Regression Model --&gt;
+
+---
+## Diagnosing non-linearity
+
+.pull-left[
+To detect nonlinearity, I'm going to create a quick function that will show us what we're missing:
+
+
+```r
+library(ggplot2); library(gridExtra)
+
+plotpreds &lt;- function(model, data){
+p1 &lt;- ggplot(model, aes(.fitted, .resid)) + 
+  geom_point() + 
+  stat_smooth(method="loess") + 
+  geom_hline(yintercept=0, col="red") + 
+  xlab("Predicted") + ylab("Residuals") + 
+  ggtitle("Residuals vs. Predicted Values")
+
+df_plt &lt;- data.frame("fitted" = fitted(model), 
+                  "observed" = data$Fertility)
+
+p2 &lt;- ggplot(df_plt, aes(x=fitted, y=observed)) + 
+  geom_point() + stat_smooth(method="loess") + 
+  geom_abline(intercept = 1, col="red") + 
+  xlab("Predicted") + ylab("Observed") + 
+  ggtitle("Observed vs. Predicted Values")
+
+grid.arrange(p1, p2, ncol=2)
+}
+```
+]
+
+.pull-right[
+
+
+```r
+cath &lt;- lm(Fertility ~ Catholic, swiss)
+plotpreds(cath, swiss)
+```
+
+&lt;img src="STAT_L2_Modelling_files/figure-html/nonlinearity-1.png" width="504" /&gt;
+
+Points should be symmetrically distributed around red line in both cases (with constant variance: next week).
+A 'bowed' pattern indicates the model makes systematic errors, over- or underpredicting in some parts.
+]
+
+---
+## So what if there's nonlinearity?
+
+If there is a pattern to observations (i.e., not just due to inherent variation), but the pattern is *not linear*,
+then using linear regression to describe relationships that are curvilinear can lead to:
+- underestimating true association (i.e. biased estimates of the parameters)
+- serious prediction errors, especially out-of-sample (data not used in fitting/training the model)
+
+The model expects catholicism to increase fertility, but while that might be generally true,
+it seems that there are some communes that are not very catholic but nonetheless moderately fertile:
+Grandson, Paysd'enhaut, and Oron.
+
+It means that for different values of catholicism, the slope of the line is different:
+while catholicism is generally associated with fertility, 
+at first a drop in catholicism can lead to higher fertility,
+and then an increase in catholicism leads to higher fertility.
+
+This suggests that this relationship is _nonlinear_.
+
+---
+## Dealing with non-linearity
+
+Fortunately, not that difficult to deal with non-linear relationships, even within a linear model family:
+
+1. Squared terms 
+  - a transformation by including the square (root) of an independent variable as an additional variable
+1. Logged terms
+  - another transformation, usually of an independent variable
+1. Adding features that were not considered before
+  - e.g. interactions
+1. Nonlinear regression
+  - lets us fit a squiggly line to the data...
+
+---
+### 1. Squared terms
+
+.pull-left[
+
+The most commonly used way to take account of non-linearity is to use polynomial regression, such as a quadratic model:
+
+`$$Y =\alpha + \beta _{1}X_{1} + \beta _{2}X_{1}^{2} + \varepsilon$$`
+
+Note while \\(X^2\\) is raised to the power of 2, model still _linear in its parameters_.
+
+
+```r
+cath2 &lt;- lm(Fertility ~ Catholic + 
+                I(Catholic^2), swiss)
+```
+
+]
+
+.pull-right[
+
+&lt;img src="STAT_L2_Modelling_files/figure-html/squared-1.png" width="504" /&gt;
+
+]
+
+---
+#### Interpreting squared terms
+
+.pull-left[
+
+\\(X^2\\) term being statistically significant is evidence that relationship indeed non-linear.
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;70.96&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;65.40&amp;nbsp;&amp;ndash;&amp;nbsp;76.52&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.67&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.13&amp;nbsp;&amp;ndash;&amp;nbsp;-0.20&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.006&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic^2&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.01&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.00&amp;nbsp;&amp;ndash;&amp;nbsp;0.01&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;0.389 / 0.362&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+]
+
+.pull-right[
+
+Terms that rely on same underlying variable _must_ be interpreted together.
+- \\(\beta_2\\) is interpreted as showing the marginal effect of one unit change in x with the level of x itself.
+- Depending on the value of \\(\beta_2\\) the function will be convex (if \\(\beta_2 &lt; 0\\)) or concave (if \\(\beta_2 &gt; 0\\)).
+- what if both parameters have the same direction? Positive or negative?
+
+Since \\(\beta_1 &lt; 0 \\) and \\(\beta_2 &gt; 0 \\), the marginal effect of x on y starts negative and then goes up, becoming positive for large values of x.
+
+]
+
+---
+### 2. Logged terms
+
+.pull-left[
+
+Another option is to take the log of an independent variable:
+
+`$$Y =\alpha + \beta _{1}log(X_{1}) + \varepsilon$$`
+
+If log-scale, then \\(2-1 = 4-2 = 8-4 = ...\\)
+- this bunches up high values relative to low values
+- can convert nonlinear X,Y relationship close to linear log(X), Y relationship
+- especially useful when relationship looks like an exponential function
+
+Again, note that the model still _linear in its parameters_.
+
+
+```r
+cathl &lt;- lm(Fertility ~ log(Catholic), swiss)
+```
+
+]
+
+.pull-right[
+
+&lt;img src="STAT_L2_Modelling_files/figure-html/logged-1.png" width="504" /&gt;
+
+In this case, just seems to have shifted the 'bow'.
+
+]
+
+---
+#### Interpreting logged terms
+
+.pull-left[
+
+The effect is significant, but certainly not as well-fitting as the quadratic model (we'll come back to fit later).
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;61.15&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;53.11&amp;nbsp;&amp;ndash;&amp;nbsp;69.19&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic [log]&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;3.08&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.60&amp;nbsp;&amp;ndash;&amp;nbsp;5.56&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.016&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;0.122 / 0.102&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+]
+
+.pull-right[
+
+Careful with interpretation though (log(X) ≠ X):
+- if \\(Y = \alpha + \beta_1 log(X), \beta_1\\) interpreted as change in Y for 1 percentage in X
+- if \\(log(Y) = \alpha + \beta_1 log(X), \beta_1\\) interpreted as percentage change in Y for 1 percentage in X
+
+Be very careful extrapolating from these models, as they can easily go beyond bounds of plausibility...
+
+Note that log(0) and e.g. log(-1) undefined.
+- if just a few 0s, add 1 to all scores (log(1) = 0)
+- if negative, maybe rescale variable but careful with interpretation
+
+]
+
+---
+### 3. Interaction terms
+
+.pull-left[
+
+Interaction terms _can_ also help with nonlinearity:
+
+`$$Y =\alpha + \beta _{1}X_{1} + \beta _{2}X_{2} + \beta _{3}X_{1}X_{2} + \varepsilon$$`
+
+Any combination of binary and continuous variables.
+
+Though involve multiplications, _terms_ still additive.
+
+\\(&gt;1\\) interaction possible, but difficult to interpret.
+
+
+```r
+cathi &lt;- lm(Fertility ~ Catholic * Education, 
+            swiss)
+```
+
+Note though that this only helps if main effects of both variables are linear.
+
+Mismodelling main effect may introduce spurious interactions
+
+]
+
+.pull-right[
+
+&lt;img src="STAT_L2_Modelling_files/figure-html/interaction-1.png" width="504" /&gt;
+
+Remember, always interpret effects with the same underlying variables together:
+- marginal effect of \\(x_1\\) is \\(b_1 + b_3 x_2\\)
+- marginal effect of \\(x_2\\) is \\(b_2 + b_3 x_1\\)
+- if \\(\beta_1\\) significant, then \\(x_1\\) effect on Y when \\(x_2 = 0\\)
+- if \\(\beta_1\\) not significant, then no \\(x_1\\) effect on Y when \\(x_2 = 0\\)
+
+]
+
+???
+
+For nonlinear relationships, consider multivariable fractional polynomials interactions (MFPI)
+
+---
+
+.pull-left-1[
+
+#### Interpreting interaction terms
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;70.94&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;64.67&amp;nbsp;&amp;ndash;&amp;nbsp;77.20&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.18&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.07&amp;nbsp;&amp;ndash;&amp;nbsp;0.29&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.002&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Education&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.43&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.95&amp;nbsp;&amp;ndash;&amp;nbsp;0.10&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.108&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic * Education&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.01&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.02&amp;nbsp;&amp;ndash;&amp;nbsp;0.00&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.119&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+No statistically significant interaction, 
+so could ignore/drop interaction or test whether linear combination of effects together are significant...
+
+]
+
+.pull-right-2[
+.tiny[
+
+
+```r
+library(multcomp)
+summary(glht(cathi, 
+          linfct = c("Catholic + Catholic:Education = 0")))
+```
+
+```
+## 
+## 	 Simultaneous Tests for General Linear Hypotheses
+## 
+## Fit: lm(formula = Fertility ~ Catholic * Education, data = swiss)
+## 
+## Linear Hypotheses:
+##                                    Estimate Std. Error t value Pr(&gt;|t|)   
+## Catholic + Catholic:Education == 0  0.17462    0.04966   3.516  0.00105 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## (Adjusted p values reported -- single-step method)
+```
+
+
+```
+## 
+## 	 Simultaneous Tests for General Linear Hypotheses
+## 
+## Fit: lm(formula = Fertility ~ Catholic * Education, data = swiss)
+## 
+## Linear Hypotheses:
+##                                     Estimate Std. Error t value Pr(&gt;|t|)  
+## Education + Catholic:Education == 0   -0.437      0.255  -1.714   0.0938 .
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## (Adjusted p values reported -- single-step method)
+```
+
+]
+]
+
+???
+
+...if we were to interpret, would mean that with every extra unit of education,
+expect to see less fertility by catholicism.
+
+Important to test whether the marginal effect x1 on y at different values of x2 is significant.
+
+If b1 &gt; 0 (i.e. positive), bint &lt; 0 (i.e. negative), and both are p&lt;0.05, then it might be that once x2 &gt; 0, b1 becomes insignificant.
+
+Solution: Set x2 to its mean and test if b1 + bint(x2) ≠ 0.
+
+---
+class: center
+
+&lt;img src="STAT_L2_Modelling_files/figure-html/interPlot-1.png" width="720" /&gt;
+
+---
+## Nonlinearity summary
+
+- Nonlinearity is a serious but relatively easily remediable issue for most linear models.
+
+- Most common solution is to include a squared term as this is especially good at accounting for the relationship when the slope goes up and down.
+
+- Where the curvilinear relationship is particularly pronounced and behaves in an exponential-like manner, include a log of the X variable.
+
+- Interactions can help, but only if main effects are linear.
+
+- There are also more sophisticated methods for deadling with nonlinearity, some of which are beyond this course...
+
+---
+class: center, middle
+# Endogeneity
+
+.pull-1[.circleoff[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.encyclopediaofmath.org%2Flegacyimages%2Fcommon_img%2Fe036910a.gif&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn4.iconfinder.com%2Fdata%2Ficons%2Fevil-icons-user-interface%2F64%2Fdownload-512.png&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleoff[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fd%2Fdf%2FTwo_Parallel_lines.svg%2F200px-Two_Parallel_lines.svg.png&amp;f=1&amp;nofb=1)]]
+
+---
+## Defining endogeneity
+
+I'm going to talk about two sets of assumptions here:
+
+1. All independent variables are uncorrelated with the error term
+  - remember that the error term is supposed to represent unpredictable random error
+  - if an indepedendent variable is correlated with the error term, then we could use that independent variable to predict errors
+  - there are three types of this kind of endogeneity...
+
+--
+
+1. Observations of the error term are uncorrelated with each other
+  - remember that the error term is supposed to represent unpredictable random error
+  - if one observation is correlated with another observation, say an observation is more positive than expected and this systematically increases the probability that the following observation is also positive
+  - this problem known generally as autocorrelation
+
+---
+## When is the exogeneity assumption violated?
+
+The features and residuals are uncorrelated
+
+1. **measurement error** -&gt; *attenuation bias*
+  - X causes Y, but we cannot observe X and Z (which we observe) is influence by X but also by Y
+  - does higher income both decrease child mortality and fertility rates?
+1. **instantaneous/reverse causation** -&gt; *simultaneity bias*
+  - X influences Y, but Y reinforces X too
+  - does child mortality lead to higher fertility rates, vice versa, or both?
+1. **omitted variables** -&gt; *selection bias*
+  - Z causes both X and Y fairly contemporaneously
+  - does education both decrease child mortality and lower fertility rates?
+
+Actually selection bias is *the* problem in observational research that undermines causal inference.
+Measurement error and instantaneous causation can be posed as problems of omitted variables.
+
+---
+## Example: Salary and education
+
+Omitted variable bias (OVB) is one of the most common and vexing problems in ordinary least squares regression. 
+
+&lt;!-- https://www.albany.edu/faculty/kretheme/PAD705/SupportMat/OVB.pdf --&gt;
+
+OVB occurs when a variable that is correlated with both the dependent and one or more included independent variables is omitted from a regression equation. 
+
+Our regression equation is:
+
+$$ Salary_i = β0 + β1education_i + ε_i$$
+
+In this case, our included independent variable is “education.” 
+However, salary is also likely to be related to innate “ability”, which has been excluded (possibly because there is no good way to measure it). 
+Ability, we would expect, is also related to the amount of education a person chooses to get – those with greater ability seek more education. 
+
+When we have data on multiple variables, we can see the manifestation of OVB by introducing variables one at a time and seeing how much the value of the coefficient changes. We can also use graphical methods to look for evidence of OVB. Below, we return to the salary example from gender.dta. Here, we begin with a regression of salary and age.
+
+---
+## The OVB Triangle
+
+.pull-left[
+An “OVB Triangle” exists when there exists a third variable that is 
+- not currently in the model, and is 
+- correlated with both the independent and dependent variable
+]
+
+.pull-left[
+<div id="htmlwidget-50aa19accf8c984276b3" style="width:504px;height:504px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-50aa19accf8c984276b3">{"x":{"diagram":"\ndigraph boxes_and_circles {\nnode [shape = circle]\nAbility; Salary; Grades\n\nAbility->Salary [label = \"  r ≠ 0\"]; \nGrades->Salary [label = \"  r ≠ 0\"];\nAbility->Grades [label = \"  r ≠ 0\"];\n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+]
+
+---
+## Diagnosing ommitted variable bias
+
+.pull-left[
+
+### 1. Plotting residuals
+
+One place to look for evidence of OVB are the residuals.
+
+If there seems to be a pattern of residuals becoming smaller or larger,
+this would be prima facie evidence of OVB.
+
+From this plot... _maybe_.
+
+]
+
+.pull-right[
+
+
+```r
+plotpreds(cath2, swiss)
+```
+
+&lt;img src="STAT_L2_Modelling_files/figure-html/ovbresid-1.png" width="504" /&gt;
+
+]
+
+---
+### 2. Ramsey RESET test
+
+The RESET test is a popular diagnostic for correctness of the specification of a linear model.
+Basically, it sees whether nonlinear combinations of the explanatory variables have any power in explaining the response variable.
+
+If they do (established using an F-test, see below), then the model is misspecified in the sense that there might be some missing variable (e.g. an OV) or a polynomial or other nonlinear functional form would be a better fit.
+
+
+```r
+library(lmtest)
+resettest(cath2, type = "fitted")
+```
+
+```
+## 
+## 	RESET test
+## 
+## data:  cath2
+## RESET = 2.3524, df1 = 2, df2 = 42, p-value = 0.1076
+```
+
+```r
+resettest(cath2, type = "regressor")
+```
+
+```
+## 
+## 	RESET test
+## 
+## data:  cath2
+## RESET = 4.2654, df1 = 4, df2 = 40, p-value = 0.00573
+```
+
+---
+### 3. Testing correlations between IVs and residuals
+
+Or we could check the Pearson correlation between each feature and the residuals.
+Then report the p-value for testing the lack of correlation between the two considered series.
+
+
+```r
+for (i in 1:(dim(swiss)[2])){
+cor_test &lt;- cor.test(swiss[, i], cath2$residuals)
+print(paste(colnames(swiss)[i],
+            '--- correlation:', as.character(round(cor_test$estimate,2)),
+            ', p-value:', as.character(round(cor_test$p.value,3)), sep = " ", collapse = NULL))
+}
+```
+
+```
+## [1] "Fertility --- correlation: 0.78 , p-value: 0"
+## [1] "Agriculture --- correlation: -0.06 , p-value: 0.68"
+## [1] "Examination --- correlation: -0.29 , p-value: 0.047"
+## [1] "Education --- correlation: -0.41 , p-value: 0.004"
+## [1] "Catholic --- correlation: 0 , p-value: 1"
+## [1] "Infant.Mortality --- correlation: 0.49 , p-value: 0.001"
+```
+
+Looks like there might be some further candidate features here... You can test each one so:
+
+
+```r
+cor.test(swiss$Education, cath2$residuals)
+```
+
+
+???
+
+We can reject the null hypothesis (that there is a lack of correlation) for several pairs,
+and cannot reject the null hypothesis for a couple of others. Which ones?
+
+Low p-values suggest we can reject the null hypothesis that the true correlation is 0.
+
+This provides some evidence of potential OVB.
+
+If adding in variables that could be correlated with both catholicism and the residuals changes the coefficient for catholicism by more than about 3-5%, then this is indicative of OVB.
+
+A reasonable supposition would be that we are still missing a key variable.
+
+---
+## So what if there's ommitted variable bias?
+
+Violating this assumption biases the coefficient estimate. To understand why this bias occurs, keep in mind that the error term always explains some of the variability in the dependent variable. However, when an independent variable correlates with the error term, OLS incorrectly attributes some of the variance that the error term actually explains to the independent variable instead. For more information about violating this assumption, read my post about confounding variables and omitted variable bias.
+
+- If any are present, `\(E[\varepsilon_i|x_i] \neq 0\)` and your estimates are biased, no matter how many observations (this is called inconsistent)
+- `\(\therefore\)` whatever point estimates we find, we can't even tell if they are positive or negative, significant or insignificant, because we do not know the size of the bias and no way to estimate the size of the bias.
+
+The amount of OVB depends on how large those correlations are – if any one of them is relatively small, then very little bias will be generated.
+
+To understand why such regressions are biased, we must back-track to the Gauss-Markov Conditions. One of the least-realistic GM Conditions is the requirement that independent variables be non-stochastic – that they not be derived from a sample. In almost all social research, both the dependent and independent variables are measured through samples. If the independent variables are non-stochastic, there is no correlation between the error term and the independent variables, which greatly simplifies the math that proves that our estimate of β is unbiased. When the independents are stochastic, we can no longer be sure the estimate of β is unbiased. The reason this matters is that our derivation of expected value of β depended on the independents being non-stochastic (see the handout “Properties of OLS Estimators Under Hetereoskedascity”). When this assumption fails, the expected value contains a second term:
+
+Omitted Variable Bias
+ ˆ
+E[β ] = E[β +
+i i ∑(Xi−X)
+] E[β]=β+E[ Cov(X,ε) ]
+∑(Xi−X)
+The only way for our estimate to be unbiased is for cov(X,ε) to be equal to zero.
+
+both the included independent variable and the dependent variable. Now, recall that this omitted variable
+and included independent variable are correlated with one another – as the omitted variable gets bigger,
+the included independent gets bigger, or if the omitted variable gets smaller then the included independent
+variable gets smaller (assuming positive correlation). If that is the case, then the amount of “extra”
+distance between Y and ˆ created by leaving out the omitted variable will also be correlated with the iYi
+included variable. Hence, there will be correlation between the included independent variable and the error term, creating bias.
+The nature of the bias on the included independent variables depends on the nature of the correlation between (a) the dependent and the excluded variable and (b) the included and excluded independent variables. If Y is the dependent variable, X1 is the included independent and X2 is the excluded independent, then the coefficient on X1, β1, will be biased in the following manner if X2 is excluded from the regression:
+∑ε (X −X)2
+
+---
+#### Why would leaving out a variable correlated to both the dependent and an included independent create covariance between the independent and error term? 
+
+So far, we have thought of the error term as a random “add-on” to our regression equation 
+  – God dips into a basket and adds or subtracts something from our salary, level of education, etc. The basket contains chits; there are more chits with zero or small numbers on them than large numbers, though every number from positive to negative infinity is possible. The distribution of possible additions and subtractions follows the normal distribution. The error term captures life’s inherently random changes to outcomes
+
+However, the error term is also defined as the difference between the actual observations (Yi) – what we actually earn – and the predicted line found via regression ( ˆ ) – what our regression says we should earn. 
+
+If we omit a variable that is correlated with both an included independent and the dependent variable, we will increase the size of the distance between Y and ˆ – our regressions will “fit” less well.
+iYi
+The “amount” that the error term gets larger depends on the relationship between the omitted variable and
+Yi
+
+Negative correlation, Y and X2 Positive correlation, Y and X2
+Negative correlation, X1 and X2
+β1 is overestimated β1 is underestimated
+Positive correlation, X1 and X2
+β1 is underestimated β1 is overestimated
+
+---
+## Dealing with endogeneity
+
+### 1. Instrumental variables (IV)
+  - An instrumental variable is strongly correlated with the explanatory variable that has problems with endogeneity (a _strong first stage_) and is not itself correlated with the error term (the _exclusion restriction_), conditional on all other covariates.
+  - E.g. Acemoglu, Johnson and Robinson (2001): good institutions =&gt; economic development, _but_ economic development =&gt; good institutions?
+    Try instrumental variable: 
+      - strong first stage: settler mortality rates (exogenous: disease environments) =&gt; colonization strategies =&gt; modern institutions =&gt; economic development
+      - exclusion restriction: settler mortality rates ≠&gt; economic development
+      - e.g. high African mortality deterred all except those interested in imposing predatory institutions, whereas low North American mortality attracted droves of migrants that demanded institutions of equal rights. Institutions persisted in both cases, but only the latter resulted in long-run economic growth.
+  - Creativity required to identify appropriate instrumental variables, and sometimes impossible.
+  
+---
+
+.pull-left[
+### 2. Difference-in-difference (DID)
+  - A difference-in-difference design is also quasi-experimental, but relies on an assumption that you can identify a (quasi) treatment and control group and that you have two or more panel waves. 
+  - Assumption that development of the two groups from pre to post would have been parallel _but for_ the causal impact of the treatment.
+
+### 3. Ignore?
+  - Not advisable because OLS inconsistent
+  - But bounded rationality: cannot identify all variables potentially correlated with IVs and DV and, even if, many difficult to measure
+  - Since bias decreases as covariance between OV and IV decreases, can live with a little bias...
+
+]
+
+.pull-right[
+
+![](https://upload.wikimedia.org/wikipedia/commons/d/da/Illustration_of_Difference_in_Differences.png)
+
+]
+
+---
+## Defining autocorrelation
+
+Autocorrelation or serial correlation is related to problems of endogeneity,
+but instead of the errors being correlated with an independent variable,
+they are correlated with themselves.
+
+Imagine our predictor of the weather is the season. 
+We don’t predict that it will be sunny in winter.
+_But_ if it is sunny on 24 Feb (so we have a large residual), 
+it’s likely to be sunny on 25 Feb (and again we have a large residual). 
+When one residual is high, next one also likely to be high.
+
+Serial/autocorrelation common in panel data (observations of same entity over time e.g. country-year designs, actor-month, etc.), but also spatial and structural (i.e. network) data.
+
+---
+
+.pull-left[
+
+### 1. Visualise with acf plot
+
+The easiest way to visually diagnose autocorrelation is using an autocorrelation function (ACF) plot.
+
+The ACF plot shows us how correlated observations or residuals are with those at different lags.
+- if not time-series data, then row number is used
+- x-axis corresponds to the lags of the residual, increasing in steps of 1
+- leftmost line shows correlation of residual with itself (Lag0), therefore always =1
+
+If values are significantly correlated with lagged values, then there is autocorrelation.
+- if not autocorrelated, lag1 onwards will drop beneath blue bounds (ideally randomly distributed)
+- significant correlations lie beyond the blue bounds
+
+]
+
+.pull-right[
+
+
+```r
+library(forecast)
+ggAcf(cath2$residuals)
+```
+
+&lt;img src="STAT_L2_Modelling_files/figure-html/acf-1.png" width="504" /&gt;
+
+&lt;img src="STAT_L2_Modelling_files/figure-html/acf2-1.png" width="504" /&gt;
+
+]
+
+???
+
+Do we observe autocorrelation here?
+
+Looks like very weak autocorrelation in the residuals of our cath2,
+but looks like strong autocorrelation in the observations of air passengers (and maybe seasonality?).
+
+---
+
+.pull-left-1[
+
+### 2. Durbin-Watson test
+
+The Durbin-Watson (DW) test tests significant residual autocorrelation at lag 1. 
+
+The DW test statistic is approximately equal to \\(2(1-a)\\), where \\(a\\) is the lag 1 residual autocorrelation. 
+
+Some notes on the Durbin-Watson test:
+- test statistic always has a value between 0 and 4
+- \\(2\\) means no autocorrelation in the sample
+- \\(&lt; 2\\) indicates positive autocorrelation
+- \\(&gt; 2\\) indicates negative autocorrelation
+
+]
+
+.pull-right-2[
+
+
+```r
+lmtest::dwtest(cath)
+```
+
+```
+## 
+## 	Durbin-Watson test
+## 
+## data:  cath
+## DW = 0.90423, p-value = 1.156e-05
+## alternative hypothesis: true autocorrelation is greater than 0
+```
+
+```r
+lmtest::dwtest(cath2)
+```
+
+```
+## 
+## 	Durbin-Watson test
+## 
+## data:  cath2
+## DW = 0.92734, p-value = 1.155e-05
+## alternative hypothesis: true autocorrelation is greater than 0
+```
+
+Looks like we can reject the null hypothesis of no autocorrelation,
+and it looks like there is indeed some positive autocorrelation at lag1.
+
+]
+
+---
+
+.pull-left-1[
+
+### 3. Runs test
+
+Unlike the Durbin-Watson test, which only tests whether there is autocorrelation at lag 1,
+the Wald–Wolfowitz runs test assesses the distribution of the length of runs.
+
+The run test is based on the null hypothesis that each element in the sequence is independently drawn from the same distribution
+
+]
+
+.pull-right-2[
+
+
+```r
+library(lawstat)
+runs.test(cath$residuals)
+```
+
+```
+## 
+## 	Runs Test - Two sided
+## 
+## data:  cath$residuals
+## Standardized Runs Statistic = -1.9149, p-value = 0.0555
+```
+
+```r
+runs.test(cath2$residuals)
+```
+
+```
+## 
+## 	Runs Test - Two sided
+## 
+## data:  cath2$residuals
+## Standardized Runs Statistic = -4.2757, p-value = 1.906e-05
+```
+
+Looks like we cannot reject the hypothesis that there are random runs/sequences for our basic catholicism model,
+and can safely assume that residuals are not autocorrelated there,
+but it looks like there is a definite pattern to the residuals in the quadratic model.
+
+]
+
+---
+## So what if there's autocorrelation?
+
+Moderate autocorrelation reduces the precision of OLS estimates.
+
+Extreme autocorrelation can also signal a badly misspecified model:
+- e.g. violation of linearity assumption (underlying exponential growth model will present autocorrelation)
+- or bias due to omitted variables
+That is, there could be a violation of the linearity assumption (an underlying exponential growth model will present autocorrelation) or due to bias that is explainable by omitted variables (interaction terms or dummy variables for identifiable conditions).
+
+Possible in both time-series models -- current value depends on previous (historic) values -- and non-time-series models -- current value depends on spatially or structurally adjacent values.
+
+---
+## Dealing with autocorrelation
+
+.pull-left[
+
+If DW &lt; 1, possibly model misspecification:
+- adding lags of variables using the `slide()` function in `DataCombine` package
+- stationarize time-series variables by differencing, logging, and/or deflating
+- account for seasonal components using dummy variables or seasonally adjust variables
+- add variables that may capture this information (like with endogeneity):
+  - temporal effects
+  - spatial effects
+  - structural (network) effects
+
+In DW &gt; 3, some variables possibly overdifferenced:
+- include a linear (trend) term for consistent increasing/decreasing pattern in the residuals
+- use Generalized Least Squares
+
+]
+
+.pull-right[
+
+Mixed models:
+- Fixed effects (FE) controls for entity-specific time-invariant characteristics we cannot observe or quantify (ex: culture, religion, gender, race)
+  - good for studying changes within an entity over time.
+- Random effects (RE) used when we suspect variation between entities is random and is an important determinant of our DV; can include entity specific time-invariant characteristics
+  - good for studying changes across entities over time.
+  
+Autocorrelation can be treated as a _nuisance_ or a _feature_.
+
+May need to be creative; more like art than algorithm.
+
+]
+
+---
+class: center, middle
+# Multicollinearity
+
+.pull-1[.circleoff[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.encyclopediaofmath.org%2Flegacyimages%2Fcommon_img%2Fe036910a.gif&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleoff[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn4.iconfinder.com%2Fdata%2Ficons%2Fevil-icons-user-interface%2F64%2Fdownload-512.png&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fd%2Fdf%2FTwo_Parallel_lines.svg%2F200px-Two_Parallel_lines.svg.png&amp;f=1&amp;nofb=1)]]
+
+---
+## Defining multicollinearity
+
+Multicollinearity means that independent variables we are interested in are closely related.
+
+This contravenes the assumption that no independent variable is a perfect linear function of other explanatory variables, i.e. that all features are linearly independent/ we cannot predict one feature from another.
+- E.g. X1 = 2 + 3 * X2 violates the assumption
+
+Say we are interested in EU elections and ask respondents also whether they like common foreign policy and common defence policy (e.g. ordinal scale).
+- these are likely to be (positively) correlated
+- this makes it difficult to work out what happens when foreign policy goes up and defence stays the same
+
+Unfortunately, this is a common problem in social science, because our concepts/variables often overlap.
+
+---
+## Diagnosing multicollinearity
+
+### 1. High \\(R^2\\) but no statistically significant variables
+
+.pull-left[
+
+
+```r
+lin_reg &lt;- lm(Fertility ~ ., swiss)
+tab_model(lin_reg, show.obs = FALSE)
+```
+
+  - but this is really just suggestive...
+  - and doesn't seem to be a problem here
+]
+
+.pull-right[
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;66.92&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;45.29&amp;nbsp;&amp;ndash;&amp;nbsp;88.54&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Agriculture&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.17&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.31&amp;nbsp;&amp;ndash;&amp;nbsp;-0.03&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.019&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Examination&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.26&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.77&amp;nbsp;&amp;ndash;&amp;nbsp;0.25&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.315&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Education&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.87&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.24&amp;nbsp;&amp;ndash;&amp;nbsp;-0.50&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.10&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.03&amp;nbsp;&amp;ndash;&amp;nbsp;0.18&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.005&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Infant.Mortality&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.08&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.31&amp;nbsp;&amp;ndash;&amp;nbsp;1.85&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.007&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;0.707 / 0.671&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+]
+
+---
+### 2. High correlations between IVs
+
+.pull-left[
+Obviously if variables are highly correlated, then there is multicollinearity
+
+A nice, visual way to check is using a _correlogram_
+
+
+```r
+library(ggcorrplot)
+ggcorrplot(cor(swiss[, -1]), type = "lower", 
+           p.mat = cor_pmat(swiss[, -1]))
+```
+
+Watch out in particular for "dummy variable trap":
+- unless you exclude a reference category, there will be perfect correlation between the dummy variables and the constant
+]
+
+.pull-right[
+
+&lt;img src="STAT_L2_Modelling_files/figure-html/corrplot-1.png" width="504" /&gt;
+
+]
+
+---
+### 3. High variance inflation factors
+
+.pull-left[
+
+A variable's VIF is calculated as 
+
+$$ VIF = 1 / (1-R^2) $$
+
+where \\(R^2\\) is for the model regressing X on all other predictors.
+
+This is proportional to how much larger X's SE would be if it were uncorrelated with all other features.
+
+Practically, highly correlated variables each have high VIFs
+  - lower VIFs are better
+  - if no features correlated, then all VIFs = 1
+  - a high VIF means the information in that variable is already provided by other variables in the model and is thus redundant
+  
+]
+
+.pull-right[
+
+
+```r
+library(car)
+t(t(vif(lin_reg)))
+```
+
+```
+##                      [,1]
+## Agriculture      2.284129
+## Examination      3.675420
+## Education        2.774943
+## Catholic         1.937160
+## Infant.Mortality 1.107542
+```
+
+We conventionally use a threshold of 4 for identifying candidates for exclusion
+  - i.e. that 75% of the variance in that IV is explained by the other IVs
+  - since 1/(1-0.75) = 1/0.25 = 4
+  
+Doesn't seem to be too much of a problem with multicollinearity here fortunately...
+]
+
+---
+## So what if there's multicollinearity?
+
+_Perfect correlation_ (+1 or -1) is a show stopper...
+- any statistical software will simply break because it cannot find any way to distinguish these variables.
+- suggests variables are different forms of the same variable
+  - e.g. games won and games lost (-1)
+  - e.g. temperature in Fahrenheit and temperature in Celsius (+1)
+- you must remove one of the variables from the model or _you shall not pass!_
+
+_Imperfect but strong correlations_ in OLS models can be fit, but:
+- estimates less efficient/precise (but still unbiased)
+- SEs will be high and it will be difficult to discern statistically significant results
+- estimates will be highly sensitive to particular sets of data
+- makes it more difficult to interpret regression coefficients since variables (kind of) move together
+
+---
+## Dealing with multicollinearity
+
+1. Just exclude one of the highly correlated independent variables
+  - say the one with the highest VIF
+  – makes sense when the causal relationships are quite clear
+  - may need to do this several times
+1. Make a scale/factor out of highly correlated independent variables
+  - use principal component analysis (PCA) to reduce features to a smaller set of uncorrelated components
+  – makes sense when there is an underlying/latent variable that we haven’t measured
+  - requires additional expertise and can make interpreting effects of individual IVs difficult
+1. Get more data/variables
+  - sometimes easier said than done...
+1. Do nothing
+  - report \\(R^2\\) and \\(F\\) statistics and explain joint significance of the IVs in the model which accounts for the lack of individual significance
+
+---
+## Model fit
+
+- We've talked about when a model is the 'best', but when is it 'good'?
+
+- For linear regression, we normally use a measure called \\(R^2\\)
+  - measures proportion of variation in Y that is explained by the fitted model
+  - varies between 0 and 1, with 1 representing 'perfect' explanation
+  - increases monotonically with each additional feature
+  
+- However, sometimes \\(R^2\\) not the most useful measure of model ‘performance’
+  - High \\(R^2\\) values don’t automatically make your model a “good” model
+  - Many social science models have low R2 values
+  - We still might be interested in whether there is a relationship between X and Y though
+  - Or whether it makes sense to favour a slightly more complex model over a more parsimonious one
+
+---
+### Overfitting
+
+.pull-left[
+
+Overfitting is "analysis that corresponds too closely to a particular set of data and may therefore fail to fit additional data or predict future observations reliably".
+
+*Curve-fitting* can lead to *false precision*.
+
+To lessen the chance of, or amount of, overfitting, one can:
+- explicitly penalize overly complex models
+- test model's ability to generalize by evaluating its performance on a set of data not used for training the model, approximating the unseen data a model might encounter
+
+]
+
+.pull-right[
+
+![](https://upload.wikimedia.org/wikipedia/commons/6/68/Overfitted_Data.png)
+
+]
+
+---
+### Adjusting R2
+
+For model selection, we use adjusted \\(R^2\\), Akaike's information criterion (AIC), or Bayesian information criterion (BIC).
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="2" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility&lt;/th&gt;
+&lt;th colspan="2" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility&lt;/th&gt;
+&lt;th colspan="2" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility&lt;/th&gt;
+&lt;th colspan="2" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility&lt;/th&gt;
+&lt;th colspan="2" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col7"&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col8"&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col9"&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  0"&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  1"&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;64.43&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;70.96&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;70.94&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;48.68&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;62.10&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.14&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.67&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.006&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.18&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;0.002&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;0.10&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;0.12&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic^2&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.01&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Education&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.43&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;0.108&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;-0.76&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;-0.98&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic * Education&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.01&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;0.119&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Infant.Mortality&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;1.30&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;&lt;strong&gt;0.002&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;1.08&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;&lt;strong&gt;0.007&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Agriculture&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;-0.15&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;&lt;strong&gt;0.029&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="2"&gt;0.215 / 0.198&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="2"&gt;0.389 / 0.362&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="2"&gt;0.598 / 0.570&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="2"&gt;0.663 / 0.639&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="2"&gt;0.699 / 0.671&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;AIC&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2"&gt;364.348&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2"&gt;354.535&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2"&gt;336.882&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2"&gt;328.668&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="2"&gt;325.241&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+???
+
+Adjusted R2 is based off of the R2 value, but introduces a penalization for additional terms. 
+Higher is better.
+
+AIC (and AICc) and BIC are similar, but based on the concept of the information criterion.
+Lower is better.
+
+---
+## Model selection
+
+### Kitchen-sink
+
+I have some data, how should I analyze it? One way of analyzing data is to throw in *every* possible variable and see which were statistically significant
+
+--
+
+This is a nonsensical way to proceed, of course.
+
+--
+
+1. Just because two variables correlated, does not mean there is causation: e.g. does belief in fairies determine height?
+
+2. Moreover, every 100 variables tested results in ~5 statistically significant (at \\(\alpha = 0.05\\) level) just by chance alone.
+
+3. And then are we supposed to include every possible interaction as well? \\(k^{k-1}\\) just for 2nd-order interactions...
+
+4. Since independent variables often correlated with one another, including them all doesn't really make sense
+
+---
+### Bathwater
+
+- Generally begin with previous empirical model (or models) based on a theory (or theories)
+  - literature review important for making sure competing/alternative explanations not responsible: don't throw baby out with bathwater!
+  - basically your baseline from previous work
+- Then introduce any additional variables or interactions according to your tweak/transformed/totally new theory
+  - e.g. previous work suggests that father’s height predicts their son’s height. We think fathers that worked as miners also have shorter sons, so we include this
+
+---
+### F... When’s an Increase a Real Increase?
+
+We can test whether increases are statistically significant using something called a *F-test*
+  - This is based on a distribution called the F-distribution.
+    - F can take only nonnegative values.
+    - Distribution is skewed right.
+    - Mean is approximately equal to 1 (closer to 1 for large n).
+  - Exact shape depends on two df values:
+    - df1 = k (number of explanatory variables in model)
+    - df2 = n – (k + 1) (sample size – no. model parameters)
+  - This test tells us whether we can reject the null hypothesis that the increase in model fit is zero
+
+We are testing the collective influence of all explanatory variables in a model on Y:
+  - H0 : \\(b_1 = b_2 = ... = b_k = 0\\)
+    - (i.e., y is independent of all explanatory variables)
+  - HA: At least one \\(b ≠ 0\\)
+    - (i.e. at least one explanatory variable has an effect on y, controlling for the others in the model)
+
+---
+### Stepwise model selection
+
+A popular method for searching for a model rather than testing a particular hypothesis
+involves fitting several models and using information about them to make decisions about which features should be in the theoretical model 
+- Forward stepwise model selection starts with a minimal model and adds features
+- Backward stepwise model selection starts with a maximal model and removes features
+
+However, be careful with semi-automated model selection:
+commonly used, commonly abused.
+
+Often coupled with (mistaken) belief that _only_ statistically significant features should be retained and presented.
+- goes against principle of hypothesis testing
+- __a lack of statistical significance does not mean definitely no effect; it just means we cannot reject the hypothesis that there is no effect__
+- sometimes just an ambiguous relationship, particular if nonlinear/endogeneity/multicollinearity
+- moreover, can lose valuable predictive information from deleting marginally significant variables
+
+---
+### KISS
+
+Basically:
+- if insignificant but main feature of the theory or an alternative explanation, keep it as a control
+- if insignificant and only weak theoretical grounds for inclusion, drop it (though keep as robustness check)
+- if significant and expected sign, cool keep it
+- if significant and unexpected sign, review data, review interactions with other variables, review statistical power, review theory...
+
+Generally, KEEP IT SIMPLE STUPID (KISS)
+  - our models are meant to help us understand reality; who could keep in mind an 80 parameter model?
+  - small datasets hold less information, thus less statistical power to identify many 'true' effects
+  - unnecessary variables likely to increase VIFs and thus SEs for all variables, making everything difficult to interpret
+  - consider Christopher Achen's ART (a rule of three) imperative... do you agree?
+  - as much art as science
+
+Last words: It's ok to say that we don't know if you've tried everything and can point out what doesn't work and what might work is beyond what we have (e.g. richer dataset, better methods). You have helped us get to the field's frontier!
+
+---
+class: center, middle
+# Summary
+
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.encyclopediaofmath.org%2Flegacyimages%2Fcommon_img%2Fe036910a.gif&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn4.iconfinder.com%2Fdata%2Ficons%2Fevil-icons-user-interface%2F64%2Fdownload-512.png&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fd%2Fdf%2FTwo_Parallel_lines.svg%2F200px-Two_Parallel_lines.svg.png&amp;f=1&amp;nofb=1)]]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>`"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
