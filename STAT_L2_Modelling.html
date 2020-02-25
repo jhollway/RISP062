@@ -24,6 +24,13 @@ class: center, middle, inverse, title-slide
 
 class: center, middle
 
+.pull-1[.circleon[![](https://graduateinstitute.ch/sites/default/files/styles/medium/public/2019-01/James%20Hollway.jpg?itok=1Yw0keum)]]
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.istockphoto.com%2Fvectors%2Fgrade-a-plus-result-vector-icon-school-red-mark-handwriting-a-plus-in-vector-id1136966571%3Fk%3D6%26m%3D1136966571%26s%3D612x612%26w%3D0%26h%3DS3pDI_xutxq1nLoWAW_D3h5j9wfwkVhWe7LSoVJRA00%3D&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fc%2Fcf%2FRewind_button.svg%2F240px-Rewind_button.svg.png&amp;f=1&amp;nofb=1)]]
+
+---
+class: center, middle
+
 .pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.encyclopediaofmath.org%2Flegacyimages%2Fcommon_img%2Fe036910a.gif&amp;f=1&amp;nofb=1)]]
 .pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn4.iconfinder.com%2Fdata%2Ficons%2Fevil-icons-user-interface%2F64%2Fdownload-512.png&amp;f=1&amp;nofb=1)]]
 .pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fd%2Fdf%2FTwo_Parallel_lines.svg%2F200px-Two_Parallel_lines.svg.png&amp;f=1&amp;nofb=1)]]
@@ -606,28 +613,15 @@ Actually selection bias is *the* problem in observational research that undermin
 Measurement error and instantaneous causation can be posed as problems of omitted variables.
 
 ---
-## Example: Salary and education
+## The OVB Triangle
 
+.pull-left[
 Omitted variable bias (OVB) is one of the most common and vexing problems in ordinary least squares regression. 
 
 &lt;!-- https://www.albany.edu/faculty/kretheme/PAD705/SupportMat/OVB.pdf --&gt;
 
 OVB occurs when a variable that is correlated with both the dependent and one or more included independent variables is omitted from a regression equation. 
 
-Our regression equation is:
-
-$$ Salary_i = β0 + β1education_i + ε_i$$
-
-In this case, our included independent variable is “education.” 
-However, salary is also likely to be related to innate “ability”, which has been excluded (possibly because there is no good way to measure it). 
-Ability, we would expect, is also related to the amount of education a person chooses to get – those with greater ability seek more education. 
-
-When we have data on multiple variables, we can see the manifestation of OVB by introducing variables one at a time and seeing how much the value of the coefficient changes. We can also use graphical methods to look for evidence of OVB. Below, we return to the salary example from gender.dta. Here, we begin with a regression of salary and age.
-
----
-## The OVB Triangle
-
-.pull-left[
 An “OVB Triangle” exists when there exists a third variable that is 
 - not currently in the model, and is 
 - correlated with both the independent and dependent variable
@@ -688,15 +682,7 @@ resettest(cath2, type = "fitted")
 ```
 
 ```r
-resettest(cath2, type = "regressor")
-```
-
-```
-## 
-## 	RESET test
-## 
-## data:  cath2
-## RESET = 4.2654, df1 = 4, df2 = 40, p-value = 0.00573
+# resettest(cath2, type = "regressor")
 ```
 
 ---
@@ -746,52 +732,25 @@ If adding in variables that could be correlated with both catholicism and the re
 A reasonable supposition would be that we are still missing a key variable.
 
 ---
-## So what if there's ommitted variable bias?
+## So what if there's omitted variable bias?
 
-Violating this assumption biases the coefficient estimate. To understand why this bias occurs, keep in mind that the error term always explains some of the variability in the dependent variable. However, when an independent variable correlates with the error term, OLS incorrectly attributes some of the variance that the error term actually explains to the independent variable instead. For more information about violating this assumption, read my post about confounding variables and omitted variable bias.
+Violating this assumption biases the coefficient estimate. 
 
-- If any are present, `\(E[\varepsilon_i|x_i] \neq 0\)` and your estimates are biased, no matter how many observations (this is called inconsistent)
-- `\(\therefore\)` whatever point estimates we find, we can't even tell if they are positive or negative, significant or insignificant, because we do not know the size of the bias and no way to estimate the size of the bias.
+To understand why, remember the error term always explains some of variability in the dependent variable. 
 
-The amount of OVB depends on how large those correlations are – if any one of them is relatively small, then very little bias will be generated.
+But when an independent variable correlates with the error term, OLS incorrectly attributes some of the variance that the error term actually explains to the independent variable instead.
 
-To understand why such regressions are biased, we must back-track to the Gauss-Markov Conditions. One of the least-realistic GM Conditions is the requirement that independent variables be non-stochastic – that they not be derived from a sample. In almost all social research, both the dependent and independent variables are measured through samples. If the independent variables are non-stochastic, there is no correlation between the error term and the independent variables, which greatly simplifies the math that proves that our estimate of β is unbiased. When the independents are stochastic, we can no longer be sure the estimate of β is unbiased. The reason this matters is that our derivation of expected value of β depended on the independents being non-stochastic (see the handout “Properties of OLS Estimators Under Hetereoskedascity”). When this assumption fails, the expected value contains a second term:
+The amount of "extra" distance between Y and \\(\hat{Y}\\) created by leaving out the omitted variable will also be correlated with any included variables the OV is correlated with.
 
-Omitted Variable Bias
- ˆ
-E[β ] = E[β +
-i i ∑(Xi−X)
-] E[β]=β+E[ Cov(X,ε) ]
-∑(Xi−X)
-The only way for our estimate to be unbiased is for cov(X,ε) to be equal to zero.
+In other words, if there are omitted variables, `\(E[\varepsilon_i|x_i] \neq 0\)` which biases your estimates, no matter how many observations (this is called inconsistent).
 
-both the included independent variable and the dependent variable. Now, recall that this omitted variable
-and included independent variable are correlated with one another – as the omitted variable gets bigger,
-the included independent gets bigger, or if the omitted variable gets smaller then the included independent
-variable gets smaller (assuming positive correlation). If that is the case, then the amount of “extra”
-distance between Y and ˆ created by leaving out the omitted variable will also be correlated with the iYi
-included variable. Hence, there will be correlation between the included independent variable and the error term, creating bias.
-The nature of the bias on the included independent variables depends on the nature of the correlation between (a) the dependent and the excluded variable and (b) the included and excluded independent variables. If Y is the dependent variable, X1 is the included independent and X2 is the excluded independent, then the coefficient on X1, β1, will be biased in the following manner if X2 is excluded from the regression:
-∑ε (X −X)2
+Therefore, whatever point estimates we find, we can't even tell if they are positive or negative, significant or insignificant, because we do not know the size of the bias and no way to estimate the size of the bias.
 
----
-#### Why would leaving out a variable correlated to both the dependent and an included independent create covariance between the independent and error term? 
+Fortunately, the amount of OVB depends on how large those correlations are – if any one of them is relatively small, then very little bias will be generated.
 
-So far, we have thought of the error term as a random “add-on” to our regression equation 
-  – God dips into a basket and adds or subtracts something from our salary, level of education, etc. The basket contains chits; there are more chits with zero or small numbers on them than large numbers, though every number from positive to negative infinity is possible. The distribution of possible additions and subtractions follows the normal distribution. The error term captures life’s inherently random changes to outcomes
+???
 
-However, the error term is also defined as the difference between the actual observations (Yi) – what we actually earn – and the predicted line found via regression ( ˆ ) – what our regression says we should earn. 
-
-If we omit a variable that is correlated with both an included independent and the dependent variable, we will increase the size of the distance between Y and ˆ – our regressions will “fit” less well.
-iYi
-The “amount” that the error term gets larger depends on the relationship between the omitted variable and
-Yi
-
-Negative correlation, Y and X2 Positive correlation, Y and X2
-Negative correlation, X1 and X2
-β1 is overestimated β1 is underestimated
-Positive correlation, X1 and X2
-β1 is underestimated β1 is overestimated
+However, the error term is also defined as the difference between the actual observations (Yi) – what we actually earn – and the predicted line found via regression ( ˆ ) – what our regression says we should earn.
 
 ---
 ## Dealing with endogeneity
