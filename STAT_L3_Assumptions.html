@@ -162,9 +162,6 @@ Some guidelines for interpretation:
 
 
 ```r
-# library(ggfortify)
-# autoplot(cathe, which = 2)
-
 df_resid &lt;- data.frame(resid = cath$residuals)
 p &lt;- ggplot(df_resid, aes(sample = resid))
 p + stat_qq() + stat_qq_line()
@@ -250,17 +247,15 @@ This assumption is actually _not_ as important as that of linearity (last week).
 
 Normality is _not_ required to obtain unbiased estimates of the regression coefficients with the minimum variance. 
 
-OLS merely requires that the residuals (errors) are independent and identically distributed (later).
+So, technically, we can omit this assumption if we assume instead that the model equation is correct and our goal is to estimate the coefficients and generate predictions (in the sense of minimizing mean squared error).
 
-However, satisfying this assumption allows you to perform statistical hypothesis testing and generate reliable confidence intervals and prediction intervals. So if your research relies on the p-values or overall test of significance, check this assumption.
+--
 
-It can matter whether the residuals are normally distributed.
+However, normally we are interested in making valid inferences from the model or estimating the probability that a given prediction error will exceed some threshold in a particular direction. To do so, the assumption about the normality of residuals must be satisfied.
 
 When this assumption is violated, it causes problems with calculating confidence intervals and various significance tests for coefficients. When the error distribution significantly departs from Gaussian, confidence intervals may be too wide or too narrow.
 
-Technically, we can omit this assumption if we assume instead that the model equation is correct and our goal is to estimate the coefficients and generate predictions (in the sense of minimizing mean squared error).
-
-However, normally we are interested in making valid inferences from the model or estimating the probability that a given prediction error will exceed some threshold in a particular direction. To do so, the assumption about the normality of residuals must be satisfied.
+So satisfying this assumption allows you to perform statistical hypothesis testing and generate reliable confidence intervals and prediction intervals. So if your research relies on the p-values or overall test of significance, check this assumption.
 
 ---
 
@@ -271,7 +266,7 @@ However, normally we are interested in making valid inferences from the model or
 ...depends on what is causing the non-normality (kurtosis) in the residuals.
 
 1. outliers
-  - if outliers are the drivers of kurtosis, these will need to be removed/treated
+  - if outliers are the drivers of kurtosis, these will need to be removed/treated (later)
 1. different components
   - it two or more subsets of the data have different statistical properties, separate models might be considered
 1. nonlinearity
@@ -327,11 +322,11 @@ A more important assumption is that
 
 Not only should the errors be normally distributed and have a mean of 0, but the variance of the errors should not change for each observation or for a range of observations. 
 
-This preferred condition is known as _ho-mo-sce-das-tic-i-ty_ (same scatter). 
+This preferred condition is known as _ho-mo-sce-das-ti-ci-ty_ (same scatter). 
 
 .right[ /ˌhoʊmoʊskəˈdæstɪk/ ]
 
-If Y is more variable at some levels of X than others, we call this _het-e-ro-sce-das-tic-i-ty_ (different scatter).
+If Y is more variable at some levels of X than others, we call this _het-e-ro-sce-das-ti-ci-ty_ (different scatter).
 
 ---
 
@@ -371,6 +366,12 @@ autoplot(cathl, which = c(1,3))
 Spread of residuals seems to decrease as fitted value increases.
 
 ]
+
+???
+
+Standardized residuals are very similar to the kind of standardization you perform earlier on in statistics with z-scores.
+
+A standardized residual is a ratio: The difference between the observed count and the expected count and the standard deviation of the expected count in chi-square testing.
 
 ---
 ### 2. Breusch-Pagan test
@@ -712,7 +713,8 @@ class: center, middle
 
 This is not really an assumption, but outliers can lead to violations of other aforementioned assumptions and so are worth checking for.
 
-Outlying observations can sometimes radically change our regression equation.
+One downside of the linear model is that it is sensitive to unusual values because the distance incorporates a squared term.
+Outlying observations can therefore sometimes radically change our regression equation.
 
 Sometimes we want to remove these outliers so that we can concentrate on the main model,
 especially if they may be measurement errors,
@@ -720,13 +722,6 @@ but othertimes we want to explicitly look at these outliers.
 
 They can help us think about other independent variables that may be important,
 or perhaps we're interested in investigating the exceptions that don't fit our predictions further (say in a case study as part of a mixed methods research design).
-
-One downside of the linear model is that it is sensitive to unusual values because the distance incorporates a squared term. Fit a linear model to the simulated data below, and visualise the results. Rerun a few times to generate different simulated datasets. What do you notice about the model?
-
-sim1a &lt;- tibble(
-  x = rep(1:10, each = 3),
-  y = x * 1.5 + 6 + rt(length(x), df = 2)
-)
 
 ---
 
