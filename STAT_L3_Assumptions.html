@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Statistics for International Relations Research II</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="James Hollway" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://raw.githack.com/jhollway/iheidmyninja/master/iheid-xaringan-style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistics for International Relations Research II
+## Assumptions
+### <large>James Hollway</large>
+
+---
+
+class: center, middle
+
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.encyclopediaofmath.org%2Flegacyimages%2Fcommon_img%2Fe036910a.gif&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn4.iconfinder.com%2Fdata%2Ficons%2Fevil-icons-user-interface%2F64%2Fdownload-512.png&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fd%2Fdf%2FTwo_Parallel_lines.svg%2F200px-Two_Parallel_lines.svg.png&amp;f=1&amp;nofb=1)]]
+
+---
+class: center, middle
+
+.pull-1[.circleon[![](https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTc5EWzkqd2tomQAKz3aV9rA-Fk_IKD623ZsLLr76-tfkI9Ienf)]]
+.pull-1[.circleon[![](https://api.time.com/wp-content/uploads/2019/11/icecream.jpg?w=800&amp;quality=85)]]
+.pull-1[.circleon[![](https://thumbs.dreamstime.com/b/isometric-businessman-walking-to-different-way-other-people-think-stand-out-crowd-unique-concept-68511039.jpg)]]
+
+
+
+&lt;!-- https://statisticsbyjim.com/regression/ols-linear-regression-assumptions/ --&gt;
+&lt;!-- https://towardsdatascience.com/verifying-the-assumptions-of-linear-regression-in-python-and-r-f4cd2907d4c0 --&gt;
+
+---
+background-image: url(https://upload.wikimedia.org/wikipedia/commons/d/d1/Swiss_children.jpg)
+background-size: 105% 105%
+
+
+
+---
+class: center, middle
+
+# Non-normality
+
+.pull-1[.circleon[![](https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTc5EWzkqd2tomQAKz3aV9rA-Fk_IKD623ZsLLr76-tfkI9Ienf)]]
+.pull-1[.circleoff[![](https://api.time.com/wp-content/uploads/2019/11/icecream.jpg?w=800&amp;quality=85)]]
+.pull-1[.circleoff[![](https://thumbs.dreamstime.com/b/isometric-businessman-walking-to-different-way-other-people-think-stand-out-crowd-unique-concept-68511039.jpg)]]
+
+---
+## Defining non-normality
+
+An oft-cited assumption of OLS regression is that:
+
+&gt; The error term is normally distributed
+
+**Note there is no assumption or requirement that the _features_ or _response_ are normally distributed.**
+It is the conditional distribution y that should be normal.
+
+--
+
+There is also another related (though rarely important) assumption:
+
+&gt; The error term has a population mean of zero
+
+If the error term did _not_ have a mean of zero (or very close to it), this would mean that we are systematically under or over predicting, which we call _bias_... and that is bad. 
+It means our model is not correct on average. 
+We want only random error/noise left for the error term. 
+That's what we'll be mostly treating today.
+
+---
+## Diagnosing non-normality
+
+.pull-left-2[
+
+Let's start with our basic model using our data from last week:
+
+
+```r
+cath &lt;- lm(Fertility ~ Catholic, swiss)
+tab_model(cath)
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;64.43&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;59.79&amp;nbsp;&amp;ndash;&amp;nbsp;69.07&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.14&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.06&amp;nbsp;&amp;ndash;&amp;nbsp;0.22&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;47&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.215 / 0.198&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+]
+
+--
+
+.pull-right-1[
+
+Note that we don't need to worry about the assumption that the error term has a population mean of zero, because the constant is automatically included. This forces the mean of the residuals to equal zero.
+
+
+```r
+mean(cath$residuals)
+```
+
+```
+## [1] 2.826492e-16
+```
+
+This is _very_ close to zero.
+
+That's because the intercept is all about finding the correct baseline so that we don't systematically over or underpredict.
+
+]
+
+---
+### 1. Normal probability (QQ) plot
+
+.pull-left[
+
+Most common visual diagnostic is the normal probability or quantile-quantile (QQ) plot.
+
+This plot compares two probability distributions by plotting their quantiles against one another.
+
+Some guidelines for interpretation:
+- residuals following \\(45^\circ\\) line means perfectly normal
+  - some deviation expected at ends, but should be .small[small]
+- bow-shaped pattern means excessive skewness (i.e., the distribution is not symmetrical, with too many large residuals in one direction)
+- s-shaped pattern means excessive kurtosis of the residuals — either too many or two few large errors in both directions
+
+]
+
+.pull-right[
+
+
+```r
+# library(ggfortify)
+# autoplot(cathe, which = 2)
+
+df_resid &lt;- data.frame(resid = cath$residuals)
+p &lt;- ggplot(df_resid, aes(sample = resid))
+p + stat_qq() + stat_qq_line()
+```
+
+&lt;img src="STAT_L3_Assumptions_files/figure-html/qq-1.png" width="504" /&gt;
+
+Seems a bit off at one end.
+
+]
+
+???
+
+The alternative might be to plot two histograms side by side, but this is a little too 'eye of the beholder'.
+
+---
+.pull-left[
+### 2. Normality tests
+
+The other way to approach this is to use formal tests of the 'normality' of the residuals.
+
+There are a bunch of different tests:
+- _Shapiro-Wilk test_
+  - shown to be most powerful
+- _Kolmogorov-Smirnov (KS) test_
+  - oldest: distance between EDF and CDF
+  - only works if mean and variance of the normal are assumed known under the null hypothesis
+  - sensitive to extreme values
+- Alternatives to KS test:
+  - _Cramer-von Mises test_
+  - _Anderson-Darling test_
+- _Jarque-Bera test_
+  - low power for distributions with short tails, especially for bimodal distributions
+
+]
+
+.pull-right[
+
+
+```r
+library(olsrr)
+ols_test_normality(cath)
+```
+
+```
+## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk              0.9087         0.0014 
+## Kolmogorov-Smirnov        0.1337         0.3397 
+## Cramer-von Mises          3.1908         0.0000 
+## Anderson-Darling          1.0581         0.0080 
+## -----------------------------------------------
+```
+
+```r
+library(tseries)
+jarque.bera.test(cath$residuals)
+```
+
+```
+## 
+## 	Jarque Bera Test
+## 
+## data:  cath$residuals
+## X-squared = 17.464, df = 2, p-value = 0.0001613
+```
+
+Seems like we can reject the null hypothesis that EDF corresponds to CDF of the normal distribution...
+
+]
+
+???
+
+Looks like people pair up to write normality tests...
+
+Note that KS test in `ols_test_normality()` does not run the `two-sided` version of the test
+  
+---
+## So what if errors aren't normal?
+
+This assumption is actually _not_ as important as that of linearity (last week).
+
+Normality is _not_ required to obtain unbiased estimates of the regression coefficients with the minimum variance. 
+
+OLS merely requires that the residuals (errors) are independent and identically distributed (later).
+
+However, satisfying this assumption allows you to perform statistical hypothesis testing and generate reliable confidence intervals and prediction intervals. So if your research relies on the p-values or overall test of significance, check this assumption.
+
+It can matter whether the residuals are normally distributed.
+
+When this assumption is violated, it causes problems with calculating confidence intervals and various significance tests for coefficients. When the error distribution significantly departs from Gaussian, confidence intervals may be too wide or too narrow.
+
+Technically, we can omit this assumption if we assume instead that the model equation is correct and our goal is to estimate the coefficients and generate predictions (in the sense of minimizing mean squared error).
+
+However, normally we are interested in making valid inferences from the model or estimating the probability that a given prediction error will exceed some threshold in a particular direction. To do so, the assumption about the normality of residuals must be satisfied.
+
+---
+
+.pull-left[
+
+## Dealing with non-normal errors
+
+...depends on what is causing the non-normality (kurtosis) in the residuals.
+
+1. outliers
+  - if outliers are the drivers of kurtosis, these will need to be removed/treated
+1. different components
+  - it two or more subsets of the data have different statistical properties, separate models might be considered
+1. nonlinearity
+  - nonlinear transformation of response or features
+1. specification
+  - sometimes just a better specified model will be enough...
+]
+
+.pull-right[
+
+
+```r
+cathe &lt;- lm(Fertility ~ Catholic + Education, swiss)
+df_resid &lt;- data.frame(resid = cathe$residuals)
+p &lt;- ggplot(df_resid, aes(sample = resid))
+p + stat_qq() + stat_qq_line()
+```
+
+&lt;img src="STAT_L3_Assumptions_files/figure-html/model2-1.png" width="504" /&gt;
+
+```r
+ols_test_normality(cathe)
+```
+
+```
+## -----------------------------------------------
+##        Test             Statistic       pvalue  
+## -----------------------------------------------
+## Shapiro-Wilk              0.9652         0.1734 
+## Kolmogorov-Smirnov        0.1123         0.5559 
+## Cramer-von Mises          4.1773         0.0000 
+## Anderson-Darling          0.4159         0.3202 
+## -----------------------------------------------
+```
+
+]
+
+---
+class: center, middle
+
+# Heteroscedasticity
+
+.pull-1[.circleoff[![](https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTc5EWzkqd2tomQAKz3aV9rA-Fk_IKD623ZsLLr76-tfkI9Ienf)]]
+.pull-1[.circleon[![](https://api.time.com/wp-content/uploads/2019/11/icecream.jpg?w=800&amp;quality=85)]]
+.pull-1[.circleoff[![](https://thumbs.dreamstime.com/b/isometric-businessman-walking-to-different-way-other-people-think-stand-out-crowd-unique-concept-68511039.jpg)]]
+
+---
+## Defining heteroscedasticity
+
+A more important assumption is that 
+
+&gt; The error term has equal variance
+
+Not only should the errors be normally distributed and have a mean of 0, but the variance of the errors should not change for each observation or for a range of observations. 
+
+This preferred condition is known as _ho-mo-sce-das-tic-i-ty_ (same scatter). 
+
+.right[ /ˌhoʊmoʊskəˈdæstɪk/ ]
+
+If Y is more variable at some levels of X than others, we call this _het-e-ro-sce-das-tic-i-ty_ (different scatter).
+
+---
+
+.pull-left[
+
+## Diagnosing heteroscedasticity
+
+
+### 1. Interrogate residual plots
+
+Easiest way to see if residuals are homoscedastic is to look at a plot,
+our old friend "residuals vs fitted".
+
+No longer looking for a bow shape, but a cone shape.
+
+A cone shape suggests the residuals shrink or grow as a function of predicted value (or time).
+
+For an extra check we can look at a plot of fitted values against the _standardized residuals_,
+otherwise known as a scale-location plot.
+This can be more convenient, as the disturbance term is standardized.
+Here we're looking for the line to be flat.
+]
+
+.pull-right[
+
+
+
+
+```r
+cath2 &lt;- lm(Fertility ~ Catholic + I(Catholic^2), swiss)
+library(ggfortify)
+autoplot(cathl, which = c(1,3))
+```
+
+&lt;img src="STAT_L3_Assumptions_files/figure-html/predfit-1.png" width="504" /&gt;
+
+Spread of residuals seems to decrease as fitted value increases.
+
+]
+
+---
+### 2. Breusch-Pagan test
+
+The _Breusch-Pagan_ tests the null hypothesis that the variance of the residuals is homogenous.
+A p-value below a certain level (like 0.05) indicates we should reject the null in favor of heteroscedasticity.
+
+.pull-left[
+
+
+```r
+library(lmtest)
+bptest(cath2, data = swiss, studentize = TRUE)
+```
+
+```
+## 
+## 	studentized Breusch-Pagan test
+## 
+## data:  cath2
+## BP = 13.363, df = 2, p-value = 0.001254
+```
+
+The results indicate that the assumption is not satisfied and we should reject hypothesis of homoscedasticity.
+
+]
+.pull-right[
+
+
+```r
+bptest(cathe, data = swiss, studentize = TRUE)
+```
+
+```
+## 
+## 	studentized Breusch-Pagan test
+## 
+## data:  cathe
+## BP = 3.134, df = 2, p-value = 0.2087
+```
+
+This is better, the condition of homoscedasticity can be accepted.
+
+]
+
+???
+
+Note there is also another test, the _Goldfeld-Quandt test_, but _Breusch-Pagan_ is generally better.
+
+---
+## So what if there's heteroscedasticity?
+
+Unfortunately, **this matters**.
+
+If residuals more spread out for some values of X than others (heteroscedasticity), standard errors will not be correct.
+
+This impacts the precision of the estimates, resulting in confidence intervals that are too wide/narrow, as well as potentially messing with out-of-sample predictions.
+
+Another effect of heteroscedasticity might be putting too much weight to a subset of the data when estimating coefficients: the subset in which the error variance was largest.
+
+If you don’t treat this, you could have results which look statistically significant but are not.
+
+---
+## Dealing with heteroscedasticity
+
+### 1. Deflate time series
+
+Sometimes the heteroscedasticity is due to the effects of time.
+
+E.g. if dependent variable relates to money, then need to manage inflation somehow on the variable.
+
+Can do this by normalising the variable, or using using ARCH (auto-regressive conditional heteroscedasticity) models to model the error variance.
+
+---
+### 2. Log transform dependent variable
+
+If variance in residuals are increasing with regression predictions, taking the log of dependent and/or independent variables may eliminate heteroscedasticity.
+
+Note that if you have logs on both sides (LHS, RHS) of the equation, a 'log-log model', you are dealing with _elasticities_:
+how a percentage change in x affects the percentage change in y.
+
+--
+
+Note though that log transformation of either or both of x and y is not the same as using a log link function.
+
+A link function connects its model's predictors to the outcome variable.
+
+$$  ln(\mu_y) = \alpha + \beta_1 x_1 + \beta_2 x_2 + ... \neq ln(y_i) = \alpha + \beta_1 x_1 + \beta_2 x_2 + ... $$
+
+In the former, a function of the mean of y (the natural log) is related to a linear combination of x variables.
+In the latter, we are not taking the log of the mean but the log of each observation and then relating the x variables to the mean for that.
+
+???
+
+Why use a log link function then?
+
+Part of what makes generalized linear models so useful is that they allow you to back-transform means and regression coefficients to a more intuitive scale.
+
+With a log transformed variable, you cannot simply take the exponent of the mean of ln(y) to get the mean of y.
+
+---
+
+.pull-left-1[
+### 3. Robust standard errors
+
+A popular way to treat heteroscedasticity is using _robust standard errors_.
+
+Most table packages allow you to report robust standard errors by manipulating the variance-covariance (VCV) matrix. 
+
+Heteroscedastic-consistent errors are generally larger than normal standard errors, and compensate for how at some levels of X there is more variation. 
+
+Because they offer a more conservative estimate, they are by now standard practice (like always opting for two-tailed t-test).
+
+However, their blanket use raises issues (see King and Peters 2015), and they are not recommended for small sample sizes.
+]
+
+.pull-right-2[
+
+
+```r
+library(sandwich)
+tab_model(cath2, show.obs = F, show.r2 = F, show.se = T, show.stat = T)
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="5" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;std. Error&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Statistic&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;70.96&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;2.76&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;65.40&amp;nbsp;&amp;ndash;&amp;nbsp;76.52&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;25.71&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.67&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.23&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.13&amp;nbsp;&amp;ndash;&amp;nbsp;-0.20&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-2.90&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.006&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic^2&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.01&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.00&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.00&amp;nbsp;&amp;ndash;&amp;nbsp;0.01&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;3.55&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+```r
+tab_model(cath2, vcov.fun = "HC", vcov.type = "HC3", show.obs = F, show.r2 = F, show.se = T, show.stat = T)
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="5" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;std. Error&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Statistic&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;70.96&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;2.98&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;64.95&amp;nbsp;&amp;ndash;&amp;nbsp;76.97&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;23.81&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.67&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.43&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.53&amp;nbsp;&amp;ndash;&amp;nbsp;0.19&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.57&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.123&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic^2&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.01&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.00&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.00&amp;nbsp;&amp;ndash;&amp;nbsp;0.02&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.90&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.064&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+]
+
+???
+
+Note that STATA uses HC1 by default... but the `sandwich` package recommends HC3.
+
+---
+
+.pull-left-1[
+### 4. Clustering
+
+Lastly, heteroscedasticity can also be explained by data clustering by actor, geographical location, country, etc.
+
+That is, there might be a bunch of covariance structures that vary by a certain characteristic – a “cluster” – but are homoskedastic within each cluster. 
+
+The result is clustered standard errors, a.k.a. cluster-robust.
+
+Extends to multi-level/mixed models...
+
+]
+
+.pull-right-2[
+
+
+```r
+library(sandwich)
+tab_model(cath2, vcov.fun = "CL", vcov.args = ~ Education, show.obs = F, show.r2 = F, show.se = T, show.stat = T)
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="5" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;std. Error&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Statistic&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;70.96&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;3.72&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;63.46&amp;nbsp;&amp;ndash;&amp;nbsp;78.46&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;19.08&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.67&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.56&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.79&amp;nbsp;&amp;ndash;&amp;nbsp;0.46&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.20&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.237&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic^2&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.01&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.01&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.00&amp;nbsp;&amp;ndash;&amp;nbsp;0.02&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.45&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.153&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+```r
+tab_model(cath2, vcov.fun = "CL", vcov.args = ~ Examination, show.obs = F, show.r2 = F, show.se = T, show.stat = T)
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="5" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;std. Error&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Statistic&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;70.96&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;2.70&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;65.53&amp;nbsp;&amp;ndash;&amp;nbsp;76.39&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;26.32&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.67&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.41&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.50&amp;nbsp;&amp;ndash;&amp;nbsp;0.16&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.62&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.113&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic^2&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.01&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.00&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.00&amp;nbsp;&amp;ndash;&amp;nbsp;0.02&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.90&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.064&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+]
+
+???
+
+Similar to heteroskedasticity-robust standard errors, you want to allow more flexibility in your variance-covariance (VCV) matrix. 
+
+---
+class: center, middle
+
+# Outliers
+
+.pull-1[.circleoff[![](https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTc5EWzkqd2tomQAKz3aV9rA-Fk_IKD623ZsLLr76-tfkI9Ienf)]]
+.pull-1[.circleoff[![](https://api.time.com/wp-content/uploads/2019/11/icecream.jpg?w=800&amp;quality=85)]]
+.pull-1[.circleon[![](https://thumbs.dreamstime.com/b/isometric-businessman-walking-to-different-way-other-people-think-stand-out-crowd-unique-concept-68511039.jpg)]]
+
+---
+## Defining outliers
+
+This is not really an assumption, but outliers can lead to violations of other aforementioned assumptions and so are worth checking for.
+
+Outlying observations can sometimes radically change our regression equation.
+
+Sometimes we want to remove these outliers so that we can concentrate on the main model,
+especially if they may be measurement errors,
+but othertimes we want to explicitly look at these outliers.
+
+They can help us think about other independent variables that may be important,
+or perhaps we're interested in investigating the exceptions that don't fit our predictions further (say in a case study as part of a mixed methods research design).
+
+One downside of the linear model is that it is sensitive to unusual values because the distance incorporates a squared term. Fit a linear model to the simulated data below, and visualise the results. Rerun a few times to generate different simulated datasets. What do you notice about the model?
+
+sim1a &lt;- tibble(
+  x = rep(1:10, each = 3),
+  y = x * 1.5 + 6 + rt(length(x), df = 2)
+)
+
+---
+
+.pull-left-1[
+
+## Diagnosing outliers
+
+### 1. z-score
+
+The `outliers` package provides useful functions to systematically extract outliers:
+
+.small[
+
+
+```r
+mean(swiss$Fertility)
+```
+
+```
+## [1] 70.14255
+```
+
+```r
+outlier(swiss$Fertility) # most exceptional
+```
+
+```
+## [1] 35
+```
+
+```r
+outlier(swiss$Fertility, opposite = TRUE) # most typical
+```
+
+```
+## [1] 92.5
+```
+
+]
+
+]
+
+.pull-right-2[
+
+
+```r
+# z-scores =&gt; (x-mean)/sd
+scores(swiss$Fertility)
+```
+
+```
+##  [1]  0.80513053  1.03728474  1.78978457  1.25342831  0.54095506  0.47691252  1.09332196  1.78177925  0.98124752  1.02127410  1.35749743 -0.48372556 -0.25957667
+## [14] -0.09947033 -0.67585318 -0.14750223  0.12467856 -1.15617222 -1.26824666 -0.40367239 -0.37165112 -0.41167770 -1.08412436 -1.02008182  0.18872110  0.32481149
+## [27]  0.14869451 -0.77191698 -0.94803397 -0.37965643  0.42888062 -0.06744906  0.57297633  0.02861475  0.74108800 -0.41167770  1.76576862  0.73308268  0.02060943
+## [40] -0.35564048  0.20473173 -0.45970961  0.59699228 -0.20353945 -2.81327291 -2.03675713 -2.18885816
+```
+
+```r
+# observations that lie beyond a given percentile based on a given score
+scores(swiss$Fertility, type="t", prob = 0.95)  
+```
+
+```
+##  [1] FALSE FALSE  TRUE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [28] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE
+```
+
+Or we can standardize the residuals (divide by s.d. expected from normal sampling variability) to find out whether they're big.
+
+
+```r
+car::outlierTest(cath)
+```
+
+```
+##               rstudent unadjusted p-value Bonferroni p
+## V. De Geneve -3.585063          0.0008397     0.039466
+```
+
+Apparently V. de Geneve is an outlier! Who would've thought!
+
+]
+
+???
+
+If there isn't an outlier, the `outlierTest()` from `car` package gives the most extreme observation based on the given model
+
+---
+### 2. Box plot
+
+Another visual way to proceed is by using boxplots.
+For a given continuous variable, outliers are those observations that lie outside \\(1.5 IQR\\), where IQR, the ‘Inter Quartile Range’ is the difference between 75th and 25th quartiles. Points outside the whiskers in the box plot signal outliers.
+
+.pull-left[
+
+
+```r
+# Univariate
+ggplot(swiss, aes(y = Fertility)) + 
+  geom_boxplot(outlier.colour = "red")
+```
+
+&lt;img src="STAT_L3_Assumptions_files/figure-html/uniboxplot-1.png" width="504" /&gt;
+
+]
+
+.pull-right[
+
+
+```r
+# Bivariate
+ggplot(swiss, aes(Catholic, Fertility)) + 
+  geom_boxplot(aes(group = cut_width(Catholic, 25)), outlier.colour = "red")
+```
+
+&lt;img src="STAT_L3_Assumptions_files/figure-html/biboxplot-1.png" width="504" /&gt;
+
+]
+
+---
+### 3. Cook's distance
+
+.pull-left-2[
+
+Declaring an outlier based on a just one feature could lead to unrealistic inferences. 
+Better to collectively consider the features that matter.
+
+Cook’s distance is a measure of how deleting an observation impacts the regression model,
+and thus reflects the influence exerted by each observation on the predicted outcome.
+
+It is computed with respect to a given regression model and therefore impacted only by the features included in the model.
+
+The lowest value that Cook's D can assume is zero, and the higher the Cook's D is, the more influential the point.
+It makes sense to investigate points with high Cook’s distances.
+
+The conventional cutoff is 4/n (used in `lindia` by default).
+]
+
+.pull-right-1[
+
+
+```r
+library(lindia)
+gg_cooksd(cath)
+```
+
+&lt;img src="STAT_L3_Assumptions_files/figure-html/cooks-1.png" width="504" /&gt;
+
+]
+
+???
+
+Observation 45 and 47 are V. de Geneve and Rive Gauche respectively.
+
+Mathematically, cook’s distance Di for observation i is calculated as:
+
+$$  D_i = \frac{\sum^n_j (\hat{y}_j - \hat{y}_i)^2}{s^2p}   $$
+
+where, Ŷ j is the value of jth fitted response when all the observations are included.
+Ŷ j(i) is the value of jth fitted response, where the fit does not include observation i.
+s2 is the mean squared error.
+p is the number of coefficients in the regression model.
+
+---
+.pull-left-2[
+
+### 4. Leverage
+
+A related measure is _leverage_. 
+A high-leverage observation is a point at extreme values of the variables, where the lack of nearby observations makes the fitted regression model pass close to that particular point.
+
+Best way to think of this is with simple linear regression.
+We’d shift the line most when points are far away from the mean (just like a lever is most effective when you push the end rather than the middle).
+
+Sometimes those observations with the biggest residuals do not have the most leverage.
+Changes in observations far from the mean make more difference to the regression line.
+
+We can get at this in two ways:
+- a leverage by residuals plot
+- a diagnostic called dfbeta tells us the effect of removing the observation on each parameter estimate
+  - a dfbeta more than 1 for a parameter means the observation has a big residual and a lot of leverage.
+
+]
+
+.pull-right-1[
+
+```r
+gg_resleverage(cath)
+```
+
+&lt;img src="STAT_L3_Assumptions_files/figure-html/leverage-1.png" width="504" /&gt;
+
+```r
+ols_plot_dfbetas(cath)
+```
+
+&lt;img src="STAT_L3_Assumptions_files/figure-html/leverage-2.png" width="504" /&gt;
+]
+
+---
+### Distance vs. Leverage
+
+
+```r
+influence.measures(cath)
+```
+
+```
+## Influence measures of
+## 	 lm(formula = Fertility ~ Catholic, data = swiss) :
+## 
+##                dfb.1_  dfb.Cthl    dffit cov.r   cook.d    hat inf
+## Courtelary    0.24293 -0.147860  0.24522 1.001 2.96e-02 0.0334    
+## Delemont     -0.00371  0.098921  0.13605 1.076 9.38e-03 0.0451    
+## Franches-Mnt -0.03922  0.266746  0.33987 1.014 5.65e-02 0.0554    
+## Moutier       0.18823 -0.040323  0.22919 0.964 2.55e-02 0.0220    
+## Neuveville    0.21112 -0.139074  0.21159 1.032 2.23e-02 0.0375    
+## Porrentruy    0.00170 -0.014774 -0.01924 1.103 1.89e-04 0.0518    
+## Broye        -0.01568  0.111105  0.14214 1.089 1.03e-02 0.0547    
+## Glane        -0.05079  0.275176  0.34176 1.027 5.74e-02 0.0605    
+## Gruyere      -0.01572  0.083048  0.10282 1.106 5.39e-03 0.0612    
+## Sarine       -0.01197  0.096079  0.12433 1.091 7.86e-03 0.0528    
+## Veveyse      -0.03425  0.173230  0.21325 1.082 2.29e-02 0.0626    
+## Aigle        -0.02556  0.015961 -0.02573 1.083 3.38e-04 0.0346    
+## Aubonne       0.03979 -0.027297  0.03981 1.088 8.10e-04 0.0402    
+## Avenches      0.06916 -0.046049  0.06927 1.081 2.45e-03 0.0381    
+## Cossonay     -0.05717  0.038931 -0.05720 1.085 1.67e-03 0.0396    
+## Echallens     0.00674 -0.002772  0.00730 1.073 2.72e-05 0.0249    
+## Grandson      0.12446 -0.084200  0.12457 1.070 7.87e-03 0.0392    
+## Lausanne     -0.16869  0.098511 -0.17118 1.038 1.47e-02 0.0318    
+## La Vallee    -0.19458  0.133703 -0.19465 1.046 1.90e-02 0.0403    
+## Lavaux        0.00508 -0.003455  0.00508 1.089 1.32e-05 0.0396    
+## Morges        0.00612 -0.004026  0.00613 1.087 1.92e-05 0.0374    
+## Moudon       -0.00100  0.000666 -0.00100 1.087 5.15e-07 0.0380    
+## Nyone        -0.15352  0.083910 -0.15737 1.039 1.24e-02 0.0297    
+## Orbe         -0.13748  0.091845 -0.13768 1.065 9.59e-03 0.0383    
+## Oron          0.14327 -0.098117  0.14333 1.066 1.04e-02 0.0400    
+## Payerne       0.16143 -0.106235  0.16181 1.054 1.32e-02 0.0374    
+## Paysd'enhaut  0.13321 -0.091037  0.13328 1.069 9.00e-03 0.0399    
+## Rolle        -0.08572  0.054247 -0.08618 1.074 3.78e-03 0.0352    
+## Vevey        -0.12721  0.063795 -0.13242 1.046 8.84e-03 0.0277    
+## Yverdon       0.00218 -0.001415  0.00219 1.086 2.44e-06 0.0366    
+## Conthey       0.01126 -0.054324 -0.06645 1.114 2.25e-03 0.0641    
+## Entremont     0.03658 -0.176674 -0.21615 1.084 2.35e-02 0.0641    
+## Herens        0.00419 -0.019990 -0.02441 1.118 3.05e-04 0.0646    
+## Martigwy      0.02987 -0.148740 -0.18273 1.092 1.69e-02 0.0631    
+## Monthey      -0.00491  0.025294  0.03121 1.114 4.98e-04 0.0620    
+## St Maurice    0.05223 -0.258986 -0.31798 1.044 5.00e-02 0.0632    
+## Sierre       -0.05678  0.276783  0.33905 1.036 5.66e-02 0.0638    
+## Sion         -0.00478  0.026350  0.03279 1.112 5.50e-04 0.0600    
+## Boudry        0.09168 -0.059978  0.09192 1.075 4.30e-03 0.0370    
+## La Chauxdfnd -0.01006  0.005673 -0.01027 1.079 5.39e-05 0.0306    
+## Le Locle      0.10959 -0.065137  0.11094 1.063 6.24e-03 0.0325    
+## Neuchatel    -0.03545  0.018537 -0.03661 1.075 6.85e-04 0.0286    
+## Val de Ruz    0.22513 -0.148722  0.22559 1.025 2.53e-02 0.0376    
+## ValdeTravers  0.03327 -0.020724  0.03349 1.082 5.73e-04 0.0345    
+## V. De Geneve -0.36347 -0.015325 -0.52882 0.640 1.11e-01 0.0213   *
+## Rive Droite  -0.20748 -0.085033 -0.38726 0.810 6.67e-02 0.0224   *
+## Rive Gauche  -0.17761 -0.178715 -0.46477 0.755 9.27e-02 0.0250   *
+```
+
+- Figure (a): Outlier without influence. Although its Y value is unusual given its X value, it has little influence on the regression line because it is in the middle of the X range
+- Figure (b) High leverage because it has a high value of X. However, because its value of Y puts it in line with the general pattern of the data it has no influence.
+- Figure (c): Combination of discrepancy (unusual Y value) and leverage (unusual X value) results in strong influence. When this case is deleted both the slope and intercept change dramatically.
+
+---
+## So what if there are outliers?
+
+
+```r
+swisso &lt;- swiss[-c(45,47),]
+catho &lt;- lm(Fertility ~ Catholic + Education + Infant.Mortality, swisso)
+tab_model(cathm, catho, dv.labels = c("Fertility With Outliers","Fertility Without"))
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility With Outliers&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility Without&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col7"&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;48.68&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;32.71&amp;nbsp;&amp;ndash;&amp;nbsp;64.65&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;47.85&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;32.37&amp;nbsp;&amp;ndash;&amp;nbsp;63.34&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.10&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.04&amp;nbsp;&amp;ndash;&amp;nbsp;0.15&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.11&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.05&amp;nbsp;&amp;ndash;&amp;nbsp;0.16&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Education&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.76&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.99&amp;nbsp;&amp;ndash;&amp;nbsp;-0.52&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.59&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.92&amp;nbsp;&amp;ndash;&amp;nbsp;-0.26&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Infant.Mortality&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.30&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.52&amp;nbsp;&amp;ndash;&amp;nbsp;2.08&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.002&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.25&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.50&amp;nbsp;&amp;ndash;&amp;nbsp;2.01&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;0.002&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;47&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;45&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.663 / 0.639&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.579 / 0.548&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+While there are no changes in significance or sign, if we include outliers our estimation of the (negative) effect of education would have been exaggerated. Outliers in data can drastically bias/change the fit estimates and predictions.
+
+---
+## Dealing with outliers
+
+The investigator's best judgement is required to decide:
+- whether there are any outliers
+- whether it is necessary to treat them
+- how to treat them
+
+--
+
+First, you may find outliers but decide for theoretical or methodological reasons _not_ to do anything about them.
+
+For example, while they might be high distance or even high leverage observations, perhaps you might expect such outliers to happen sometimes within the data-generating process and so you want to retain them in the training data.
+
+--
+
+Or perhaps you decide that the problem is not the data but the model.
+
+Outliers can be particularly informative observations for other predictors you may want to include in your model.
+
+--
+
+A good idea is to run everything without the outlier(s) and see if the ‘interesting’ relationships change much.
+
+If you decide that these outliers could lead to problematic inference, you have a few options about how to treat them, either by modifying (correcting?) the data points or by lessening their impact on the parameter estimates.
+
+---
+### Treating the data
+
+#### 1. Deleting
+
+The first option is to delete the outliers.
+This is generally not a good idea unless you have a reason to think this whole observation is an error.
+It’s a real observation after all and may have important information on other variables (too).
+
+#### 2. Imputation
+
+We could replace outliers with the mean / median / mode.
+This reduces any leverage that observation has on that parameter estimate without removing the observation entirely.
+
+#### 3. Capping
+
+Or we could 'cap' outliers by replacing values that lie below the \\(1.5 IQR\\) limits with the value of 5th percentile and those that lie above the upper limit with the value of 95th percentile.
+This keeps some influence, but mitigates it.
+
+#### 4. Prediction
+
+Or outliers could be replaced with missing values (NA) and then predicted by considering them as a response variable. This tries to make the treated values consistent with expectations raised by the other observations.
+
+---
+### Treating the model
+
+#### 5. ‘Robust’ regression
+
+One oft used option is ‘robust regression’, which downweighs the influence high leverage observations.
+
+
+```r
+library(MASS)
+cathr &lt;- rlm(Fertility ~ Catholic, swiss)
+```
+
+Use robust standard errors when heteroscedasticity; use robust regression when high leverage observations.
+
+.pull-left-2[
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;OLS Regression&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Robust Regression&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;std. Error&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;std. Error&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col7"&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;64.43&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;2.31&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;65.28&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;2.01&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.14&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.04&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.15&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.03&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;47&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;47&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.215 / 0.198&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;NA&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+]
+
+.pull-right-1[
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;With Robust SEs&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;std. Error&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;64.43&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.81&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.14&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.03&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;47&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.215 / 0.198&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+]
+
+???
+
+Robust regression is done by iterated re-weighted least squares (IRLS).
+
+As the absolute residual goes down, the weight goes up. 
+In other words, cases with a large residuals tend to be down-weighted.
+
+Basically, if there seems to be a big difference between OLS and robust regression, trust robust regression more.
+
+---
+
+#### 6. ‘Resistant’ regression
+
+Lastly, another way to make linear models more robust to outliers is to use a different distance measure.
+
+OLS uses root-mean-squared distance or error (RMSD or RMSE), but we could use mean-absolute distance (MAD or MAE) instead, which is less sensitive to outliers (because they're not squared) and more robust to non-normality.
+
+Note whereas robust regression dampens outlier influence, 
+resistant regression use estimates that trim outliers out.
+
+
+```r
+library(L1pack)
+cathq &lt;- lad(Fertility ~ Catholic, swiss)
+```
+
+.pull-left[
+
+
+```
+## 
+## Call:
+## lm(formula = Fertility ~ Catholic, data = swiss)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -35.309  -4.060   0.511   6.851  16.682 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 64.42826    2.30510  27.950  &lt; 2e-16 ***
+## Catholic     0.13889    0.03956   3.511  0.00103 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 11.19 on 45 degrees of freedom
+## Multiple R-squared:  0.215,	Adjusted R-squared:  0.1976 
+## F-statistic: 12.33 on 1 and 45 DF,  p-value: 0.001029
+```
+
+]
+
+.pull-right[
+
+
+```
+## Call:
+## lad(formula = Fertility ~ Catholic, data = swiss)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -36.022  -4.728   0.000   6.437  16.063 
+## 
+## Coefficients:
+##              Estimate Std.Error Z value p-value
+## (Intercept) 64.6742   3.2271   20.0409  0.0000
+## Catholic     0.1499   0.0554    2.7070  0.0068
+## 
+## Degrees of freedom: 47 total; 45 residual
+## Scale estimate: 11.07738
+## Log-likelihood: -176.3195 on 3 degrees of freedom
+```
+
+]
+
+???
+
+Resistant statistics are measures of the data that are not influenced by outliers, such as the median.
+
+This is best accomplished by trimming the data, which "trims" extreme values from either end (or both ends) of the range of data values.
+  
+The disadvantages of LAD include being more computationally expensive than OLS and having the possibility of more than one solution.
+
+The reason for this is that unlike OLS (which has an analytical solution derived from matrix calculus), the LAD coefficient estimates are found iteratively, usually with the OLS estimates as the initial values.
+
+---
+# OLS Assumptions
+
+.pull-left[
+**Data**
+  1. *Random*
+  1. *Size*
+  1. *Variance*
+  
+**Models**
+  1. *Linearity and Correctly Specified*
+  1. *Exogeneity and No Autocorrelation*
+  1. *No Multicollinearity*
+
+**Errors**
+  1. *Normality Around Zero*
+  1. *Homoscedasticity*
+  1. *No Outliers*
+]
+
+--
+
+.pull-right[
+
+NB: When errors homoscedastic and no autocorrelation, statisticians call them _spherical errors_.
+
+The _Gauss-Markov Theorem_ states OLS is the
+  - &lt;span style="color:blue"&gt;B&lt;/span&gt;est (minimizes variance)
+  - &lt;span style="color:blue"&gt;L&lt;/span&gt;inear
+  - &lt;span style="color:blue"&gt;U&lt;/span&gt;nbiased (e(B) = B)
+  - &lt;span style="color:blue"&gt;E&lt;/span&gt;stimator
+
+of population parameters _if_ errors uncorrelated with equal variance and a mean of zero.
+
+]
+
+---
+## Why you should care
+
+.pull-left[
+
+The _Gauss-Markov Theorem_ states OLS is the
+  - &lt;span style="color:blue"&gt;B&lt;/span&gt;est (minimizes variance)
+  - &lt;span style="color:blue"&gt;L&lt;/span&gt;inear
+  - &lt;span style="color:blue"&gt;U&lt;/span&gt;nbiased (e(B) = B)
+  - &lt;span style="color:blue"&gt;E&lt;/span&gt;stimator
+
+of population parameters _if_ errors uncorrelated with equal variance and a mean of zero.
+
+]
+
+If these assumptions hold true, OLS gives best possible estimates. 
+
+--
+
+Which means you can relax.
+
+--
+
+So it's worth checking these assumptions in particular.
+
+--
+
+'Unbiased' means gives least biased estimates of population parameters.
+'Best' means resulting in the lowest variance of the estimate, i.e. is _efficient_.
+
+--
+
+Note that for OLS to be BLUE, the residuals do not need to follow normal (Gaussian) distribution, nor do they need to be _independent and identically distributed_ (IID).
+
+If error term also follows the normal distribution, you can safely use hypothesis testing to determine whether the independent variables and the entire model are statistically significant and produce reliable confidence intervals and prediction intervals.
+
+--
+
+In summary, we should care about all these issues to the appropriate degree (like with the coronavirus...). Unless one grossly misjudges the data-structure, can fix many issues.
+Things to worry about: heteroskedasticity, influential outliers, endogeneity, and autocorrelation.
+
+???
+
+Efficiency is a statistical concept that compares the quality of the estimates calculated by different procedures while holding the sample size constant. OLS is the most efficient linear regression estimator when the assumptions hold true.
+
+Another benefit of satisfying these assumptions is that as the sample size increases to infinity, the coefficient estimates converge on the actual population parameters.
+
+---
+## Now for the cheat sheet...
+
+.pull-left-1[
+
+
+```r
+library(ggfortify)
+autoplot(cath)
+```
+
+&lt;img src="STAT_L3_Assumptions_files/figure-html/autoplot-1.png" width="504" /&gt;
+]
+
+.pull-right-2[
+
+
+```r
+gvlma::gvlma(cath)
+```
+
+```
+## 
+## Call:
+## lm(formula = Fertility ~ Catholic, data = swiss)
+## 
+## Coefficients:
+## (Intercept)     Catholic  
+##     64.4283       0.1389  
+## 
+## 
+## ASSESSMENT OF THE LINEAR MODEL ASSUMPTIONS
+## USING THE GLOBAL TEST ON 4 DEGREES-OF-FREEDOM:
+## Level of Significance =  0.05 
+## 
+## Call:
+##  gvlma::gvlma(x = cath) 
+## 
+##                     Value   p-value                   Decision
+## Global Stat        36.705 2.071e-07 Assumptions NOT satisfied!
+## Skewness           10.965 9.283e-04 Assumptions NOT satisfied!
+## Kurtosis            6.499 1.079e-02 Assumptions NOT satisfied!
+## Link Function      10.445 1.230e-03 Assumptions NOT satisfied!
+## Heteroscedasticity  8.796 3.020e-03 Assumptions NOT satisfied!
+```
+
+]
+
+???
+
+Ok, (of course) our assumptions are not satisfied.
+
+In fact, all of them are issues here with our simplest model.
+
+Three of the assumptions are not satisfied. This is probably because we have only 50 data points in the data and having even 2 or 3 outliers can impact the quality of the model. So the immediate approach to address this is to remove those outliers and re-build the model. Take a look at the diagnostic plot below to arrive at your own conclusion.
+
+
+
+From the above plot the data points: 23, 35 and 49 are marked as outliers. Lets remove them from the data and re-build the model.
+
+Though the changes look minor, it is more closer to conforming with the assumptions. There is one more thing left to be explained. That is, the plot in the bottom right. It is the plot of standardized residuals against the leverage. Leverage is a measure of how much each data point influences the regression. The plot also contours values of Cook’s distance, which reflects how much the fitted values would change if a point was deleted.
+
+A point far from the centroid with a large residual can severely distort the regression. For a good regression model, the red smoothed line should stay close to the mid-line and no point should have a large cook’s distance (i.e. should not have too much influence on the model.)
+
+---
+## Cheating
+
+.pull-left-1[
+
+
+```r
+library(ggfortify)
+autoplot(catha)
+```
+
+&lt;img src="STAT_L3_Assumptions_files/figure-html/autoplot2-1.png" width="504" /&gt;
+]
+
+.pull-right-2[
+
+
+```r
+gvlma::gvlma(catha)
+```
+
+```
+## 
+## Call:
+## lm(formula = Fertility ~ Catholic + Education + Infant.Mortality + 
+##     Agriculture, data = swiss)
+## 
+## Coefficients:
+##      (Intercept)          Catholic         Education  Infant.Mortality       Agriculture  
+##          62.1013            0.1247           -0.9803            1.0784           -0.1546  
+## 
+## 
+## ASSESSMENT OF THE LINEAR MODEL ASSUMPTIONS
+## USING THE GLOBAL TEST ON 4 DEGREES-OF-FREEDOM:
+## Level of Significance =  0.05 
+## 
+## Call:
+##  gvlma::gvlma(x = catha) 
+## 
+##                       Value p-value                Decision
+## Global Stat        0.746402  0.9455 Assumptions acceptable.
+## Skewness           0.005896  0.9388 Assumptions acceptable.
+## Kurtosis           0.228597  0.6326 Assumptions acceptable.
+## Link Function      0.230480  0.6312 Assumptions acceptable.
+## Heteroscedasticity 0.281429  0.5958 Assumptions acceptable.
+```
+
+]
+
+---
+class: center, middle
+# Summary
+
+.pull-1[.circleon[![](https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTc5EWzkqd2tomQAKz3aV9rA-Fk_IKD623ZsLLr76-tfkI9Ienf)]]
+.pull-1[.circleon[![](https://api.time.com/wp-content/uploads/2019/11/icecream.jpg?w=800&amp;quality=85)]]
+.pull-1[.circleon[![](https://thumbs.dreamstime.com/b/isometric-businessman-walking-to-different-way-other-people-think-stand-out-crowd-unique-concept-68511039.jpg)]]
+
+---
+class: center, bottom
+
+# Next week...
+
+--
+
+What if our DV is not continuous?
+
+--
+
+Introduction to Maximum Likelihood Estimation (MLE).
+
+--
+
+Why can’t we just use OLS?
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>` "
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
