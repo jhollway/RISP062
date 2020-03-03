@@ -42,8 +42,8 @@ background-image: url(https://upload.wikimedia.org/wikipedia/commons/d/d1/Swiss_
 background-size: 105% 105%
 
 ---
-class: center
 
+.pull-left[
 
 ```r
 library(table1)
@@ -134,6 +134,24 @@ table1::table1(~. , swiss)
 </tbody>
 </table>
 </div>
+]
+
+.pull-right[
+
+Switzerland, in 1888, was entering a period known as the demographic transition; i.e., its fertility was beginning to fall from the high level typical of underdeveloped countries.
+
+The data collected are for 47 French-speaking “provinces” at about 1888.
+
+- Fertility: Ig, ‘common standardized fertility measure’
+- Agriculture: % of males involved in agriculture as occupation
+- Examination: % draftees receiving highest mark on army examination
+- Education: % education beyond primary school for draftees.
+- Catholic: % ‘catholic’ (as opposed to ‘protestant’).
+- Infant.Mortality: live births who live less than 1 year.
+
+All variables but ‘Fertility’ give proportions of the population.
+
+]
 
 ---
 class: center, middle
@@ -1172,13 +1190,14 @@ _Imperfect but strong correlations_ in OLS models can be fit, but:
 1. Just exclude one of the highly correlated independent variables
   - say the one with the highest VIF
   – makes sense when the causal relationships are quite clear
-  - may need to do this several times
+  - may need to do this several times, be wary of OVB though!
 1. Make a scale/factor out of highly correlated independent variables
   - use principal component analysis (PCA) to reduce features to a smaller set of uncorrelated components
   – makes sense when there is an underlying/latent variable that we haven’t measured
   - requires additional expertise and can make interpreting effects of individual IVs difficult
 1. Get more data/variables
-  - sometimes easier said than done...
+  - basically, multicollinearity just means there’s not enough independent variation to separately identify marginal effects
+  - more data might mean more variation to identify effects? Sometimes easier said than done...
 1. Do nothing
   - report \\(R^2\\) and \\(F\\) statistics and explain joint significance of the IVs in the model which accounts for the lack of individual significance
 
