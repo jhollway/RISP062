@@ -1224,6 +1224,8 @@ In other words, cases with a large residuals tend to be down-weighted.
 
 Basically, if there seems to be a big difference between OLS and robust regression, trust robust regression more.
 
+Note robust regression does not address issues of heterogeneity of variance. This problem can be addressed by using functions in the `sandwich` package after the `lm` function.
+
 ---
 
 #### 6. ‘Resistant’ regression
@@ -1299,6 +1301,8 @@ This is best accomplished by trimming the data, which "trims" extreme values fro
 The disadvantages of LAD include being more computationally expensive than OLS and having the possibility of more than one solution.
 
 The reason for this is that unlike OLS (which has an analytical solution derived from matrix calculus), the LAD coefficient estimates are found iteratively, usually with the OLS estimates as the initial values.
+
+See also least trimmed squares using `ltsReg()` in the `robustbase` package
 
 ---
 # OLS Assumptions
