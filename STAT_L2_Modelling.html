@@ -575,6 +575,30 @@ class: center
 &lt;img src="STAT_L2_Modelling_files/figure-html/interPlot-1.png" width="720" /&gt;
 
 ---
+#### DIY
+
+.pull-left[
+
+
+```r
+plot_model(cathi, type = "int") # plots minmax by default
+```
+
+&lt;img src="STAT_L2_Modelling_files/figure-html/intplot-1.png" width="504" /&gt;
+
+]
+
+.pull-right[
+
+This model shows how Catholicism affects provinces with low education differently than those that are highly educated.
+
+For those provinces with low education (in red), increasing Catholicism (vs Protestantism) leads to increased fertility.
+
+But for those provinces with high eduation (in blue), increasing Catholicism (vs Protestantism) leads to _decreased_ fertility.
+
+]
+
+---
 ## Nonlinearity summary
 
 - Nonlinearity is a serious but relatively easily remediable issue for most linear models.
@@ -1414,6 +1438,9 @@ This is a nonsensical way to proceed, of course.
   - e.g. previous work suggests that father’s height predicts their son’s height. We think fathers that worked as miners also have shorter sons, so we include this
 
 ---
+
+.pull-left[
+
 ### F... When’s an Increase a Real Increase?
 
 We can test whether increases are statistically significant using something called a *F-test*
@@ -1426,11 +1453,34 @@ We can test whether increases are statistically significant using something call
     - df2 = n – (k + 1) (sample size – no. model parameters)
   - This test tells us whether we can reject the null hypothesis that the increase in model fit is zero
 
+]
+
+.pull-right[
 We are testing the collective influence of all explanatory variables in a model on Y:
   - H0 : \\(b_1 = b_2 = ... = b_k = 0\\)
     - (i.e., y is independent of all explanatory variables)
   - HA: At least one \\(b ≠ 0\\)
     - (i.e. at least one explanatory variable has an effect on y, controlling for the others in the model)
+
+
+```r
+anova(cathm, catha)
+```
+
+```
+## Analysis of Variance Table
+## 
+## Model 1: Fertility ~ Catholic + Education + Infant.Mortality
+## Model 2: Fertility ~ Catholic + Education + Infant.Mortality + Agriculture
+##   Res.Df    RSS Df Sum of Sq      F  Pr(&gt;F)  
+## 1     43 2422.2                              
+## 2     42 2158.1  1    264.18 5.1413 0.02857 *
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+]
+
 
 ---
 ### Stepwise model selection
