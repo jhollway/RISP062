@@ -44,13 +44,6 @@ background-size: 105% 105%
 ---
 
 .pull-left[
-
-```r
-library(table1)
-data("swiss", package = 'Zelig')
-table1::table1(~. , swiss)
-```
-
 <div class="Rtable1"><table class="Rtable1">
 <thead>
 <tr>
@@ -176,6 +169,8 @@ This makes \\(Y\\) a linear function of \\(X\\) and \\(\varepsilon\\), or “lin
 
 Obvs linear regression is therefore not appropriate when the relationship between variables is *nonlinear*.
 
+&gt; The regression model is linear in parameters 
+
 Note that we are _not_ saying that the dependent variable must be linear. It is the relationship between dependent variable on the one hand and independent variables and error term on the other hand that must be linear.
 
 &lt;!-- Related: The Difference Between Linear and Nonlinear Regression and How to Specify a Regression Model --&gt;
@@ -187,38 +182,9 @@ Note that we are _not_ saying that the dependent variable must be linear. It is 
 To detect nonlinearity, I'm going to create a quick function that will show us what we're missing:
 
 
-```r
-library(ggplot2); library(gridExtra)
-
-plotpreds &lt;- function(model, data){
-p1 &lt;- ggplot(model, aes(.fitted, .resid)) + 
-  geom_point() + 
-  stat_smooth(method="loess") + 
-  geom_hline(yintercept=0, col="red") + 
-  xlab("Predicted") + ylab("Residuals") + 
-  ggtitle("Residuals vs. Predicted Values")
-
-df_plt &lt;- data.frame("fitted" = fitted(model), 
-                  "observed" = data$Fertility)
-
-p2 &lt;- ggplot(df_plt, aes(x=fitted, y=observed)) + 
-  geom_point() + stat_smooth(method="loess") + 
-  geom_abline(intercept = 1, col="red") + 
-  xlab("Predicted") + ylab("Observed") + 
-  ggtitle("Observed vs. Predicted Values")
-
-grid.arrange(p1, p2, ncol=2)
-}
-```
 ]
 
 .pull-right[
-
-
-```r
-cath &lt;- lm(Fertility ~ Catholic, swiss)
-plotpreds(cath, swiss)
-```
 
 &lt;img src="STAT_L2_Modelling_files/figure-html/nonlinearity-1.png" width="504" /&gt;
 
@@ -271,10 +237,6 @@ The most commonly used way to take account of non-linearity is to use polynomial
 Note while \\(X^2\\) is raised to the power of 2, model still _linear in its parameters_.
 
 
-```r
-cath2 &lt;- lm(Fertility ~ Catholic + 
-                I(Catholic^2), swiss)
-```
 
 ]
 
@@ -357,9 +319,6 @@ If log-scale, then \\(2-1 = 4-2 = 8-4 = ...\\)
 Again, note that the model still _linear in its parameters_.
 
 
-```r
-cathl &lt;- lm(Fertility ~ log(Catholic), swiss)
-```
 
 ]
 
@@ -520,12 +479,6 @@ so could ignore/drop interaction or test whether linear combination of effects t
 .tiny[
 
 
-```r
-library(multcomp)
-summary(glht(cathi, 
-          linfct = c("Catholic + Catholic:Education = 0")))
-```
-
 ```
 ## 
 ## 	 Simultaneous Tests for General Linear Hypotheses
@@ -579,11 +532,6 @@ class: center
 
 .pull-left[
 
-
-```r
-plot_model(cathi, type = "int") # plots minmax by default
-```
-
 &lt;img src="STAT_L2_Modelling_files/figure-html/intplot-1.png" width="504" /&gt;
 
 ]
@@ -624,15 +572,16 @@ class: center, middle
 
 I'm going to talk about two sets of assumptions here:
 
-1. All independent variables are uncorrelated with the error term
+&gt; All independent variables are uncorrelated with the error term
+  
   - remember that the error term is supposed to represent unpredictable random error
-  - if an indepedendent variable is correlated with the error term, then we could use that independent variable to predict errors
+  - if an indepedendent variable is correlated with the error term, then we could use that to predict errors
   - there are three types of this kind of endogeneity...
 
 --
 
-1. Observations of the error term are uncorrelated with each other
-  - remember that the error term is supposed to represent unpredictable random error
+&gt; Observations of the error term are uncorrelated with each other
+  
   - if one observation is correlated with another observation, say an observation is more positive than expected and this systematically increases the probability that the following observation is also positive
   - this problem known generally as autocorrelation
 
@@ -692,11 +641,6 @@ From this plot... _maybe_.
 
 .pull-right[
 
-
-```r
-plotpreds(cath2, swiss)
-```
-
 &lt;img src="STAT_L2_Modelling_files/figure-html/ovbresid-1.png" width="504" /&gt;
 
 ]
@@ -710,11 +654,6 @@ Basically, it sees whether nonlinear combinations of the explanatory variables h
 If they do (established using an F-test, see below), then the model is misspecified in the sense that there might be some missing variable (e.g. an OV) or a polynomial or other nonlinear functional form would be a better fit.
 
 
-```r
-library(lmtest)
-resettest(cath2, type = "fitted")
-```
-
 ```
 ## 
 ## 	RESET test
@@ -723,25 +662,12 @@ resettest(cath2, type = "fitted")
 ## RESET = 2.3524, df1 = 2, df2 = 42, p-value = 0.1076
 ```
 
-```r
-# resettest(cath2, type = "regressor")
-```
-
 ---
 ### 3. Testing correlations between IVs and residuals
 
 Or we could check the Pearson correlation between each feature and the residuals.
 Then report the p-value for testing the lack of correlation between the two considered series.
 
-
-```r
-for (i in 1:(dim(swiss)[2])){
-cor_test &lt;- cor.test(swiss[, i], cath2$residuals)
-print(paste(colnames(swiss)[i],
-            '--- correlation:', as.character(round(cor_test$estimate,2)),
-            ', p-value:', as.character(round(cor_test$p.value,3)), sep = " ", collapse = NULL))
-}
-```
 
 ```
 ## [1] "Fertility --- correlation: 0.78 , p-value: 0"
@@ -755,9 +681,6 @@ print(paste(colnames(swiss)[i],
 Looks like there might be some further candidate features here... You can test each one so:
 
 
-```r
-cor.test(swiss$Education, cath2$residuals)
-```
 
 
 ???
@@ -862,12 +785,6 @@ If values are significantly correlated with lagged values, then there is autocor
 
 .pull-right[
 
-
-```r
-library(forecast)
-ggAcf(cath2$residuals)
-```
-
 &lt;img src="STAT_L2_Modelling_files/figure-html/acf-1.png" width="504" /&gt;
 
 &lt;img src="STAT_L2_Modelling_files/figure-html/acf2-1.png" width="504" /&gt;
@@ -902,10 +819,6 @@ Some notes on the Durbin-Watson test:
 .pull-right-2[
 
 
-```r
-lmtest::dwtest(cath)
-```
-
 ```
 ## 
 ## 	Durbin-Watson test
@@ -913,10 +826,6 @@ lmtest::dwtest(cath)
 ## data:  cath
 ## DW = 0.90423, p-value = 1.156e-05
 ## alternative hypothesis: true autocorrelation is greater than 0
-```
-
-```r
-lmtest::dwtest(cath2)
 ```
 
 ```
@@ -949,21 +858,12 @@ The run test is based on the null hypothesis that each element in the sequence i
 .pull-right-2[
 
 
-```r
-library(lawstat)
-runs.test(cath$residuals)
-```
-
 ```
 ## 
 ## 	Runs Test - Two sided
 ## 
 ## data:  cath$residuals
 ## Standardized Runs Statistic = -1.9149, p-value = 0.0555
-```
-
-```r
-runs.test(cath2$residuals)
 ```
 
 ```
@@ -1038,8 +938,11 @@ class: center, middle
 ## Defining multicollinearity
 
 Multicollinearity means that independent variables we are interested in are closely related.
+This contravenes the assumption that 
 
-This contravenes the assumption that no independent variable is a perfect linear function of other explanatory variables, i.e. that all features are linearly independent/ we cannot predict one feature from another.
+&gt; No independent variable is a perfect linear function of other explanatory variables
+
+i.e. that all features are linearly independent/ we cannot predict one feature from another.
 - E.g. X1 = 2 + 3 * X2 violates the assumption
 
 Say we are interested in EU elections and ask respondents also whether they like common foreign policy and common defence policy (e.g. ordinal scale).
@@ -1056,10 +959,6 @@ Unfortunately, this is a common problem in social science, because our concepts/
 .pull-left[
 
 
-```r
-lin_reg &lt;- lm(Fertility ~ ., swiss)
-tab_model(lin_reg, show.obs = FALSE)
-```
 
   - but this is really just suggestive...
   - and doesn't seem to be a problem here
@@ -1132,11 +1031,6 @@ Obviously if variables are highly correlated, then there is multicollinearity
 A nice, visual way to check is using a _correlogram_
 
 
-```r
-library(ggcorrplot)
-ggcorrplot(cor(swiss[, -1]), type = "lower", 
-           p.mat = cor_pmat(swiss[, -1]))
-```
 
 Watch out in particular for "dummy variable trap":
 - unless you exclude a reference category, there will be perfect correlation between the dummy variables and the constant
@@ -1170,11 +1064,6 @@ Practically, highly correlated variables each have high VIFs
 
 .pull-right[
 
-
-```r
-library(car)
-t(t(vif(lin_reg)))
-```
 
 ```
 ##                      [,1]
@@ -1462,10 +1351,6 @@ We are testing the collective influence of all explanatory variables in a model 
   - HA: At least one \\(b ≠ 0\\)
     - (i.e. at least one explanatory variable has an effect on y, controlling for the others in the model)
 
-
-```r
-anova(cathm, catha)
-```
 
 ```
 ## Analysis of Variance Table
