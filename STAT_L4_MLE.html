@@ -273,6 +273,8 @@ $$ L(\theta|x_i) $$
 
 ]
 
+--
+
 .pull-right-1[
 .small[
 Maybe drinks are indistinguishable (\\(\hat\theta = 0.5\\)):
@@ -537,6 +539,8 @@ Problem: likelihood functions often look scary:
 - issues with numeric precision when we get into teeeeny probabilities...
 ]
 
+--
+
 So, we work with the _log_ of this function.
 The log is a monotonic transformation which preserves important properties (i.e. extrema occur in the same place), 
 but turns a product into a sum, which is easier to work with:
@@ -636,7 +640,7 @@ So long as some 'regularity conditions' are met...
 
 ...the log-likelihood should be twice differentiable around the MLE:
 - the _first derivative_, \\(f'(y)\\), gives us information about whether we are on a plateau and which direction to move in to maximise/minimise log-likelihood
-- the _second derivative_, \\(f''(y)\\), gives us information about how quickly to move in that direction
+- the _second derivative_, \\(f''(y)\\), gives us information about whether we are at a maximum or minimum, and how much uncertainty there is
 
 ---
 #### First derivative
@@ -676,7 +680,8 @@ Second derivative gives us the direction in which the slope of the function is c
 - The bigger the absolute value of the second derivative, the more 'curved' the function,
 which tells us the rate at which the slope is changing...
 
-&lt;!-- --- --&gt;
+--
+
 #### Putting it together
 
 .pull-left[
@@ -861,12 +866,11 @@ The Wald test is a generalised version of the standard t-test.
 
 The maximised likelihood, _L_, also serves as the basis for AIC and BIC, where _k_ is the number of estimated parameters in the fitted model:
 
-1. AIC
+AIC
 
 $$  -2\log L + 2k  $$
 
-2. BIC
-
+BIC
 
 $$  -2 \log L + k \log n  $$
 
