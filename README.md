@@ -10,3 +10,5 @@ The course is hosted at https://jhollway.github.io/statsII/
 [Lecture 2](https://jhollway.github.io/statsII/STAT_L2_Modelling.html)
 
 [Lecture 3](https://jhollway.github.io/statsII/STAT_L3_Assumptions.html)
+
+[Lecture 4](https://jhollway.github.io/statsII/STAT_L4_MLE.html)

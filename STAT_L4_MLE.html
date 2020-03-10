@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Statistics for International Relations Research II</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="James Hollway" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/table1/table1_defaults.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://raw.githack.com/jhollway/iheidmyninja/master/iheid-xaringan-style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistics for International Relations Research II
+## Maximum Likelihood Estimation
+### <large>James Hollway</large>
+
+---
+
+class: center, middle
+
+.pull-1[.circleon[![](https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTc5EWzkqd2tomQAKz3aV9rA-Fk_IKD623ZsLLr76-tfkI9Ienf)]]
+.pull-1[.circleon[![](https://api.time.com/wp-content/uploads/2019/11/icecream.jpg?w=800&amp;quality=85)]]
+.pull-1[.circleon[![](https://thumbs.dreamstime.com/b/isometric-businessman-walking-to-different-way-other-people-think-stand-out-crowd-unique-concept-68511039.jpg)]]
+
+---
+class: center, middle
+
+.pull-1[.circleon[![](https://is4-ssl.mzstatic.com/image/thumb/Purple125/v4/5f/8f/55/5f8f55e1-6ca3-3911-b3f1-5aad674a5095/source/512x512bb.jpg)]]
+.pull-1[.circleon[![](https://i.ya-webdesign.com/images/polo-drawing-cartoon-4.png)]]
+.pull-1[.circleon[![](https://www.topratedforexbrokers.com/wp-content/uploads/comparison-list.svg)]]
+
+
+
+---
+class: center, middle
+
+# Introduction to MLE
+
+.pull-1[.circleon[![](https://is4-ssl.mzstatic.com/image/thumb/Purple125/v4/5f/8f/55/5f8f55e1-6ca3-3911-b3f1-5aad674a5095/source/512x512bb.jpg)]]
+.pull-1[.circleoff[![](https://activecalculus.org/single/images/1_6_Intro.svg)]]
+.pull-1[.circleoff[![](https://www.topratedforexbrokers.com/wp-content/uploads/comparison-list.svg)]]
+
+---
+## Today's data
+
+.pull-left-2[
+
+
+```r
+library(WDI)
+wdi &lt;- WDI(country = "all",
+           indicator = c("EN.POP.DNST",
+                         "EN.ATM.CO2E.KT",
+                         "NY.GDP.PCAP.PP.CD"),
+           start = 2012, end = 2012, 
+           extra = TRUE, cache = NULL)
+wdi &lt;- subset(wdi, region != "Aggregates")
+wdi &lt;- na.omit(wdi)
+names(wdi)[4:7] &lt;- c("PopDensity", "CO2", "GDPpc","WB")
+attach(wdi)
+table1::table1(~ CO2 + GDPpc + PopDensity, wdi)
+```
+
+<div class="Rtable1"><table class="Rtable1">
+<thead>
+<tr>
+<th class='rowlabel firstrow lastrow'></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Overall<br><span class='stratn'>(n=189)</span></span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>CO2</span></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>176000 (845000)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Median [Min, Max]</td>
+<td class='lastrow'>9670 [11.0, 1e+07]</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>GDPpc</span></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>19000 (21000)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Median [Min, Max]</td>
+<td class='lastrow'>11400 [720, 127000]</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>PopDensity</span></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>338 (1550)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Median [Min, Max]</td>
+<td class='lastrow'>82.3 [1.82, 18900]</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+]
+
+.pull-right-1[
+
+![](https://farm6.staticflickr.com/5540/31519242204_424deb06ca_b.jpg)
+
+]
+
+---
+## Ordinary method
+
+Recall that inference is making statements about parameter(s), \\(\theta\\), given a sample of data, \\(X_1, X_2, ..., X_n\\)
+
+So what we could do is we could try to estimate the effect of GDP per capita on CO2 emissions using OLS.
+
+Recall that to identify the .blue[best linear unbiased estimates],
+assuming that the conditions for the Gauss-Markov Theorem are met,
+all we need to do is plug in the values of _x_ and _y_ into the following equations:
+
+$$ \hat{\beta} = \frac{\sum_i^n (x_i - \bar{x}) (y_i - \bar{y})}{\sum_i^n (x_i - \bar{x})^2}       $$
+
+$$  \hat{\alpha} = \bar{y} - \hat{\beta}\bar{x}     $$
+
+This will render the .blue[best linear unbiased estimates] of parameter values based on information from this data.
+
+--
+
+Cool, _but_... what if:
+- some assumptions not met, e.g. nonlinear?
+- dependent variable not continuous?
+
+---
+### From OLS to MLE
+
+OLS assumes a linear model and an unbounded, continuous outcome.
+
+.blockquote[The linear model is a good one, but the world around can be both nonlinear and bounded. 
+
+~ Ward and Ahlquist]
+
+--
+
+- For example, need to take logs of both CO2 and per capita GDP for the model to work.
+
+- Or want to predict a probability, which varies between 0 and 1.
+(OLS may predict values below 0 or above 1...)
+
+- Or perhaps Y _isn't_ normally distributed around mean for each value of X...
+e.g. for a binary or discrete response.
+
+---
+## Introduction to MLE
+
+_Maximum likelihood estimation_ (MLE) is an efficient and widely-used approach.
+
+It is an iterative process that estimates the best fitting parameter values, \\(\theta\\), _for any probability distribution_.
+
+Basically, MLE searches for the value(s) of \\(\theta\\) that _maximises the likelihood_ of observing the sample data collected.
+
+--
+
+.pull-down[
+...
+Er, what does 'likelihood' mean?
+]
+
+---
+## 'Probably' a probability review would be useful
+
+Concerns the probability of observing events
+- probabilities of different outcomes for a certain event must add up to 1 (_law of total probability_)
+- e.g. if heads = p, then tails = 1-p (the _complement_)
+
+If events independent, then probability of pairs of outcomes is the product of these probabilities (_joint probability_).
+- e.g. probability of observing two heads from an unbiased coin = 0.5 x 0.5 = 0.25
+- useful for expressing more complex problems, as we shall see
+
+--
+
+But events rarely fully independent...
+- e.g. though schizophrenia in population is 1%,
+having sister with schizophrenia greatly increases risk of
+becoming schizophrenic (_conditional probability_)
+- \\(\Pr(X|Y)\\), e.g. Pr(Sz|sister has Sz)
+
+Can abstract proportion of obs. expected with smooth, continuous curve called a _probability density function_ (PDF).
+- Probability that, for any one observation i, Y will take on the particular value y.
+- A function of the expected value of the distribution (e.g. \\(\mu\\)) 
+and the variability of the distribution around that mean (e.g. \\(\sigma^2\\)).
+
+???
+
+A PDF also has a corresponding cumulative density function (CDF) that shows the cumulated probability to that point.
+
+---
+### Likelihood ≠ Probability
+
+These are not the same.
+
+The _probability_ of an event X depends on model parameters \\(\theta\\) is \\(\Pr(X|\theta)\\)
+- Knowing parameters ‐&gt; Prediction of outcome.
+
+The _likelihood_ concerns how likely parameter values are given the data: \\(L(\theta|X)\\)
+- Observation of data ‐&gt; Estimation of parameters.
+
+The likelihood is being maximised with respect to the parameters, not the sample data.
+
+--
+
+.pull-down[
+What does this mean?
+
+Be careful when using the term 'likelihood' when you are talking about model results.
+
+Don't say "there is a high likelihood that the stock market will crash tomorrow"; that's a probability. 
+]
+
+---
+## Intuition
+
+Ok, with that out of the way, let's learn the intuition behind maximum likelihood estimation on a toy example first:
+
+--
+
+Let's say that you are having a disagreement with your friends about the best beer (or wine, or coffee, or tea).
+You prefer one type of beer, and all three of your friends prefer the other type. You want to show them.
+
+--
+
+You devise a [taste test](https://adland.tv/adnews/schlitz-schlitz-vs-michelob-live-1981-060-usa). 
+You put both types into unmarked mugs and ask your friends to indicate which is their favourite. 
+You mark down 1 if they choose your favourite and 0 if they choose their favourite.
+
+
+```r
+drinks &lt;- c(1,1,0)
+```
+
+&lt;!-- Given this data, what is the unknown probability distribution most likely to have generated it? --&gt;
+
+---
+.pull-left-2[
+
+### Bernoulli
+ 
+This is a binary outcomes problem.
+If the probability of success is \\(\theta\\) then the complement is \\(1- \theta\\).
+
+In other words, this is a Bernoulli\\(^1\\) distribution: \\(Y \sim f_B(y|\theta)\\) with \\(E[Y] = \theta\\) and \\(\operatorname{Var}(Y) = \theta(1-\theta)\\), such that the probability of observing (a particular set of) data is:
+
+$$ \theta^{1s} (1 - \theta)^{0s} $$
+
+.footnote[1 Jacob Bernoulli was a Swiss mathematician who derived the law of large numbers, discovered the mathematical constant _e_, 
+
+and formulated the eponymous Bernoulli and binomial distributions.]
+
+Let's consider how likely two particular parameters are for each observation: 
+
+$$ L(\theta|x_i) $$
+
+]
+
+.pull-right-1[
+.small[
+Maybe drinks are indistinguishable (\\(\hat\theta = 0.5\\)):
+
+
+```r
+0.5^1 * (1-0.5)^0
+```
+
+```
+## [1] 0.5
+```
+
+```r
+0.5^1 * (1-0.5)^0
+```
+
+```
+## [1] 0.5
+```
+
+```r
+0.5^0 * (1-0.5)^1
+```
+
+```
+## [1] 0.5
+```
+
+Or maybe your friends are right (\\(\hat\theta = 0\\)):
+
+
+```r
+0^1 * (1-0)^0
+```
+
+```
+## [1] 0
+```
+
+```r
+0^1 * (1-0)^0
+```
+
+```
+## [1] 0
+```
+
+```r
+0^0 * (1-0)^1
+```
+
+```
+## [1] 1
+```
+]]
+
+---
+### i.i.d.
+
+But what is the most likely parameter estimate for _all_ the data?
+
+&lt;!-- Let \\(X_i\\) be random variables and \\(x_i\\) their realizations (actual observed values). --&gt;
+&lt;!-- Let’s assume \\(X_i\\) are distributed according to a certain probability distribution \\(D\\) (e.g. Bernoulli)  --&gt;
+&lt;!-- with density \\(f(\theta)\\) where \\(\theta\\) is a parameter of said distribution. --&gt;
+
+If we assume that observations are:
+- _independent and identically distributed_ (i.i.d.), i.e. not related to one another), 
+- governed by the same data generating process (DGP), \\(f(x|\theta)\\)
+
+then joint probability of the observations, \\( \Pr(Y_i = y_i \forall_i) \\), is simply the product of the marginals
+because unconditional probabilities compound.
+
+$$ f(x_1|\theta)f(x_2|\theta)f(x_3|\theta) = \prod_i^N \Pr(X_i = x_i) = L(\theta|x_1, x_2, x_3) $$
+
+&lt;!-- The joint probability that our observations were generated by our distribution \\(D(\theta)\\) is therefore: --&gt;
+
+This product is our _likelihood function_, \\(L(\theta|x_1, x_2, ..., x_n)\\), the probability of observing all data as a function of \\(\theta\\)!
+
+Maximizing this function yields \\(\hat\theta\\), the value of the parameter that makes the sample the most probable.
+
+---
+
+.pull-left[
+### Grid search
+
+To find the most likely estimates \\(\hat\theta\\) for this data, you could use _grid search_: 
+a systematic and evenly spaced grid of points to see which has the higher likelihood.
+
+Since \\(\theta\\) must be between 0 and 1, 
+we check every .1 increment and calculate the likelihood for this data.
+
+If we compare the likelihood function at two parameter points and find \\(L(\theta_1|x) &gt; L(\theta_2|x)\\), 
+then observed data more likely to have occurred if \\(\theta = \theta_1\\) than if \\(\theta = \theta_2\\),
+i.e. \\(\theta_1\\) a more plausible value for \\(\theta\\) than \\(\theta_2\\).
+
+Equiprobable guess of .5 turns out not to have been the most likely to have generated this data,
+and the guess that theirs is always the best beer is completely discredited.
+
+But what about in between .6 and .7? Do we just repeatedly guess?
+]
+
+.pull-right[
+
+```r
+thetahat &lt;- seq(0, 1, .1)
+likelihood &lt;- as.data.frame(t(sapply(thetahat, 
+                function(x) c(x, x^table(drinks)[2] * (1 - x)^table(drinks)[1]))))
+ggplot(likelihood, aes(V1, `1`)) + geom_point() +
+  scale_x_continuous(breaks = seq(0, 1, .1)) + xlab("theta") + ylab("likelihood")
+```
+
+&lt;img src="STAT_L4_MLE_files/figure-html/plotintuition-1.png" width="504" /&gt;
+
+]
+
+---
+### Differential calculus
+
+--
+
+&lt;!-- We will call the expression that describes the joint probability of the observed data as a function of the parameters the likelihood function: \\(L(y|\theta)\\) --&gt;
+
+Of course, we don’t know \\(\hat\theta\\); that's what we want to figure out. 
+We want to know most likely values of \\(\theta\\), given \\(Y\\):
+
+$$  L(\hat{\theta}|Y) \propto \Pr(Y|\hat{\theta})    $$
+
+We can get this by treating the likelihood as a function (which it is)
+and use tools from calculus to solve for the maximum:
+
+$$ L = \theta^2(1-\theta)^1  $$
+
+$$ logL = 2 log \theta + 1 log(1-\theta)  $$
+
+$$ \frac{\partial logL}{\partial \theta} = \frac{2}{\theta} - \frac{1}{(1-\theta)} = 0  $$
+
+$$ \hat\theta = \frac{2}{3}  $$
+
+The value of \\(\theta\\) that maximises the likelihood function is call the _maximum likelihood estimate_ or MLE.
+
+.footnote[Ward and Ahlquist show how you would get the same result by using the binomial distribution instead of the Bernoulli distribution.]
+
+???
+
+Ok, I swear this is still intuition, we'll get to the guts of this next.
+
+&lt;!-- --- --&gt;
+&lt;!-- ## Binomial distribution --&gt;
+
+&lt;!-- $$  P(x) = \frac{n!}{x!(n-x)!} p^x (1-p)^{n-x}     $$ --&gt;
+
+&lt;!-- - \\(P(x)\\) is number of heads obtained --&gt;
+&lt;!-- - \\(n!\\) is count of how many times we flip the coin (# event can occur) --&gt;
+&lt;!-- - \\(x!\\) deletes duplications --&gt;
+&lt;!-- - \\((n-x)!\\) ends count of events --&gt;
+&lt;!-- - \\(p^x\\) is probability of success (head) for n trials --&gt;
+&lt;!-- - \\((1-p)^{n-x}\\) is probability of failure (tail) for n trials --&gt;
+
+&lt;!-- Joint probability of obtaining h heads and n-h tails is simply the product of all the individual probabilities. --&gt;
+
+---
+class: center, middle
+
+# Deeper into MLE
+
+.pull-1[.circleoff[![](https://is4-ssl.mzstatic.com/image/thumb/Purple125/v4/5f/8f/55/5f8f55e1-6ca3-3911-b3f1-5aad674a5095/source/512x512bb.jpg)]]
+.pull-1[.circleon[![](https://activecalculus.org/single/images/1_6_Intro.svg)]]
+.pull-1[.circleoff[![](https://www.topratedforexbrokers.com/wp-content/uploads/comparison-list.svg)]]
+
+---
+## Back to our data
+
+Ok, let's get back to our main example for today: CO2 emissions.
+
+
+```r
+x.mat &lt;- cbind(1, log(wdi$GDPpc))
+y.vec &lt;- log(wdi$CO2)
+```
+
+--
+
+### Express joint probability
+
+If observations _i.i.d._, then we can express the joint probability thus:
+
+$$  \Pr(y_1|\theta_1) = f(y_1|\theta_1) $$
+
+$$  \Pr(y_1,y_2|\theta_1,\theta_2) = f(y_1|\theta_1) \times f(y_2|\theta_2) $$
+
+$$  \Pr(y_1,...,y_n|\theta_1,...,\theta_n) = \prod_i^n f(y_i|\theta_i) $$
+
+---
+### Convert joint probability into a likelihood
+
+$$ L(\theta|y) = h(y) \Pr(y|\theta) \propto \Pr(y|\theta) = \prod_i^n f(y_i|\theta_i) $$
+
+Note the presence of _h(y)_, an _unknown_ scaling factor that is a function of the data but not the parameter.
+
+Because it is unknown and cannot be estimated, the likelihood is only defined up to this multiplicative constant and does not have a direct interpretation as a probability; we have to interpret likelihoods relative to one another.
+
+_But_ the _likelihood principle_ states that, after the data have been collected, 
+all information relevant for inference about \\(\theta\\) is contained in the likelihood function for the observed data under the assumed probability model.
+Two likelihood functions that are proportional to one another contain the same information about theta.
+
+Because it is unknown and cannot be estimated, and just adds notational complexity, we're going to ignore it,
+and just say that the likelihood is '_proportional to_' \\( \propto \Pr(y|\theta) \\)
+
+$$ L(\theta|x) = h(x) f(x|\theta) \propto f(x|\theta)    $$
+
+---
+## Two decisions
+
+Using maximum likelihood estimation means making two decisions:
+1. residuals: what probability distribution are we assuming govern our data generating process?
+  - also called the _stochastic component_: \\( Y_i \sim f(\theta) \\)
+1. pattern: what is our model for the parameters of the assumed probability distribution?
+  - also called the _systematic component_: \\( \theta_i = \beta_0 + \beta_1 x_i \\)
+  
+--
+
+Addressed the systematic component in previous classes, but now much more flexibility on the stochastic component.
+
+--
+
+In \\( Y_i \sim f(\theta) \\) , \\(f\\) could be one of a range of probability distribution or mass functions.
+- tackle a number this semester: e.g. the binomial, Poisson, or Weibull, or even a mixture (NB: mixture ≠ mixed)
+
+---
+### Gaussian
+
+Here we choose the _Gaussian_, where residuals are expected to be normally distributed around the mean.
+
+We therefore consider a model that looks like \\(Y_i \sim f_N(\mu, \sigma^2)\\), where \\(E(Y) = \mu\\) and \\(\operatorname{Var}(Y) = \sigma^2\\), giving a PDF:
+
+$$ \Pr(Y_i = y_i) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp[-\frac{(Y_i - \mu)^2}{2 \sigma ^2}]      $$
+
+\\( \theta_i = (\mu_i, \sigma^2) \\) are the parameters we'll be estimating, 
+with \\( \mu_i = \beta_0 + \beta_1 x_i \\) our systematic component
+
+\\(\exp[-\frac{(Y_i - \mu)^2}{2 \sigma ^2}]\\) ensures the variable is symmetric around the mean
+
+\\(-\frac{(Y_i - \mu)^2}{2 \sigma ^2}\\) ensures the PDF lies between 0 and 1 for all values of the variable between 1 and \\(-\infty\\)
+
+\\(\frac{1}{\sqrt{2 \pi \sigma^2}}\\) ensures the PDF integrates to a total mass of 1
+
+This means our likelihood is:
+
+$$ L(\mu, \sigma^2|y) = \prod_i^n (2\pi\sigma^2)^\frac{-1}{2} exp[\frac{-(y_i - \mu_i)^2}{2\sigma^2}]  $$
+
+---
+## Simplify expression
+
+.pull-left[
+$$ L(\mu, \sigma^2|y) = \prod_i^n (2\pi\sigma^2)^\frac{-1}{2} exp[\frac{-(y_i - \mu_i)^2}{2\sigma^2}]  $$
+]
+
+.pull-right[
+Problem: likelihood functions often look scary:
+- products generally hard to deal with, and ..
+- issues with numeric precision when we get into teeeeny probabilities...
+]
+
+So, we work with the _log_ of this function.
+The log is a monotonic transformation which preserves important properties (i.e. extrema occur in the same place), 
+but turns a product into a sum, which is easier to work with:
+
+Whereas \\(L(\theta|x_1, x_2) = f(x_1|\theta)f(x_2|\theta)\\), the *log-likelihood* is \\(\log L(\theta|x_1, x_2) = \log f(x_1|\theta) + \log f(x_2|\theta)\\), or 
+
+$$ \log(\prod_i^N \Pr(X_i = x_i)) = \sum_i^N \log(\Pr(X_i = x_i))  $$
+
+???
+
+Multiplying small numbers yields even smaller numbers, which makes the floating point approximation used by a computer less accurate.
+
+---
+### Taking the log of our normal PDF
+
+$$  \log L(\mu, \sigma^2|y) = \sum_i^n \log[ (2\pi\sigma^2)^\frac{-1}{2} exp[\frac{-(y_i - \mu_i)^2}{2\sigma^2}] ] $$
+
+$$ = \sum_i^n [ - \frac{1}{2} \log(2\pi) - \frac{1}{2} \log(\sigma^2) - \frac{1}{2\sigma^2} (y_i - (\beta_0 + \beta_1 x_i))^2]  $$
+
+$$ -2 \log L(\mu, \sigma^2|y) = \sum_i^n [ \log(2\pi) + \log(\sigma^2) + \frac{1}{\sigma^2} (y_i - (\beta_0 + \beta_1 x_i))^2]   $$
+
+### Eliminating unknown parameters
+
+Since the first term, \\(log(2\pi)\\), is just a constant unrelated to any of the parameters to be estimated, it can be safely dropped, leaving us with:
+
+$$ -2logL(\mu, \sigma^2|y) = \sum_i^n [log(\sigma^2) + \frac{1}{\sigma^2} (y_i - (\beta_0 + \beta_1 x_i))^2]  $$
+
+---
+## Find the extrema of this expression
+
+Therefore, the maximum likelihood estimator \\(\hat\theta\\), is:
+
+$$  \hat\theta = \arg \max_n L(\theta|x) $$
+
+It is easy to estimate linear normal regression in R using MLE. Here are the main steps, showing you how to program the likelihood directly so that you might understand what is happening 'under the hood'.
+
+First let's write up a custom log-likelihood function for calculating the log-likelihood for our data.
+
+
+```r
+loglik.my &lt;- function(par, X, y){
+  y &lt;- y.vec
+  X &lt;- x.mat
+  k &lt;- ncol(X); n &lt;- nrow(X)
+  xbeta &lt;- X %*% par[1:k] # matrix notation
+  sigma &lt;- sqrt(1 / (n-k) * sum((y - xbeta)^2)) # assumed known here
+  sum(-log(sigma) - (1/(2*sigma^2)) * (y - xbeta)^2) # log-likelihood
+}
+```
+
+---
+### Marco Polo
+
+To find the \\(\hat\theta\\) that maximises the likelihood, we could just try many values of \\(\theta\\).
+But this is tedious and carries no guarantee that the maximum found is the global maximum.
+
+--
+
+Instead we can play a sophisticated game of 'Marco Polo' or 'hotter-colder'.
+
+Rather than a grid search, we're going to get feedback on whether we are close to the maximum and which way we should go.
+
+The ‘hotter/colder’ information these algorithms utilize comes from the way in which the likelihood function changes as we move across the parameter space.
+
+---
+### Skiing
+
+.pull-left[
+
+The intuition of Newton-Raphson is pretty simple: you pick a starting point and look around for the steepest slope. 
+- if you are minimising the function, ski downhill a little way, check again, ski again, etc until you can't go any lower
+- if you are maximising the function, climb uphill until you can't get any higher
+
+We need two pieces of information to do this:
+- whether on a plateau or not
+- which way to go if not
+
+The neat thing about this approach is that it will work for any family of models that you can write an equation for.
+
+]
+
+.pull-right[
+
+&lt;img src="STAT_L4_MLE_files/figure-html/plotintuition2-1.png" width="504" /&gt;
+
+
+]
+
+---
+### Regularity
+
+So long as some 'regularity conditions' are met...
+- \\(L\\) should be smooth without any kinks or holes (i.e. continuous), at least in the neighbourhood of \\(\hat\theta\\)
+- \\(\hat\theta\\) should not fall on some edge or boundary of the parameter space
+- the support of the distribution or mass function for X should not depend on the value of \\(\theta\\)
+- likelihoods with a single maximum, rather than many small, local hills or plateaus, are easier to work with.
+
+...the log-likelihood should be twice differentiable around the MLE:
+- the _first derivative_, \\(f'(y)\\), gives us information about whether we are on a plateau and which direction to move in to maximise/minimise log-likelihood
+- the _second derivative_, \\(f''(y)\\), gives us information about how quickly to move in that direction
+
+---
+#### First derivative
+
+We want to move the vector to the point at which the value of the likelihood is at its highest,
+and to do this we want information about the slope of the likelihood function at each point.
+
+This information is offered by the matrix of first derivatives of the (log-)likelihood w.r.t. the \\(\theta\\)s, called the _gradient_ matrix \\(\nabla\\).
+
+The _score function_, \\(S(\theta)\\), is the gradient of the log-likelihood.
+Evaluated at a particular point \\(\theta\\), the score function will describe the steepness of the log-likelihood.
+- If the gradient is positive, then the likelihood is increasing in \\(\hat\theta\\), 
+and so we should increase our estimate even more...
+
+- If the gradient is negative, then the likelihood is decreasing in \\(\hat\theta\\), 
+and so we should decrease our estimate of \\(\hat\theta\\)
+
+- If the function is continuous, then at the maximum or minimum, this vector of first partial derivatives equals 0, telling us when we are at a maximum (or minimum).
+
+--
+
+We can therefore find an extrema for this curve by setting the first derivative to zero and solving.
+
+--
+
+But is it the maximum or the minimum?
+
+---
+#### Second derivative
+
+The second derivative is closely related to the notion of curvature of a function,
+and is critical in both estimating the MLE and describing our uncertainty.
+
+Second derivative gives us the direction in which the slope of the function is changing:
+&lt;!-- - If \\( f''(Y)\\) positive, then slope of \\( f''(Y)\\) is becoming more positive in the variable, indicating a minimum. --&gt;
+- If \\( f''(Y)\\) negative, then slope of \\( f'(Y)\\) becoming less positive, indicating a maximum.
+- The bigger the absolute value of the second derivative, the more 'curved' the function,
+which tells us the rate at which the slope is changing...
+
+&lt;!-- --- --&gt;
+#### Putting it together
+
+.pull-left[
+
+$$  \hat\theta_k = \hat\theta_j + \Delta_j \lambda_j $$
+
+- ∆ (delta) tells us the direction we want to take a step in 
+- λ (lambda) tells us the amount by which we want to change our estimates (the “length” of the step size)
+- using _j_ here for _k - 1_; the old parameter estimates...
+
+]
+
+.pull-right[
+
+![](https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fimg.sparknotes.com%2Ffigures%2F6%2F6feb2790f92651105afa8c668bf0b7ba%2Ffigure3-8p-3.gif&amp;f=1&amp;nofb=1)
+
+]
+
+---
+### Using optim
+
+
+```r
+mle.fit &lt;- optim(
+  par = c(5,5), # practically speaking, OLS estimates usually good starting guesses
+  fn = loglik.my, # function to minimise
+  method = "BFGS", # algorithm choice (a quasi-Newton-Raphson method)
+  control = list(
+    trace = T, # trace optimisation progress
+    maxit = 1000, # maximum number of iterations
+    fnscale = -1 # changes minimiser to maximiser
+  ),
+  hessian = T) # return Hessian matrix (later)
+```
+
+```
+## initial  value 802.226018 
+## iter  10 value 250.166036
+## iter  10 value 250.166036
+## iter  10 value 250.166036
+## final  value 250.166036 
+## converged
+```
+
+```r
+if(mle.fit$convergence != 0) print("WARNING: Convergence Problems; Try again!")
+```
+
+---
+## Establishing uncertainty
+
+.pull-left[
+The second derivative is also important for describing our uncertainty about \\(\hat\theta\\).
+
+The negative of the second derivative tells us how much (a quantity, not a function) information about \\(\theta\\) we have at the MLE.
+This is called _Fisher information_, \\(I(\hat\theta)\\).
+
+When \\(\theta\\) is a _k_-dimensional vector, the matrix of second partial derivatives is known as the _Hessian matrix_, \\(H(\theta)\\).
+
+Inverting the Hessian matrix, \\(-H(\hat\theta)^{-1}\\), will provide the variance-covariance matrix, the square root of the diagonal of which contains the estimated standard errors for the parameters.
+]
+
+.pull-right[
+
+```r
+ses &lt;- sqrt(-diag(solve(mle.fit$hessian)))
+z &lt;- mle.fit$par/ses
+p.z &lt;- 2 * (1 - pnorm(abs(z))) # p-values
+out.table &lt;- data.frame(Est = mle.fit$par,
+                        SE = ses,
+                        Z = z,
+                        pval = p.z)
+round(out.table, 2)
+```
+
+```
+##    Est   SE    Z pval
+## 1 0.26 1.31 0.20 0.84
+## 2 0.98 0.14 6.97 0.00
+```
+]
+
+These results imply that, in the set of countries/year examined, higher levels of GDP are associated with higher levels of CO2 emissions.
+The estimated coefficient for GDP (B1) means that for every order of magnitude increase in GDP per capita, there will be an order of magnitude increase in annual CO2 emissions, on average.
+
+???
+
+Therefore, expected Fisher information, written in terms of the Hessian matrix, is:
+
+$$  I(\theta) \equiv E[S(\theta)S(\theta)^T] = -E[H(\theta)]   $$
+
+---
+## MLE Properties
+
+_Invariance_
+- a transformation of the MLE equals the MLE of that transformation
+
+_Large-sample properties_ based on the Law of Large Numbers and the Central Limit Theorem
+
+2. _Consistency_: given infinite data, the MLE collapses to the 'true' parameter value
+3. _Asymptotic efficiency_: as sample size increases, they become unbiased minimum variance estimators as the sample size increases
+3. _Asymptotic normality_: as sample size increases, standard error becomes normal
+  - allowing conventional hypothesis testing and _z_-scores for results
+  - enables predictions of yet-to-be observed data
+
+--
+
+_No guarantee_ that MLE is unbiased, and often is in small samples. But bias only a second-order concern here:
+1. bias disappears as _n_ increases
+1. bias in the MLE can be estimated and account for, if needed, using cross-validation
+1. an unbiased estimator is not robust to re-parameterisation
+
+---
+class: center, middle
+
+# Diagnostics and Comparisons
+
+.pull-1[.circleoff[![](https://is4-ssl.mzstatic.com/image/thumb/Purple125/v4/5f/8f/55/5f8f55e1-6ca3-3911-b3f1-5aad674a5095/source/512x512bb.jpg)]]
+.pull-1[.circleoff[![](https://activecalculus.org/single/images/1_6_Intro.svg)]]
+.pull-1[.circleon[![](https://www.topratedforexbrokers.com/wp-content/uploads/comparison-list.svg)]]
+
+---
+## Diagnostics
+
+Because we cannot get _h(x)_, the likelihood is itself not meaningful as a raw value but,
+so long as you are basing these calculations on the _exact same data_,
+, we can use it to compare across models through:
+- the likelihood ratio
+- the score test
+- the Wald statistics
+- the Akaike information criterion
+- the Bayesian information criterion
+
+NB: Sometimes including a new parameter will mean losing some observations when only non-missing data is retained.
+In this case, it is difficult to compare/contrast likelihoods.
+
+---
+### Likelihood ratios
+
+You can simply divide one by the other, canceling out the unknown scaling factor.
+
+The likelihood ratio is used to compare 'nested' models, i.e. when one is a restricted case of the other.
+
+$$  LR(\theta_R, \theta_G|x) = -2 \log \frac{L(\theta_R|x)}{L(\theta_G|x)}   $$
+
+This likelihood ratio statistics is distributed according to the \\(\chi^2\\) distribution under the null hypothesis that the more restricted model is the "correct" one.
+
+The degrees of freedom of the null distribution equals the number of parameter restrictions imposed as we go from the general to restricted model.
+
+Therefore we can calculate the probability of observing a likelihood ratio statistic at least as great as the one we observe for our dataset and proposed models.
+
+Statistical packages often report a _model_ \\(\chi^2\\).
+This compares the fitted model to one that includes _only_ the intercept.
+That is, is the model better than just using the mean?
+
+---
+
+.pull-left[
+
+### Score tests
+
+The score test relies on the score function to consider the slope of the log-likelihood when we constrain a particular parameter to some hypothesised value.
+
+If the constraint is appropriate, then the slope of the log-likelihood near the constraint should be about 0 since, at the maximum of the likelihood function, the derivative with respect to the parameters equals 0.
+
+]
+.pull-right[
+
+![](https://stats.idre.ucla.edu/wp-content/uploads/2016/02/nested_tests.gif)
+
+&lt;!-- ![](https://zhanxw.com/blog/wp-content/uploads/2014/12/FAQ__How_are_the_likelihood_ratio__Wald__and_Lagrange_multiplier__score__tests_different_and_or_similar_.png) --&gt;
+
+]
+
+### Wald tests
+
+We also have the Wald test, which is simply the squared difference of the estimated parameters from some constrained value (typically zero), weighted by the curvature of the log-likelihood.
+The Wald test is a generalised version of the standard t-test.
+
+---
+### Information criteria
+
+The maximised likelihood, _L_, also serves as the basis for AIC and BIC, where _k_ is the number of estimated parameters in the fitted model:
+
+1. AIC
+
+$$  -2\log L + 2k  $$
+
+2. BIC
+
+
+$$  -2 \log L + k \log n  $$
+
+- Neither are meaningful on their own, only in comparison to other models _on the exact same data_.
+- For both of these information criteria, smaller values are "better".
+- Both AIC and BIC penalise models for greater complexity, unlike LR and other such tests.
+- BIC imposes a higher penalty so long a \\(n ≥ 8\\)
+- AIC even has a version with greater penalisation, the AICc.
+
+---
+## What if L is wrong?
+
+Note that information about \\(\theta\\) comes from both the observed data _and_ our assumptions about the DGP as embodied in the probability model \\(f(x|\theta)\\).
+
+Many of the MLE's desirable properties are predicated on the untestable assumption that our probability model correctly captured some objective, "true" DGP.
+
+If the model is wrong, then parameter estimates can be (but are not necessarily) biased and inconsistent.
+
+What this comes down to is that we need to choose the best probability model given what we know about the DGP for a particular application.
+
+We can use AIC and BIC to compare different model specifications, and this includes the use of a different probability model.
+
+--
+
+Under certain circumstances we may also want to correct for some misspecification problems. 
+For example, if our estimates are still consistent with respect to theta, then robust standard errors can help.
+
+---
+### Model identification issues
+
+It is not always possible to find one set of parameter values that uniquely optimizes the log-likelihood.
+
+1. If there are too many parameters (model is ‘underidentified’).
+
+1. Local minima/maxima can happen!
+
+![](https://www.researchgate.net/profile/Eugene_Fink2/publication/220080335/figure/fig1/AS:341297194913803@1458383000853/Illustration-of-the-local-maxima-surrounding-a-minimum-a-i-These-maxima-are-used-in.png)
+
+--
+
+If this happens, estimates may not converge at all.
+If convergence is difficult, try the following:
+- Make sure that the model is properly- (or, at least, well-) specified.
+- Delete all missing data explicitly.
+- Rescale the variables so that they’re all more-or-less on the same scale.
+- Perhaps try another optimization algorithm.
+
+---
+## OLS vs MLE
+
+So is MLE better than OLS?
+
+--
+
+Not really. Indeed they are equivalent for certain situations.
+
+--
+
+Ward and Ahlquist say that OLS is just marketed as the 'ordinary' model, but it is really just a special case of MLE.
+
+--
+
+But there are some important conceptual advantages to MLE:
+- more than just a collection of statistical models or even an estimation procedure
+- a unified way of thinking about model construction, estimation and evaluation (Ron Fisher)
+- enables us to custom-design our own statistical estimators for our own research questions
+
+---
+## Other estimation techniques
+
+MLE is just one family of estimation techniques.
+Others include _general method of moments_ or _Bayesian_ approaches.
+
+Actually MLE and Bayesian estimation quite related.
+
+Bayesian thinking builds on Rev. Thomas Bayes' Rule, which provides a principled basis for combining prior knowledge and beliefs with newly acquired data to generate an updated set of beliefs.
+
+$$  \Pr(\theta|x) = \frac{\Pr(x|\theta) \Pr(\theta)}{\Pr(x)} \propto \Pr(x|\theta) \Pr(\theta) \propto L(\theta)\Pr(\theta)  $$
+
+From Bayes' Rule, we see that the posterior \\( \Pr(\theta|x) \\) is the prior \\( \Pr(\theta) \\) times the likelihood \\( \Pr(x|\theta) \\), scaled by the marginal probability of the data, \\(\Pr(x) \\).
+- As the volume of observed data increases, the information in the data dominates our prior beliefs and the posterior comes to resemble the likelihood.
+- If we assume that the prior, \\(\Pr(\theta)\\), follows a uniform distribution with support that includes \\(\hat\theta\\), then the mode of the posterior will be the MLE.
+
+While Bayesian estimation is more involved than MLE (and thus beyond this course) and the final interpretation of the parameter estimates differ, in many situations ML and Bayesian estimation yield similar results.
+
+???
+
+Maximum likelihood is based on the idea that the observed data are more likely to have come about as a result of a particular set of parameters.
+
+That is, rather than consider the data as random and the parameters as fixed, MLE treats the observed data as fixed and asks: 
+What parameter values are most likely to have generated the data?
+
+It is thus quite similar to a Bayesian framework.
+
+---
+class: center, middle
+
+# Summary
+
+.pull-1[.circleon[![](https://is4-ssl.mzstatic.com/image/thumb/Purple125/v4/5f/8f/55/5f8f55e1-6ca3-3911-b3f1-5aad674a5095/source/512x512bb.jpg)]]
+.pull-1[.circleon[![](https://activecalculus.org/single/images/1_6_Intro.svg)]]
+.pull-1[.circleon[![](https://www.topratedforexbrokers.com/wp-content/uploads/comparison-list.svg)]]
+
+Try to digest all this a bit before next week...
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>` "
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
