@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Statistics for International Relations Research II</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="James Hollway" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/table1/table1_defaults.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://raw.githack.com/jhollway/iheidmyninja/master/iheid-xaringan-style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistics for International Relations Research II
+## Models for Binary Outcomes
+### <large>James Hollway</large>
+
+---
+
+class: center, middle
+
+.pull-1[.circleon[![](https://is4-ssl.mzstatic.com/image/thumb/Purple125/v4/5f/8f/55/5f8f55e1-6ca3-3911-b3f1-5aad674a5095/source/512x512bb.jpg)]]
+.pull-1[.circleon[![](https://i.ya-webdesign.com/images/polo-drawing-cartoon-4.png)]]
+.pull-1[.circleon[![](https://www.topratedforexbrokers.com/wp-content/uploads/comparison-list.svg)]]
+
+
+
+---
+class: center, middle
+
+.pull-1[.circleon[![](https://us.123rf.com/450wm/evgen79/evgen791307/evgen79130700021/20661978-seamless-pattern-with-a-binary-code-for-your-design.jpg?ver=6)]]
+.pull-1[.circleon[![](https://pbs.twimg.com/profile_images/981544484684075008/lHu4ogWd_400x400.jpg)]]
+.pull-1[.circleon[![](https://www.coopathome.ch/img/produkte/880_880/RGB/6117246_001.jpg?_=1524058709415)]]
+
+???
+
+This week we're going to talk about models for binary data.
+We'll talk about why OLS is poor (or is it?) for binary data,
+and what the alternatives are,
+paying special attention to _the logit_.
+
+Next we're going to discuss the interpretation of logit models.
+We'll talk about how one can talk about log-odds and predicted probabilities,
+marginal effects and odds ratios.
+
+Lastly, we'll talk about goodness of fit measures for logits,
+which is a bit of an applied version of the bit at the end of last time that we didn't have time for...
+We'll talk about likelihood ratios and Wald tests, as well as ROC curves and cross-validation.
+
+---
+class: center, middle
+# Binary Models
+
+.pull-1[.circleon[![](https://us.123rf.com/450wm/evgen79/evgen791307/evgen79130700021/20661978-seamless-pattern-with-a-binary-code-for-your-design.jpg?ver=6)]]
+.pull-1[.circleoff[![](https://pbs.twimg.com/profile_images/981544484684075008/lHu4ogWd_400x400.jpg)]]
+.pull-1[.circleoff[![](https://www.coopathome.ch/img/produkte/880_880/RGB/6117246_001.jpg?_=1524058709415)]]
+
+---
+## Binary response variables
+
+Some response variables intrinsically binary; 
+others binary “versions” of some other variable...
+- Voting for a Republican or a Democrat
+- Going to war or not
+- Whether a country ratifies a country or not
+- Whether a country is a democracy or not (sort of...)
+
+How do we deal with such response variables?
+
+???
+
+But quickly, a rant: Dichotomizing continuous variables throws away information, and replaces data with assumptions that are arbitrary but necessary (typically a bad combination).
+
+It's even worse when you do this to multiple variables.
+
+Consider two continuous variables: Y = personal income and Z = shoe size.
+
+Let's say we use a median split (dichotomize them so that observations falling above the median get a value of one, and the rest get zeros)
+
+Both dichotomous variables will have mean = 0.5, and identical variances (0.252).
+
+Moreover, it's impossible to “get back to” the mean or the variance of either variable on the basis of the 0/1 indicators alone.
+
+This is why _measurement_ is really one of the most important parts of all statistics... nay, research!
+
+---
+## Today's data
+
+.pull-left[
+![](https://static01.nyt.com/images/2020/01/12/us/politics/00biden2002/00biden2002-superJumbo.jpg)
+
+<div class="Rtable1"><table class="Rtable1">
+<thead>
+<tr>
+<th class='rowlabel firstrow lastrow'></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Democrat<br><span class='stratn'>(n=51)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Republican<br><span class='stratn'>(n=49)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Overall<br><span class='stratn'>(n=100)</span></span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>War</span></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>0.569 (0.500)</td>
+<td>0.980 (0.143)</td>
+<td>0.770 (0.423)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Median [Min, Max]</td>
+<td class='lastrow'>1.00 [0.00, 1.00]</td>
+<td class='lastrow'>1.00 [0.00, 1.00]</td>
+<td class='lastrow'>1.00 [0.00, 1.00]</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>VotedBush</span></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>51.0 (7.46)</td>
+<td>58.6 (7.98)</td>
+<td>54.8 (8.58)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Median [Min, Max]</td>
+<td class='lastrow'>51.2 [39.0, 67.0]</td>
+<td class='lastrow'>57.6 [39.0, 73.7]</td>
+<td class='lastrow'>53.8 [39.0, 73.7]</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+]
+
+.pull-right[
+
+![](https://www.govtrack.us/congress/votes/107-2002/s237/diagram)
+
+&lt;img src="STAT_L5_Binary_files/figure-html/iraqBar-1.png" width="432" /&gt;
+
+]
+
+???
+
+So here we have some data on senators voting to authorise the use of military force in Iraq.
+
+---
+## The Linear Probability Model
+
+.pull-left-1[
+&lt;img src="STAT_L5_Binary_files/figure-html/xyc-1.png" width="504" /&gt;
+]
+
+One option, called the Linear Probability Model (LPM), is just to do a regular OLS regression of Y on X, but with a binary response variable.
+
+--
+
+We model the expected value of Y as linear function of X, \\( E(Y) = \beta X \\), 
+which in the binary case is:
+
+$$ E(Y) = \Pr(Y = 1) = 1[\Pr(Y = 1)] + 0[\Pr(Y = 0)]   $$
+
+So we model:
+
+$$  \Pr(Y_i = 1) = \beta X_i $$
+
+The result (in one continuous independent variable) looks like Figure 1.
+
+--
+
+This is called the linear probability model (LPM).
+
+--
+
+Can you spot any potential problems with this?
+
+---
+## What's wrong with this?
+
+
+.pull-left-1[
+&lt;img src="STAT_L5_Binary_files/figure-html/xyc2-1.png" width="504" /&gt;
+]
+
+__Nonsensical predictions__ (i.e., probabilities that are &lt; 0 or &gt; 1):
+
+If you call voting yea=1 and nay=0, does it make sense to say they're 0.6, 0.9, or 1.2 for yea?
+
+--
+
+__Heteroskedastic variance__ by construction:
+
+Since Y is binomial, \\(Var(Y) = E(Y)[1 - E(Y)] = X_i\beta(1 - X_i\beta)\\)
+
+So error term can only take on two values: either \\( 1 - X_i\beta \\) (distance from prediction to 1) or \\(-X_i\beta\\) (distance from prediction to 0).
+
+So errors can never be normally distributed, implying that traditional t-tests for individual significance and F-tests for overall
+significance are invalid.
+
+--
+
+Wrong __functional form__:
+
+We’d usually expect variables that impact probabilities to exhibit diminishing returns: as their value increases, the impact on Y would decrease.
+We want diminishing returns because 100% certainty something will happen should be rare.
+LPM doesn’t allow this; is constant for all values of X and Y.
+
+---
+## So what?
+
+Note that (with the possible exception of the last one) none of these problems go to bias; 
+OLS point estimates \\( \hat\beta \\) remain unbiased estimates of the true parameter values \\( \beta \\).
+
+--
+
+That's why you still sometimes see LPM used in econometrics or experimental studies because:
+- **Interpretability**: OLS estimates intuitive to understand and interpret; output from logits/probits less so.
+- **Similar model fit**: If probabilities you are modelling are moderate (say mostly between .2 and .8), then linear and logistic models (next) fit about equally well.
+
+--
+
+.pull-left[
+Still, if you submit an LPM to a polisci journal these days, you’ll get __desk-rejected__.
+
+The rationale is that we have no real excuse not to use more appropriate models,
+which are very common and well understood by now.
+
+What's the alternative?
+]
+
+.pull-right[
+![](https://www.incimages.com/uploaded_files/image/970x450/Hand-says-no-pano_12478.jpg)
+]
+
+---
+
+.pull-left-2[
+## Logistic regression
+
+Logistic regression is a linear regression applied to categorical outcomes using a logistic _link function_.
+This link function allows us to linearly relate X to Y.
+How does this work? Three steps:
+
+__First__, binary outcomes are binary, 0 or 1, and we want something continuous.
+The solution is to consider the _probability_ of the outcome being one or the other.
+This gives us \\([0,1]\\).
+
+__Second__, probabilities are bounded between 0 and 1, and we want something unbounded.
+The solution is to get the _odds_ of the probability of something happening: \\(\frac{p}{1-p}\\).
+Since probability can never be less than 0 or greater than 1, 
+this gives us \\([0,+\infty]\\).
+
+__Third__, odds are still lower bounded at zero and are badly skewed.
+The solution is to take the log of the odds \\(\log(\frac{p}{1-p})\\), commonly called the _logit_.
+This gives us \\([-\infty,+\infty]\\).
+
+The logit is therefore best link function for categorical DVs, 
+in which \\(\exp(\beta)\\) is a (biased) estimate for the corresponding odds ratio. 
+]
+
+.pull-right-1[
+
+&lt;img src="STAT_L5_Binary_files/figure-html/probs-1.png" width="504" /&gt;
+
+&lt;img src="STAT_L5_Binary_files/figure-html/oddsdist-1.png" width="504" /&gt;
+
+&lt;img src="STAT_L5_Binary_files/figure-html/logitdist-1.png" width="504" /&gt;
+
+]
+
+???
+
+The logit transformation and the logistic regression model was developed by Sir David Cox in the 1960’s. 
+The extension of the model to general linear models using various link functions came later.
+
+There are three ways of conceiving of this transformation:
+1. As an expression of odds of observing (I personally find this most intuitive)
+1. As a continuous/latent/unobservable \\(Y^\*\\) that relates somehow to the observed values of Y (\\(Y^\*\\) is not part of your data, it is part of the model). 
+You assume that Y equals to 1 if the signal of \\(Y^\*\\) is above some threshold, and otherwise Y is equal to zero. 
+Furthermore, assume, without loss of generality, that this threshold is zero.
+1. As an expression of choice based on some utility function
+
+---
+## The Standard Logistic Distribution
+
+.pull-left[
+If we assume that the error term follows a standard logistic distribution, we get a logit model...
+
+The standard logistic probability density is:
+
+$$ \Pr(u) = \lambda(u) = \frac{\exp(u)}{[1+\exp(u)]^2}     $$
+
+That’s the probability density function (PDF), 
+the term for the probability that _u_ takes on some specific value.
+
+The standard logistic has the following characteristics:
+1. It is “bell-shaped” and symmetrical around zero
+  - I.e. \\(\lambda(u) = 1 - \lambda(-u) \text{ and } 1 - \Lambda(-u)\\).
+1. The PDF has a variance equal to \\( \frac{\pi^2}{3} \approx 3.29 \\)
+  - I.e. fatter “tails” than the standard normal distribution
+]
+
+.pull-right[
+
+```r
+ggplot(data.frame(x = c(-4, 4)), aes(x = x)) +
+stat_function(fun = dlogis, colour = "red") +
+stat_function(fun = dnorm, colour = "blue")
+```
+
+&lt;img src="STAT_L5_Binary_files/figure-html/pdfcompare-1.png" width="504" /&gt;
+]
+
+---
+## The Standard Logistic Cumulative Distribution Function
+
+.pull-left[
+Once we assume that error is distributed according to the standard logistic, we can say something about the probability that Y = 1:
+
+$$ \Pr(Y_i = 1) = Y_i^* &gt; 0 = \Pr(u_i ≥ -X_i\beta)    $$
+
+If we want to know the cumulative probability that a standard-logistic variable is less than or equal to some value, 
+we consider the CDF of the logit:
+
+$$ \Lambda(u) = \int \lambda(u)du = \frac{\exp(u)}{1 + \exp(u)}     $$
+
+As an example, consider some values for _u_:
+- _u_ = 0 then \\(\Lambda(u) = 0.5\\)
+- _u_ = 1 then \\(\Lambda(u) = 0.73\\)
+- _u_ = 2 then \\(\Lambda(u) = 0.88\\)
+- _u_ = -1 then \\(\Lambda(u) = 0.27\\)
+- _u_ = -2 then \\(\Lambda(u) = 0.12\\)
+]
+
+.pull-right[
+
+```r
+ggplot(data.frame(x = c(-4, 4)), aes(x = x)) +
+stat_function(fun = plogis, colour = "red") +
+stat_function(fun = pnorm, colour = "blue")
+```
+
+&lt;img src="STAT_L5_Binary_files/figure-html/cdfcompare-1.png" width="504" /&gt;
+
+Notice the sigmoidal curve and the thick tails!
+]
+
+&lt;!-- https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fd2r5da613aq50s.cloudfront.net%2Fwp-content%2Fuploads%2F415059.image0.jpg&amp;f=1&amp;nofb=1 --&gt;
+
+---
+## Now we can MLE like last time!
+
+.pull-left-1[
+We can linearly relate the log-odds of the occurrence of some binary event of interest to a set of covariates:
+
+Through fancy algebra, we can determine the probability for the logit model:
+
+Turn it into a likelihood function:
+
+Add up all (N) observations to get overall likelihood (note the multiplication):
+
+Lastly, we take the log (again) to avoid teensy values:
+
+]
+
+.pull-right-2[
+$$ \log\Bigl(\frac{\Pr(Y_i = 1)}{1-\Pr(Y_i = 1)}\Bigr) = X_i\beta    $$
+
+$$ \Pr(Y_i = 1) = \frac{\exp(X_i\beta)}{1 + \exp(X_i\beta)} $$
+
+`$$L_i = \Bigl(\frac{\exp(X_i\beta)}{1 + \exp(X_i\beta)}\Bigr)^{Y_i} \Bigl[1 - \frac{\exp(X_i\beta)}{1 + \exp(X_i\beta)}\Bigr]^{1-Yi}$$`
+
+`$$L = \prod_i^N \Bigl(\frac{\exp(X_i\beta)}{1 + \exp(X_i\beta)}\Bigr)^{Y_i} \Bigl[1 - \frac{\exp(X_i\beta)}{1 + \exp(X_i\beta)}\Bigr]^{1-Yi}$$`
+
+`$$\log L = \sum_i^N \log\Bigl(\frac{\exp(X_i\beta)}{1 + \exp(X_i\beta)}\Bigr) + (1 - Y_i) \log\Bigl[1 - \frac{\exp(X_i\beta)}{1 + \exp(X_i\beta)}\Bigr]$$`
+]
+
+.pull-down[
+This yields a standard binary logit model,
+and then all we need to do is maximize this log-likelihood with respect to \\(\beta\\)s to obtain our MLEs!
+]
+
+???
+
+Note that this slide is really only for enthusiasts.
+
+As applied researchers, you will never need to show this working.
+
+But I like to include these slides sometimes to show that this is not all just a black box; that it is really just a set of (by now) standard transformations to deal with particular properties of certain types of data.
+
+If you _are_ interested in going down this rabbit hole though,
+please make an appointment during my office hours!
+
+---
+## Other Binary Response Models
+
+### Probit (Probability Logit, though perhaps better called the "normit")
+
+It assumes errors in the underlying latent equation distributed _normally_
+  - That is, probit uses a normal distribution link function, while logit uses a logistic link function
+
+Some argue that assuming normal errors is better justified than (standard) logistic errors (because of the central limit theorem, etc.).
+  - Because the standard logistic distribution has a larger variance, it will also yield larger estimated  \\(\hat\beta\\) (and correspondingly larger standard error estimates).
+  - As a result, logit estimates are usually roughly 1.8 times the size of probit ones (which is \\(\approx \sqrt{3.29}\\) - recall that the variance of the standard normal is 1, while that for the standard logistic is 3.29).
+
+BUT, because the CDF of the standard normal has no closed form solution, can’t figure out integral through algebra/calculus, and instead have to approximate it numerically (hence _z_-tables).
+And THOUGH we can approximate it very accurately, we can’t simply figure out probit probabilities using a garden-variety hand calculator.
+
+???
+
+In practice, you could use logit or probit (just slightly different log-odds),
+but there are some considerations:
+- Disciplinary use: Logits are more commonly used in poli sci, probits more in economics.
+- Interpretation: logit coefficients can be back transformed into odds ratios, a somewhat intuitive way to interpret the effect. Not the case with probit coefficients.
+  - Coefficients for probit models can be interpreted as the difference in Z-score associated with each one-unit difference in the predictor variable. That’s not very intuitive.
+  - Another way to interpret these coefficients is to use the model to calculate predicted probabilities at different values of X.
+- Assumptions about data and observations: Probit models can be generalized to account for non-constant error variances in more advanced econometric settings (known as heteroskedastic probit models)
+  - The probit is used because it is easier to calculate if values are not independent over time.
+  - If the binary choice is independent from other observations, then there is no difference between logit and probit.
+- Variable form: Logit is used if you want to calculate estimates for categorical data.
+
+---
+### Clog-log (Complementary Log-Log Model)
+- Whereas the log-log model approaches 0 quickly but 1 slowly, its inverse or 'complement', the clog-log, approaches 0 slowly but 1 quickly
+- It is therefore not symmetrical around 0.5 like the logit and probit are
+&lt;!-- - The cloglog is called for if you believe that the probability of success rises slowly from zero, but then tapers off more quickly as it approaches one. --&gt;
+- We’ll come back to the cloglog model a bit later on, when we discuss models for event counts...
+
+### Scobit (Skewed-Logit)
+- Used where individuals with any initial probability of choosing either of two alternatives (0.5) are most sensitive to changes in independent variables.
+
+### Tobit (Censored Regression Model)
+- Designed to estimate linear relationships between variables when there is either left- or right-censoring in the dependent variable.
+
+???
+
+I feel like tobits had their hey-day last decade,
+with a set of more high-profile papers.
+
+---
+class: center, middle
+# Interpretation
+
+.pull-1[.circleoff[![](https://us.123rf.com/450wm/evgen79/evgen791307/evgen79130700021/20661978-seamless-pattern-with-a-binary-code-for-your-design.jpg?ver=6)]]
+.pull-1[.circleon[![](https://pbs.twimg.com/profile_images/981544484684075008/lHu4ogWd_400x400.jpg)]]
+.pull-1[.circleoff[![](https://www.coopathome.ch/img/produkte/880_880/RGB/6117246_001.jpg?_=1524058709415)]]
+
+???
+
+Ok, now that we've motivated and explained logistic regression,
+let's now talk about how to estimate (briefly) and interpret
+logit models.
+
+---
+## Estimation
+
+.pull-left[
+
+Let's say we have a pretty straightforward model for which senators vote for authorizing use of force in Iraq:
+
+$$ \Pr(War_i = 1) = f\bigl[\beta_0 + \beta_1(Republican) + \beta_2(VotedBush) + u_i\bigr]  $$
+
+That is, whether a senator will vote for war depends on some function of their general propensity to vote for war (\\(\beta_0\\)),
+whether they are Republican or not (\\(\beta_1\\), because President Bush was Republican), and what percentage of their constituents voted for Bush over Gore in the last election (\\(\beta_2\\), the rationale being that this reveals how precarious their seat is).
+
+We can estimate this model using (e.g.) the `glm()` function in R.
+
+]
+
+.pull-right[
+
+
+```r
+fullmodel &lt;- glm(War ~ VotedBush + Republican, 
+                 data=iraqVote, 
+                 family=binomial(link="logit"))
+tab_model(fullmodel, transform = NULL)
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;War&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Log-Odds&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-5.44&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-10.27&amp;nbsp;&amp;ndash;&amp;nbsp;-1.26&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.017&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;VotedBush&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.11&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.03&amp;nbsp;&amp;ndash;&amp;nbsp;0.21&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.012&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Republican []&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;3.02&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.30&amp;nbsp;&amp;ndash;&amp;nbsp;5.95&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.005&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;100&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; Tjur&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.315&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+]
+
+???
+
+We will encounter `glm()` again, as it refers to generalized linear models, which encompasses many other models too.
+
+The formula specification should look pretty familiar by now.
+You could use interactions or any other transformations you might want here.
+
+Note how I have specified that we will use a logit link function
+over e.g. a probit for the way in which we're expecting the errors to be distributed.
+
+Note also that I have told `sjPlot` _not_ to transform the coefficients... this will become clear in a couple of slides...
+
+---
+## (No Direct) Interpretation
+
+.pull-left[
+On the right are the parameter estimates. 
+
+The estimates from logistic regression characterize the relationship between the predictor and response variable on a log-odds scale.
+
+For example, this model suggests that for every one unit increase in VotedBush, the log-odds of the senator voting for war increases by 0.11.
+
+Er, what? What the hell does that mean?
+
+Turns out there is no real intuitive way to interpret log-odds,
+but we have a few options to help us get the most out of this...
+]
+
+.pull-right[
+
+```r
+fullmodel &lt;- glm(War ~ VotedBush + Republican, 
+                 data=iraqVote, 
+                 family=binomial(link="logit"))
+tab_model(fullmodel, transform = NULL)
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;War&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Log-Odds&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-5.44&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-10.27&amp;nbsp;&amp;ndash;&amp;nbsp;-1.26&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.017&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;VotedBush&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.11&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.03&amp;nbsp;&amp;ndash;&amp;nbsp;0.21&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.012&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Republican []&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;3.02&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.30&amp;nbsp;&amp;ndash;&amp;nbsp;5.95&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.005&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;100&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; Tjur&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.315&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+]
+
+---
+## “Sign-ificance”
+
+.pull-left[
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;War&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Log-Odds&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-5.44&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-10.27&amp;nbsp;&amp;ndash;&amp;nbsp;-1.26&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.017&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;VotedBush&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.11&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.03&amp;nbsp;&amp;ndash;&amp;nbsp;0.21&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.012&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Republican []&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;3.02&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.30&amp;nbsp;&amp;ndash;&amp;nbsp;5.95&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.005&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;100&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; Tjur&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.315&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+]
+
+.pull-right[
+
+One option for interpretation is what I call “sign-ificance”:
+- See whether (and to what extent) \\(\beta\\) statistically differentiable from zero
+- See whether the sign of \\(\beta\\) is:
+  - positive: increases in X correspond to increases in Pr(Y = 1)
+  - negative: increases in X correspond to decreases in Pr(Y = 1)
+]
+
+Together this is sufficient for hypothesis-testing:
+we know that the signal in the data is not just by chance,
+and whether it goes in the same direction as hypothesised.
+
+Therefore common to see articles using this approach where authors only focused on hypothesis testing,
+and they are trying to avoid problems with using odds-ratios (and log-odds) to compare effect sizes within and across models (see below).
+
+Not the most useful way to present results though, since no direct, 
+intuitive way to interpret the log-odds coefficients substantively and among each other.
+
+---
+## Odds Ratios
+
+.pull-left[
+Another approach is to transform the logit's log-odds coefficients into 
+something more intuitive to support substantive interpretation: _odds ratios_.
+
+Recall from Stats I that odds are a different way of thinking about probability:
+- If Pr(Y=1)=0.50, then odds 1 to 1
+- If Pr(Y=1)=0.75, odds 3 to 1, etc. 
+- Odds range from 0 to \\(\infty\\) (but never negative).
+
+Much more intuitive than log-odds!
+Would you prefer to bet on a horse winning at the track based on log-odds of -1.95 or an odds ratio of 7 to 1?
+]
+
+
+---
+.pull-left[
+### Odds Ratios and the Logit Model
+
+The odds ratio is the change in the odds of Pr(Y=1) associated with a one unit change in our covariate.
+
+Get by exponentiating logistic regression coefficients: 
+
+`$$\text{Odds Ratio} = \exp(\hat\beta_k\delta)$$`
+
+Can then also translate into percentage change in odds:
+
+`$$\text{Percentage Change} = 100[\exp(\hat\beta_k\delta) - 1]$$`
+
+Quick Guide:
+- OR&gt;1: \\(\Pr(Y=1) &gt; \Pr(Y=0)\\)
+- OR&lt;1: \\(\Pr(Y=1) &lt; \Pr(Y=0)\\)
+- OR=1: \\(\Pr(Y=1) = \Pr(Y=0)\\)
+]
+
+.pull-right[
+
+```r
+ # sjPlot reports OR by default
+ tab_model(fullmodel)
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;War&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Odds Ratios&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.00&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.00&amp;nbsp;&amp;ndash;&amp;nbsp;0.28&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.017&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;VotedBush&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.12&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.03&amp;nbsp;&amp;ndash;&amp;nbsp;1.23&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.012&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Republican []&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;20.47&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;3.69&amp;nbsp;&amp;ndash;&amp;nbsp;384.20&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.005&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;100&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; Tjur&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.315&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+E.g. logit estimate \\(\hat\beta\\) = 3.02, means being Republican
+- ...increases the log-odds of voting for war by 3.02
+- ...increases the odds by \\(\exp(3.02) = 20.47\\)
+- ...increases the odds by \\(100[\exp(3.02)-1] = 1947\\)%
+]
+
+What you _cannot_ say: Republicans 1947% more likely to vote for war:
+that's a probability statement (risk) not odds.
+
+???
+
+Probability still needs to be between 0 and 1, remember.
+
+The `optiRum` package has some neat functions for translating between logit coefficients,
+odds, and probabilities.
+
+---
+### Oddities with ORs
+
+Mood (2010) argues that, because log-odds and ORs also reflect unobserved heterogeneity in the DV (even if unrelated to IVs),
+problematic to interpret them substantively, 
+or compare them across model specifications (different IVs), across samples, across groups within samples, and across time...
+
+--
+
+Mood (2010) suggests:
+- Pick a continuous instead of a binary DV (not always possible though)
+- Use predicted probabilities, marginal effects, and average marginal effects (AMEs) as quantities of interest
+- Use LPM if non-linearity not a real concern in your model (OLS estimates easier to interpret and compare)
+
+--
+
+Other scholars (e.g. Buis 2017) argue that issues of unobserved heterogeneity 
+not as problematic if we think of the DV not in terms of a latent variable model (as Mood 2010 does), 
+but as a chance of an event taking place or not.
+
+Take-Away: Whether ORs are problematic or not depends on the theory and the type of research question the researcher has.
+
+---
+
+.pull-left[
+## Predicted Probabilities
+
+What we really care about, in most cases, 
+is the effect of changes in X on the probability of the actual event of interest. 
+
+To get this is a bit more involved than with OLS,
+since effect of covariates is linear only with respect to the log-odds, not Y itself.
+Because model nonlinear, 
+real net effect of a change in X depends on the constant, other Xs and their parameter estimates.
+
+Unlike in a linear regression model, 
+the first derivative of our (binary) logit function depends on X and \\(\hat\beta\\):
+
+$$  \frac{\partial\Pr(\hat{Y}_i = 1)}{\partial X_k} \equiv \lambda(X) = \frac{\exp(X_i\hat\beta)}{[1 + \exp(X_i\hat\beta)]^2}\hat\beta_k $$
+]
+
+.pull-right[
+Practically, this means that if you’re interested in the effect of a one-unit change in X on Pr(Yi = 1), 
+how much change there is depends critically on “where you are on the curve”.
+
+&lt;img src="STAT_L5_Binary_files/figure-html/predprobplot-1.png" width="504" /&gt;
+
+We need to calculate predicted probabilities of Y at specific values of key predictors.
+]
+
+---
+### Using predict()
+
+Fortunately, we can simply pass data on our independent variables, 
+either in-sample, out-of-sample, or totally-made-up,
+to `predict()` and see what probability of a 1 would be predicted by the model:
+
+
+```r
+predict(fullmodel, type="response")[1:4]
+```
+
+```
+##         1         2         3         4 
+## 0.9850607 0.9850607 0.9968734 0.9968734
+```
+
+```r
+(test &lt;- data.frame(Republican = as.factor(c("Democrat","Democrat","Republican","Republican")),
+                   VotedBush = seq(20,80, by = 20)))
+```
+
+```
+##   Republican VotedBush
+## 1   Democrat        20
+## 2   Democrat        40
+## 3 Republican        60
+## 4 Republican        80
+```
+
+```r
+predict(fullmodel, newdata=test, type="response")
+```
+
+```
+##          1          2          3          4 
+## 0.03997294 0.28609572 0.98749105 0.99868560
+```
+
+---
+## Marginal Effects
+
+.pull-left[
+Marginal effects (ME) are popular in some disciplines (e.g. Economics) 
+because they offer some of the same advantages that the Linear Probability Model (LPM) does:
+a good, single number approximation to the amount of change in \\(\Pr(Y=1)\\) 
+produced by a 1-unit change in X.
+
+These are marginal effects, because they show how \\(\Pr(Y=1)\\) changes after controlling for all other variables in the model.
+
+However, some argue that marginal effects for categorical independent variables are easier to understand and also more useful than marginal effects for continuous variables.
+
+
+]
+
+.pull-right[
+
+```r
+plot_model(fullmodel, type = "pred", 
+     terms = c("VotedBush","Republican"),
+     colors = c("blue","red"))
+```
+
+&lt;img src="STAT_L5_Binary_files/figure-html/margins-1.png" width="504" /&gt;
+]
+
+---
+### Average Marginal Effects
+
+One can also calculate AMEs (average marginal effects), 
+which are the differences in values associated with a unit change in the specified covariate.
+
+
+```r
+library(margins)
+summary(margins(fullmodel))
+```
+
+```
+##                factor    AME     SE      z      p  lower  upper
+##  RepublicanRepublican 0.3170 0.0724 4.3768 0.0000 0.1751 0.4590
+##             VotedBush 0.0134 0.0043 3.0950 0.0020 0.0049 0.0219
+```
+
+This suggests that being a Republican senator increases the probability of voting for war by 32 percentage points.
+
+Each percentage point increase in the proportion that had voted for Bush over Gore in the previous presidential election
+increases the probability of voting for war by ~1 percentage point.
+
+---
+## Summary
+
+So, logit interpretation harder (more involved, actually) than OLS, BUT ...
+- Not that much harder
+- Different approaches to support interpretation 
+
+--
+
+For now, remember three key points:
+1. Nearly all of these approaches require one to be cognizant of “where we are on the curve.”
+2. When it comes to any kind of interpretation, a picture really is much more valuable than text or tables.
+3. With very rare exceptions, never a good idea to present quantities of interest without their associated measures of uncertainty.
+
+---
+class: center, middle
+# Evaluation
+
+.pull-1[.circleoff[![](https://us.123rf.com/450wm/evgen79/evgen791307/evgen79130700021/20661978-seamless-pattern-with-a-binary-code-for-your-design.jpg?ver=6)]]
+.pull-1[.circleoff[![](https://pbs.twimg.com/profile_images/981544484684075008/lHu4ogWd_400x400.jpg)]]
+.pull-1[.circleon[![](https://www.coopathome.ch/img/produkte/880_880/RGB/6117246_001.jpg?_=1524058709415)]]
+
+???
+
+Great, we’re all done, right? 
+
+Not just yet. Some critical questions that still remain: 
+- Is the model any good? 
+- How well does the model fit the data? 
+- Are the predictions accurate?
+- Which predictors are most important? 
+
+We’ll talk about three general ways of conveying this information: 
+- Pseudo-R2
+- Proportional reduction in error (PRE)
+- ROC curves.
+
+We must now examine the model to understand how well it fits the data and generalizes to other observations. 
+The evaluation process involves the assessment of three distinct areas – goodness of fit, tests of individual predictors, and validation of predicted values – in order to produce the most useful model. 
+While the following content isn’t exhaustive, it should provide a compact ‘cheat sheet’ and guide for the modeling process.
+
+---
+### Pseudo-R2
+
+One natural place to start would be to ask whether we can just use \\(R^2\\) or the equivalent. But unlike with OLS, there is no \\(R^2\\) statistic which explains the proportion of variance in the dependent variable that is explained by the predictors. 
+
+However, there are a number of so-called pseudo-\\(R^2\\) metrics based on likelihood ratios, predicted values, etc. Most notable is McFadden’s \\(R^2\\):
+- defined as \\(1−[\log(L_F)/\log(L_0)]\\) where \\(\log(L_F)\\) is the log likelihood value for the fitted model and \\(\log(L_0)\\) is the log likelihood for the null model with only an intercept as a predictor. 
+- ranges from 0 to just under 1, with values closer to zero indicating that the model has no predictive power.
+
+
+```r
+library(pscl)
+pR2(fullmodel)  # look for 'McFadden'
+```
+
+```
+##         llh     llhNull          G2    McFadden        r2ML        r2CU 
+## -35.9421472 -53.9276341  35.9709740   0.3335115   0.3021211   0.4578199
+```
+
+Not always all that useful though as they can have odd statistical properties and rarely offer an intuitive substantive interpretation.
+
+---
+### Akaike’s information criterion (AIC)
+
+Better to report the log-likelihood and use AIC and BIC to compare models (as discussed last week).
+
+
+```r
+partyonly &lt;- glm(War ~ Republican, data=iraqVote, 
+                 family=binomial(link="logit"))
+tab_model(partyonly, fullmodel, show.loglik = T, show.aic = T, show.r2 = F)
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;War&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;War&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Odds Ratios&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Odds Ratios&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col7"&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.32&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.76&amp;nbsp;&amp;ndash;&amp;nbsp;2.32&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.329&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.00&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.00&amp;nbsp;&amp;ndash;&amp;nbsp;0.28&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;0.017&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Republican []&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;36.41&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;7.06&amp;nbsp;&amp;ndash;&amp;nbsp;669.38&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;20.47&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;3.69&amp;nbsp;&amp;ndash;&amp;nbsp;384.20&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;0.005&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;VotedBush&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.12&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.03&amp;nbsp;&amp;ndash;&amp;nbsp;1.23&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;0.012&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;100&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;100&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;AIC&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;83.500&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;77.884&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;log-Likelihood&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;-39.750&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;-35.942&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+This is good, but it doesn't tell us whether the lower LogL/AIC in the full model (which is better) is _that_ much better.
+
+---
+
+.pull-left[
+
+### Likelihood Ratio Test
+
+We discussed the likelihood ratio test last week.
+Removing predictor variables from a model will almost always make the model fit less well.
+
+The LRT compares the likelihood scores of the two models to determine 
+if the difference between the two is statistically significant.
+We can thus test whether the predictors are jointly significant.
+
+The null hypothesis is that the reduced (smaller) model is true, and the alternative is that the complete (larger) model is true.
+
+Given that H0 holds that the reduced model is true, a p-value for the overall model fit statistic that is less than 0.05 would compel us to reject the null hypothesis. 
+
+It would provide evidence against the reduced model in favor of the current model.
+
+]
+
+.pull-right[
+
+```r
+anova(partyonly, fullmodel, test ="Chisq")
+```
+
+```
+## Analysis of Deviance Table
+## 
+## Model 1: War ~ Republican
+## Model 2: War ~ VotedBush + Republican
+##   Resid. Df Resid. Dev Df Deviance Pr(&gt;Chi)   
+## 1        98     79.500                        
+## 2        97     71.884  1    7.616 0.005785 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+```r
+library(lmtest)
+lrtest(partyonly, fullmodel)
+```
+
+```
+## Likelihood ratio test
+## 
+## Model 1: War ~ Republican
+## Model 2: War ~ VotedBush + Republican
+##   #Df  LogLik Df Chisq Pr(&gt;Chisq)   
+## 1   2 -39.750                       
+## 2   3 -35.942  1 7.616   0.005785 **
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+Fullmodel fits the data significantly better!
+
+]
+
+???
+
+The likelihood ratio test can be performed in R using the lrtest() function from the lmtest package or using the anova() function in base.
+
+---
+
+.pull-left[
+
+### ROC Curves
+
+The “receiver operating characteristic” (ROC) is a measure of classifier performance,
+based on the proportion of positive data points that are correctly considered as positive 
+and the proportion of negative data points that are mistakenly considered as positive. 
+
+The ROC is usually visualised as a trade-off between 
+rate of correct predictions versus rate of incorrect predictions.
+But we can also summarise the area under the ROC curve (AUROC or AUC) as a measure. 
+The metric ranges from 0.50 to 1.00, and some good rules of thumb for interpretation are:
+- Area under ROC = 0.90-1.00 ! Excellent (A)
+- Area under ROC = 0.80-0.90 ! Good (B)
+- Area under ROC = 0.70-0.80 ! Fair (C) 
+- Area under ROC = 0.60-0.70 ! Poor (D)
+- Area under ROC = 0.50-0.60 ! Total Failure (F)
+
+]
+
+.pull-right[
+
+
+```r
+library(plotROC)
+test &lt;- data.frame(resp = c(iraqVote$War), 
+                    PartyOnly = predict(partyonly, iraqVote, type="response"),
+                    FullModel = predict(fullmodel, iraqVote, type="response"))
+test &lt;- melt_roc(test, "resp", c("PartyOnly","FullModel"))
+out &lt;- ggplot(test, aes(d = D, m = M, colour = name)) +
+   geom_roc(n.cuts = 0) + style_roc(theme = theme_grey)
+out + annotate("text", x = .75, y = .25, label = paste(paste(unique(test$name), "AUC =", round(calc_auc(out)$AUC, 2)), collapse = "\n"))
+```
+
+&lt;img src="STAT_L5_Binary_files/figure-html/roc-1.png" width="504" /&gt;
+
+By these criteria, our full voting model predicts well,
+but a model including only party predicts fairly well.
+]
+
+???
+
+Bear in mind that ROC curves can examine both target-x-predictor pairings and target-x-model performance. An example of both are presented below.
+
+There are a range of variations on this theme.
+
+I may add some notes about some of the more common ones if I get time.
+
+---
+## Wald Test
+
+We learned last week that we can use the Wald test to evaluate the statistical significance of each coefficient in the model.
+It is calculated by taking the ratio of the square of the regression coefficient to the square of the standard error of the coefficient. 
+
+Idea is to test the hypothesis that the coefficient of an feature in the model is significantly different from zero. 
+If test fails to reject null hypothesis, removing the variable from the model should not substantially harm the fit of that model.
+
+
+```r
+library(survey)
+regTermTest(fullmodel, "VotedBush")
+```
+
+```
+## Wald test for VotedBush
+##  in glm(formula = War ~ VotedBush + Republican, family = binomial(link = "logit"), 
+##     data = iraqVote)
+## F =  6.308672  on  1  and  97  df: p= 0.013666
+```
+
+```r
+regTermTest(fullmodel, "Republican")
+```
+
+```
+## Wald test for Republican
+##  in glm(formula = War ~ VotedBush + Republican, family = binomial(link = "logit"), 
+##     data = iraqVote)
+## F =  7.939307  on  1  and  97  df: p= 0.0058624
+```
+
+???
+
+Since p&lt;0.05 for both, it looks like both of these variables are important and belong in the full model!
+
+---
+# Some Final Words
+
+Note that this lecture hardly exhausts the possible approaches for estimating and interpreting binary response models:
+- other methods of model evaluation and (cross-)validation, as well as identifying variable importance
+- residual Analysis, including influence statistics, outlier detection, etc.
+- problems of identification
+
+--
+
+Lastly, you might be asking “Why should we think that anything is ever distributed according to a standard logistic distribution?”
+
+The point is not that we are saying that a set of probabilities _are_ logistically distributed, but it is useful to consider errors for log-odds to be logistically distributed to model binary outcomes.
+
+--
+
+Can you think of something that should be logistically distributed?
+
+--
+
+[_Coronavirus_](https://flowingdata.com/2020/03/10/visual-explanation-of-exponential-growth-and-epidemics/) can't grow exponentially forever...
+
+---
+class: center, middle
+# Summary
+
+.pull-1[.circleon[![](https://us.123rf.com/450wm/evgen79/evgen791307/evgen79130700021/20661978-seamless-pattern-with-a-binary-code-for-your-design.jpg?ver=6)]]
+.pull-1[.circleon[![](https://pbs.twimg.com/profile_images/981544484684075008/lHu4ogWd_400x400.jpg)]]
+.pull-1[.circleon[![](https://www.coopathome.ch/img/produkte/880_880/RGB/6117246_001.jpg?_=1524058709415)]]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>` "
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
