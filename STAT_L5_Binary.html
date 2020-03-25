@@ -280,6 +280,14 @@ in which \\(\exp(\beta)\\) is a (biased) estimate for the corresponding odds rat
 
 ???
 
+Think about the binary case: Y can have only values of 1 or 0, and we’re really interested in how a predictor relates to the probability that Y=1. But we can’t use the probability itself as the function above. There are two big reasons:
+
+1. Probability can only have values between 0 and 1, whereas the right hand side of the equation can vary from -∞ to ∞.
+
+2. The relationship between probability and the predictors isn’t linear, it’s sigmoidal (a.k.a., S-shaped).
+
+So we need a function of the probability that does two things: (1) converts a probability into a value that runs from -∞ to ∞ and (2) has a linear relationship with the Xs.
+
 The logit transformation and the logistic regression model was developed by Sir David Cox in the 1960’s. 
 The extension of the model to general linear models using various link functions came later.
 
@@ -428,6 +436,14 @@ BUT, because the CDF of the standard normal has no closed form solution, can’t
 And THOUGH we can approximate it very accurately, we can’t simply figure out probit probabilities using a garden-variety hand calculator.
 
 ???
+
+The real difference between logit and probit is theoretical: they use different link functions.
+
+In generalized linear models, instead of using Y as the outcome, \\(\mu_Y\\), we use a function of the mean of Y, \\(f(\mu_Y)\\). This is the link function.
+
+Logistic regression uses a logit link function: \\(f(\mu_Y) = \log(\frac{\pi}{1-\pi})\\)
+
+Probit regression uses an inverse normal link function: \\(f(\mu_Y) = \Phi^{-1}(P)\\)
 
 In practice, you could use logit or probit (just slightly different log-odds),
 but there are some considerations:
