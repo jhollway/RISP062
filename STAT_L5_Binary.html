@@ -355,7 +355,18 @@ stat_function(fun = pnorm, colour = "blue")
 Notice the sigmoidal curve and the thick tails!
 ]
 
-&lt;!-- https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fd2r5da613aq50s.cloudfront.net%2Fwp-content%2Fuploads%2F415059.image0.jpg&amp;f=1&amp;nofb=1 --&gt;
+???
+
+What's the difference between _logistic_ and _logit_?
+
+The _logit_ is a link function/transformation of a parameter \\(\pi\\).
+We transform probability, \\(\pi\\), into odds, \\(\frac{\pi}{1-\pi}\\), and then take the log, \\(\log(\frac{\pi}{1-\pi})\\).
+
+The _logistic_ is the inverse of the logit, \\(\frac{\exp(x)}{1 + \exp(X)}\\).
+We get it by exponentialising out of the log-odds framework.
+
+We use the logit link function to linearly relate the RHS to the LHS, \\(\log(\frac{\pi}{1-\pi}) = X\beta\\),
+and the logistic inverse of that to talk about probabilities, \\(\pi = \frac{\exp(x)}{1 + \exp(X)}\\).
 
 ---
 ## Now we can MLE like last time!
