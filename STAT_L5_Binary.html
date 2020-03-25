@@ -247,7 +247,7 @@ What's the alternative?
 .pull-left-2[
 ## Logistic regression
 
-Logistic regression is a linear regression applied to categorical outcomes using a logistic _link function_.
+Logistic regression is a linear regression applied to categorical outcomes using a logit _link function_.
 This link function allows us to linearly relate X to Y.
 How does this work? Three steps:
 
@@ -288,7 +288,8 @@ Think about the binary case: Y can have only values of 1 or 0, and we’re reall
 
 So we need a function of the probability that does two things: (1) converts a probability into a value that runs from -∞ to ∞ and (2) has a linear relationship with the Xs.
 
-The logit transformation and the logistic regression model was developed by Sir David Cox in the 1960’s. 
+Log-odds have been used for a while, e.g. by Charles Sanders Pierce, the pragmatist, in the late 19th century.
+The logit transformation and the logistic regression model was developed into more or less its current form by Sir David Cox in the 1960’s. 
 The extension of the model to general linear models using various link functions came later.
 
 There are three ways of conceiving of this transformation:
