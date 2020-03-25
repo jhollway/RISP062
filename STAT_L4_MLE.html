@@ -206,6 +206,12 @@ and the variability of the distribution around that mean (e.g. \\(\sigma^2\\)).
 A PDF also has a corresponding cumulative density function (CDF) that shows the cumulated probability to that point.
 
 ---
+### PDF, CDF, come again?
+
+- The PDF (Probability Density Function) looks at probability at one point.
+- The CDF (Cumulative Density Function) is the total probability of anything below it.
+
+---
 ### Likelihood ≠ Probability
 
 These are not the same.
@@ -557,6 +563,11 @@ $$ \log(xy) = \log(x) + \log(y)  $$
 
 Multiplying small numbers yields even smaller numbers, which makes the floating point approximation used by a computer less accurate.
 
+The asymptotic properties of sums are easier to analyze.
+
+Products are not numerically stable: they tend to converge quickly to zero or to infinity. 
+Sums are instead more stable from a numerical standpoint; this is important because the maximum likelihood problem is often solved numerically on computers where limited machine precision does not allow to distinguish a very small number from zero and a very large number from infinity.
+
 ---
 ### Taking the log of our normal PDF
 
@@ -811,8 +822,8 @@ class: center, middle
 ## Diagnostics
 
 Because we cannot get _h(x)_, the likelihood is itself not meaningful as a raw value but,
-so long as you are basing these calculations on the _exact same data_,
-, we can use it to compare across models through:
+so long as you are basing these calculations on the _exact same data_, 
+we can use it to compare across models through:
 - the likelihood ratio
 - the score test
 - the Wald statistics

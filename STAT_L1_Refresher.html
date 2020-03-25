@@ -538,8 +538,8 @@ What can we say about our 'hypothesis' that _y_ is significantly related to _x_?
 .pull-left[
 
 ```r
+# Recommended
 library(sjPlot)
-library(sjmisc)
 lm(y ~ x, sim1) %&gt;% tab_model()
 ```
 
@@ -578,8 +578,19 @@ lm(y ~ x, sim1) %&gt;% tab_model()
 &lt;/table&gt;
 
 ```r
-       # sjt.lm(no.output = TRUE, show.se = TRUE) %&gt;% 
-       # return() %&gt;% .[["knitr"]] %&gt;% asis_output
+# Alternatives
+
+# library(stargazer)
+# sim1_mod &lt;- lm(y ~ x, sim1)
+# stargazer(sim1_mod, type = "text")
+
+# library(finalfit)
+# finalfit(sim1, “y”, “x”)
+
+# library(modelsummary)
+# models &lt;- list()
+# models[['OLS 1']] &lt;- lm(y ~ x, sim1)
+# msummary(models)
 ```
 ]
 
