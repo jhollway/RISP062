@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Statistics for International Relations Research II</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="James Hollway" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/table1/table1_defaults.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://raw.githack.com/jhollway/iheidmyninja/master/iheid-xaringan-style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistics for International Relations Research II
+## Models for Categorical Outcomes
+### <large>James Hollway</large>
+
+---
+
+class: center, middle
+
+.pull-1[.circleon[![](https://us.123rf.com/450wm/evgen79/evgen791307/evgen79130700021/20661978-seamless-pattern-with-a-binary-code-for-your-design.jpg?ver=6)]]
+.pull-1[.circleon[![](https://pbs.twimg.com/profile_images/981544484684075008/lHu4ogWd_400x400.jpg)]]
+.pull-1[.circleon[![](https://www.coopathome.ch/img/produkte/880_880/RGB/6117246_001.jpg?_=1524058709415)]]
+
+
+
+---
+class: center, middle
+
+.pull-1[.circleon[![](https://www.dictionary.com/e/wp-content/uploads/2018/04/Sophies-choice.jpg)]]
+.pull-1[.circleon[![](https://imgaz1.staticbg.com/thumb/view/oaupload/banggood/images/7D/F5/55632c9a-6d5a-4a7e-acf8-37642e2dc570.JPG)]]
+.pull-1[.circleon[![](https://lh3.googleusercontent.com/proxy/WL-jUWXU8Rd5FuSUvXHIX8zxtlR42VpkXVKIsnrXkAj0H3MC9EQ7lZNF5tEPn3vfw_JQKIMf1khAAchgOOFQNgLG2GeE-tR38DcEmOHUyz5zjA)]]
+
+---
+class: center, middle
+# Data
+
+.pull-1[.circleon[![](https://www.dictionary.com/e/wp-content/uploads/2018/04/Sophies-choice.jpg)]]
+.pull-1[.circleoff[![](https://imgaz1.staticbg.com/thumb/view/oaupload/banggood/images/7D/F5/55632c9a-6d5a-4a7e-acf8-37642e2dc570.JPG)]]
+.pull-1[.circleoff[![](https://lh3.googleusercontent.com/proxy/WL-jUWXU8Rd5FuSUvXHIX8zxtlR42VpkXVKIsnrXkAj0H3MC9EQ7lZNF5tEPn3vfw_JQKIMf1khAAchgOOFQNgLG2GeE-tR38DcEmOHUyz5zjA)]]
+
+---
+## Multiple category (nominal) data
+
+Of course, not all discrete categorical data is binary/dictomous, 
+and not all polychotomous categorical data is equal.
+
+Ordered response variables are where there is a clear ordering to the categories;
+one category is 'higher' than another (though we don't know by how much).
+- Some are grouped continuous variables (e.g. age groups, income brackets)
+- Others are assessed items (e.g. Likert scale survey items, warning levels)
+- .red[Can you think of others?]
+
+Unordered response variables are where there is no clear ordering to the categories;
+they are just different possibilities.
+- Some are aggregates (e.g. occupational categories, international interactions)
+- Others are "natural" types (e.g. electoral votes, institutional choices, political strategies)
+- .red[Can you think of others?]
+
+
+--
+
+Another cross-cutting division:
+- Stated preferences (individuals face a virtual choice between items with stated characteristics)
+- Revealed preferences (data are observed choices of individuals, e.g. for a particular mode of transportation)
+
+???
+
+Obviously, we need to be sensitive to classification schemes when making such classifications.
+Different classifications = different results.
+
+Of course, you can model ordered responses as unordered too.
+This would help you get around the "parallel regression" assumption,
+meaning that features can have different effects acros different response categories,
+and this might make sense.
+However, it is inefficient, because it doesn't use information about the ordering of categories.
+
+And obviously don't use ordinal logistic regression on unordered categories;
+garbage in, garbage out.
+
+Main takeaway: make sure you theoretically discuss whether categories truly ordered
+and/or whether we should care about ordering.
+
+Multinomial choice models are being much more widely used...
+
+Folks are starting to realize that simply dichotomizing polychotomous variables can be very misleading.
+
+E.g., the Whitten and Palmer article:
+- Voter choice in multi-party elections needs to be modeled as what it is: a choice across a range of options.
+- These models let you extract additional information out of your data.
+- The software is also readily available (more on this in a bit as well).
+
+---
+## Today's data
+
+.pull-left-2[
+
+
+
+
+```r
+data("vote92", package = "pscl")
+vote92 &lt;- vote92 %&gt;%
+  mutate(female = as_factor(female),
+         dem = as_factor(dem),rep = as_factor(rep))
+table1::table1(~female+dem+rep+persfinance+natlecon|vote, vote92)
+```
+
+<div class="Rtable1"><table class="Rtable1">
+<thead>
+<tr>
+<th class='rowlabel firstrow lastrow'></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Perot<br><span class='stratn'>(n=183)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Clinton<br><span class='stratn'>(n=416)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Bush<br><span class='stratn'>(n=310)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Overall<br><span class='stratn'>(n=909)</span></span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>female</span></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>0</td>
+<td>111 (60.7%)</td>
+<td>193 (46.4%)</td>
+<td>173 (55.8%)</td>
+<td>477 (52.5%)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>1</td>
+<td class='lastrow'>72 (39.3%)</td>
+<td class='lastrow'>223 (53.6%)</td>
+<td class='lastrow'>137 (44.2%)</td>
+<td class='lastrow'>432 (47.5%)</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>dem</span></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>0</td>
+<td>118 (64.5%)</td>
+<td>60 (14.4%)</td>
+<td>287 (92.6%)</td>
+<td>465 (51.2%)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>1</td>
+<td class='lastrow'>65 (35.5%)</td>
+<td class='lastrow'>356 (85.6%)</td>
+<td class='lastrow'>23 (7.4%)</td>
+<td class='lastrow'>444 (48.8%)</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>rep</span></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>0</td>
+<td>96 (52.5%)</td>
+<td>386 (92.8%)</td>
+<td>36 (11.6%)</td>
+<td>518 (57.0%)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>1</td>
+<td class='lastrow'>87 (47.5%)</td>
+<td class='lastrow'>30 (7.2%)</td>
+<td class='lastrow'>274 (88.4%)</td>
+<td class='lastrow'>391 (43.0%)</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>persfinance</span></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>-0.00546 (0.842)</td>
+<td>-0.166 (0.809)</td>
+<td>0.197 (0.770)</td>
+<td>-0.00990 (0.818)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Median [Min, Max]</td>
+<td class='lastrow'>0.00 [-1.00, 1.00]</td>
+<td class='lastrow'>0.00 [-1.00, 1.00]</td>
+<td class='lastrow'>0.00 [-1.00, 1.00]</td>
+<td class='lastrow'>0.00 [-1.00, 1.00]</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>natlecon</span></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>-0.661 (0.560)</td>
+<td>-0.839 (0.399)</td>
+<td>-0.455 (0.675)</td>
+<td>-0.672 (0.565)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Median [Min, Max]</td>
+<td class='lastrow'>-1.00 [-1.00, 1.00]</td>
+<td class='lastrow'>-1.00 [-1.00, 1.00]</td>
+<td class='lastrow'>-1.00 [-1.00, 1.00]</td>
+<td class='lastrow'>-1.00 [-1.00, 1.00]</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+]
+
+.pull-right-1[
+To illustrate the multinomial logit model, we’ll look at old 3-party electoral data.
+
+Note that is _Bill_ Clinton, not _Hillary_,
+and George *H. W.* Bush, not George *W.* Bush.
+
+We are interested in when respondents vote for each of these three options (Y).
+
+Covariates:
+- *female* - dummy
+- *dem* - Democratic party affiliation, dummy
+- *rep* - Republican party affiliation, dummy
+- *persfinance* - sign of personal financial situation in last year
+- *natlecon* - sign of national economy in last year
+
+]
+
+???
+
+See `?vote92` for more details
+
+---
+## Assumptions
+
+### Assumption 1: Mutually exclusive and exhaustive
+
+Let _S_ be some finite set with cardinality _M_.
+Define \\(Z_i\\) such that, for any \\(m \in S\\), \\(\Pr(Z_i=m) = p_m\\).
+
+&gt; Categories should be _exhaustive_; i.e. they should cover the entire set of possibilities
+
+`$$\Pr(Z_i = l) = 0 \forall l \notin S$$`
+
+&gt; Categories should be _mutually exclusive_; i.e. each possible value/response should belong to only one category
+
+`$$\sum_{m\in S} p_m = 1$$` 
+
+???
+
+Certain assumptions need to be met to estimate categorical DVs.
+
+I'm using some math from Ward and Ahlquist to make my point on these two statements,
+though they are not to be read as proofs or anything.
+
+First, if categories are exhaustive, then the probability of observing some other category not in the set should be 0.
+
+Second, if categories are mutually exclusive, then their probabilities should sum to 1 (exactly),
+not more, as they would if observations could belong to multiple categories.
+
+Here our three categories are exhaustive (there wasn't a fourth presidential option),
+and mutually exclusive (you only get one vote).
+
+---
+
+.pull-right-1[
+![](https://imgaz1.staticbg.com/thumb/view/oaupload/banggood/images/7D/F5/55632c9a-6d5a-4a7e-acf8-37642e2dc570.JPG)&lt;!-- --&gt;
+]
+
+### Assumption 2: Independence of irrelevant alternatives (IIA):
+
+The second main assumption is about the nature of the choice process:
+
+&gt; An individual's choice should not depend on the availability or characteristics of inaccessible alternatives.
+
+That is, the proportion of choosing one of two alternatives
+should not change with the introduction of a third alternative
+(and it should definitely not switch).
+
+Take our political parties example: 
+I shouldn't prefer Labour to National if I only choose between the two, 
+but National to Labour if the Green party is also on the ballot.
+
+This is called the 'red bus/blue bus' problem (see McFadden 1974): 
+Multinomial logit should only be used in cases where outcome categories 
+“can plausibly be assumed to be distinct and weighed independently in the eyes of the decision maker.”
+
+???
+
+IIA is closely related to the notion of transitive (or acylic) preferences.
+
+---
+#### Diagnosing Violations of the IIA Assumption
+
+A violation of the IIA assumption is basically a case of correlation between the residuals 
+for the equations predicting each of the _J−1_ categories 
+(excluding the baseline) of the response variable.
+- E.g. if two options are similar (buses of any colour), there may be unmeasured characteristics
+that make them likely to choose either relative to other options (e.g. I like public transportation).
+
+Since it is just correlated residuals, 
+we can test for them using the Hausman-McFadden (HM) test or the Small-Hsaio (SH) test.
+
+
+```r
+library(mlogit) # note this is a different package than the one we are mostly using here
+hmftest()
+```
+
+**However**, Long and Freese (2006) and [Paul Allison](http://www.statisticalhorizons.com/iia) raise concerns about the use of these tests.
+- These tests often provide conflicting results (e.g. some reject the null while others do not, see also Cheng and Long 2006)
+- Various simulation studies have shown these tests are not useful for assessing violations of IIA
+- Multinomial logit works best when alternatives dissimilar and not just substitutes, regardless of whether tests showed it or not.
+
+So only do this if you have a grumpy reviewer, 
+and in the meantime concentrate on there being theoretical differences between the categories.
+
+???
+
+Note that the `mlogit` and `mnlogit` packages require a different data format 
+than the more straightforward one used here and by the neural network package `nnet`.
+This is discussed in more detail in Ward and Ahlquist.
+
+---
+#### Dealing with Violations of the IIA Assumption
+
+Wald and Ahlquist outline several options that either partially relax IIA assumptions,
+or allow for unequal variance or correlation across the outcome categories.
+
+1. Heteroskedastic multinomial logit
+1. Nested logit
+1. Multinomial probit
+1. Random coefficients and mixed logit
+
+I won't be covering these today, 
+but if you do diagnose IIA and want to try one of these solutions, 
+compare them (via AIC/LRtest) to the standard multinomial logit 
+to see whether you get very different results.
+
+--
+
+Other times, IIA violations can be mitigated by how you choose to collect or represent data.
+
+???
+
+Multinomial probit is computationally more intensive, but does not assume IIA.
+Though sometimes even if IIA is violated, the logit is a better model...
+
+We're going to argue that the IIA assumption is met here.
+Though there were actually further third party candidates in 1992,
+for the Libertarian, New Alliance, Natural Law, U.S. Taxpayer's, Populist, Social Workers' parties,
+and some additional independents in some states,
+we're going to say that their inclusion would not affect the (proportional) choices between those
+we do currently have in the model.
+
+---
+class: center, middle
+
+# Modelling
+
+.pull-1[.circleoff[![](https://www.dictionary.com/e/wp-content/uploads/2018/04/Sophies-choice.jpg)]]
+.pull-1[.circleon[![](https://imgaz1.staticbg.com/thumb/view/oaupload/banggood/images/7D/F5/55632c9a-6d5a-4a7e-acf8-37642e2dc570.JPG)]]
+.pull-1[.circleoff[![](https://lh3.googleusercontent.com/proxy/WL-jUWXU8Rd5FuSUvXHIX8zxtlR42VpkXVKIsnrXkAj0H3MC9EQ7lZNF5tEPn3vfw_JQKIMf1khAAchgOOFQNgLG2GeE-tR38DcEmOHUyz5zjA)]]
+
+---
+## MNL as
+
+### Model of Discrete Outcomes
+
+.pull-left[
+
+Say \\(Y_i=j \in J \\) unordered, mutually exclusive and exhaustive categories.
+
+We want \\(\Pr(Y_i=j) \\) to vary as some \\(f(X_i \beta_j) \\).
+
+&lt;!-- to allow the probability of \\(Y_i=j \in J \\) to vary  --&gt;
+&lt;!-- as a function of some *k* independent variables \\(X_i\\), --&gt;
+&lt;!-- indexed by a \\(k\times1\\) vector of parameters specific to that outcome \\(\beta_j\\). --&gt;
+
+To ensure each probability is positive, we use the exponential function, \\(P_{ij}=\exp(X_i\beta_j)\\), but this makes:
+
+`$$\sum_j P_{ij} \neq 1$$`
+
+But it (by definition) has to. So we rescale the probabilities by dividing each by the sum of all them.
+
+`$$\Pr(Y_i = j) \equiv P_{ij} = \frac{\exp(X_i\beta_j)}{\sum_{j=1}^J\exp(X_i\beta_j)}$$`
+
+]
+
+.pull-right[
+
+That way, observation *i*’s probability associated with category *j* is expressed as 
+a fraction of the sum of all of observation *i*’s probabilities across the various categories *J*. 
+
+That provides us with our primary statement of probability for the MNL and ensures that 
+
+`$$\Pr(Y_i=j) \in (0,1)$$` and:
+
+`$$\sum_{j=1}^J \Pr(Y_i=j) = 1$$`
+
+]
+
+---
+#### Identification and Reference Categories
+
+.pull-left[
+But, this model is also *unidentified*: 
+knowing the probability of *J − 1* options, 
+means knowing the probability of choosing the remaining alternative.
+
+Put differently, this model can have an infinite number of parameters 
+which will generate the identical set of probabilities – 
+not unlike the situation with the constant term in the ordered probit/logit models.
+
+We deal with this by setting the parameters for one of the *J* alternatives to 0 
+(usually the “first” one, i.e., \\(\beta_1\\)). 
+This is then referred to as the baseline, omitted, or reference category.
+It is the alternative to which the others are compared when the model’s coefficients are estimated.
+]
+
+--
+
+.pull-right[
+When we do this, the formula for \\(\Pr(Y_i=1)\\) reduces to:
+
+`$$\frac{1}{1+\sum_{j=2}^J \exp(X_i\beta_j')}$$`
+
+And that for the other _J-1_ alternatives are: 
+
+`$$\frac{\exp(X_i\beta_j')}{1+\sum_{j=2}^J \exp(X_i\beta_j')}$$`
+
+Where \\(\beta_j'=\beta_j-\beta_1\\)) are the “rescaled” parameters 
+(that is, they express the influence of the various Xs on \\(\Pr(Y_i=j)\\) relative to
+\\(\Pr(Y_i=1)\\).
+]
+
+---
+### Model of Discrete Choices
+
+An alternative is to say that an individual *i* chooses among *J* alternatives:
+- S/he has a utility \\( U_{ij} \\) associated with each choice *j*.
+- That utility has a stochastic (random) part and a systematic part: 
+
+`$$U_{ij} = \mu_i + \varepsilon_{ij}$$`
+
+- The systematic part is a function of some variables associated with the individual, 
+who may give different weights to those characteristics across alternatives (that is, \\(\mu_i = X_i\beta_j\\))
+
+The individual chooses among the alternatives in such a way that it maximizes his or her utility, so that:
+
+`$$\begin{align}
+\Pr(Y_i=j) &amp; = \Pr(U_{ij} &gt; U_{il} ~\forall~ l \neq j \in J)\\
+&amp; = \Pr(\mu_{i} + \epsilon_{ij} &gt; \mu_i  + \epsilon_{il} ~\forall~ l \neq j \in J)\\
+&amp; = \Pr(X_{i}\beta_j + \epsilon_{ij} &gt; X_{i}\beta_l  + \epsilon_{il} ~\forall~ l \neq j \in J)\\
+&amp; = \Pr(\epsilon_{ij} - \epsilon_{il} &gt; X_{i}(\beta_l - \beta_j)  ~\forall~ l \neq j \in J)\\
+\end{align}$$`
+
+In other words, one alternative is chosen over another if
+the difference between their stochastic parts is greater than
+the difference between their systematic parts.
+This can happen because \\(\varepsilon_{ij}\\) is large, \\(X_ij\\) is large, or both...
+
+???
+
+To complete this model, we need to choose an expression for the stochastic component, 
+i.e., we specify the distribution of the error terms.
+A multivariate normal distribution results in the multinomial probit;
+a Gumbel/type-I extreme value distribution (see Ward and Ahlquist) gives the multinomial logit.
+
+---
+#### What's the difference to binary logistic regression?
+
+A good question.
+--
+ Imagine estimating a model where each choice (=1) is contrasted with all others.
+- e.g. whether or not each survey respondent identified as Democrat.
+
+--
+
+Such a series of models are effectively equivalent to the MNL we’ve talked about so far.
+It can be useful to remember this as we move forward with interpretation.
+
+--
+
+This similarity highlights that multinomial models very demanding of data, as they burn through degrees of freedom rapidly as we estimate M-1 parameters for every new explanatory variable.
+All the problems of perfect separation and rare events are amplified; with so many combinations of predictors and outcomes, small observations in any cells can arise more easily.
+
+--
+
+Unlike binary logit, we constrain the probabilities to sum to unity, gaining efficiency through joint estimation.
+Unlike ordinal logit, does not constrain the \\(\beta\\)s to be constant across categories.
+Any multinomial model can be reestimated with a different reference category.
+
+---
+## From probability to likelihood, again
+
+.pull-left[
+
+Either way we motivate the model, we can estimate it using MLE. Remember:
+
+`$$\Pr(Y_i = j) \equiv P_{ij} = \frac{\exp(X_i\beta_j)}{\sum_{j=1}^J\exp(X_i\beta_j)}$$`
+
+Then we define an indicator variable \\(\delta_{ij}=1\\) if \\(Y_i=j\\) and 0 otherwise, 
+so that we can write the likelihood for a single obseration as:
+
+`$$L_i = \prod_{j=1}^J [\Pr(Y_i=j)]^{\delta_{ij}}$$`
+
+We can take the product across all N observations to get the likelihood for all the data:
+
+`$$L = \prod_{i=1}^{N}\prod_{j=1}^J[\Pr(Y_i=j)]^{\delta_{ij}}$$`
+
+]
+
+.pull-right[
+
+
+Then take the log of this, noting the formula for \\(\Pr(Y_i=j)\\) from above:
+
+`$$\log L = \sum_{i=1}^{N}\sum_{j=1}^{J}\delta_{ij}\log\Bigl(\frac{\exp(X_i\beta_j)}{\sum_{j=1}^{J}\exp(X_i\beta_j)}\Bigr)$$`
+
+Maddala (1983) shows this likelihood is very well-behaved...
+- First and second derivatives are easily calculated.
+- Second derivative is everywhere negative definite, meaning the function is globally concave.
+- Therefore Newton-Raphson will always converge to a global maximum (so N-R almost always used).
+- Producing (in the limit) estimates that are consistent, normal, and efficient.
+
+]
+
+---
+## Estimation
+
+Of course, we don't need to do any of this ourselves; we made computers to maximise log-likelihoods for us.
+
+There are several packages in R that enable multinomial logistic regression,
+including `mlogit` and `mnlogit`,
+but we're going to use the easiest (though most limited) one from `nnet`:
+
+
+```r
+library(nnet)
+mnl1 &lt;- multinom(vote ~ female + persfinance + natlecon, vote92, Hess = T, model = T)
+mnl2 &lt;- multinom(vote ~ female + persfinance + natlecon + dem + rep, vote92, Hess = T, model = T)
+mnl3 &lt;- multinom(relevel(vote, ref = "Bush") ~ female + persfinance + natlecon + dem + rep, vote92, Hess = T, model = T)
+
+# mnl1 &lt;- multinom(partyid ~ age + sex + race, pew)
+# mnl2 &lt;- multinom(partyid ~ age + sex + race + educ + income, pew)
+# mnl3 &lt;- multinom(partyid ~ age + sex + race + educ + income + ideo, pew)
+```
+
+---
+class: center, middle
+
+# Interpretation
+
+.pull-1[.circleoff[![](https://www.dictionary.com/e/wp-content/uploads/2018/04/Sophies-choice.jpg)]]
+.pull-1[.circleoff[![](https://imgaz1.staticbg.com/thumb/view/oaupload/banggood/images/7D/F5/55632c9a-6d5a-4a7e-acf8-37642e2dc570.JPG)]]
+.pull-1[.circleon[![](https://lh3.googleusercontent.com/proxy/WL-jUWXU8Rd5FuSUvXHIX8zxtlR42VpkXVKIsnrXkAj0H3MC9EQ7lZNF5tEPn3vfw_JQKIMf1khAAchgOOFQNgLG2GeE-tR38DcEmOHUyz5zjA)]]
+
+---
+.pull-left-1[
+
+## Model Fit
+
+### Likelihood ratio test
+The “Global” Likelihood Ratio Test is a test vs. the global null (that is, a test for whether all coefficients \\(\hat\beta = 0 \forall j,k\\)
+
+It is distributed \\(\chi^2_{(J-1)(k-1)}\\)
+where *J* is the number of possible outcomes and *k* is the number of covariates, including the constant term.
+
+It tells you if you can reject this null (not often very interesting or useful).
+
+We can also use `lrtest()` to examine whether we should prefer the
+more parsimonous or more elaborate of two nested models.
+
+]
+
+.pull-right-2[
+.tiny[
+
+```r
+lrtest(mnl1)
+```
+
+```
+## # weights:  6 (2 variable)
+## initial  value 998.638570 
+## final  value 951.983244 
+## converged
+```
+
+```
+## Likelihood ratio test
+## 
+## Model 1: vote ~ female + persfinance + natlecon
+## Model 2: vote ~ 1
+##   #Df  LogLik Df  Chisq Pr(&gt;Chisq)    
+## 1   8 -897.76                         
+## 2   2 -951.98 -6 108.45  &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+```r
+lrtest(mnl1,mnl2)
+```
+
+```
+## Likelihood ratio test
+## 
+## Model 1: vote ~ female + persfinance + natlecon
+## Model 2: vote ~ female + persfinance + natlecon + dem + rep
+##   #Df  LogLik Df  Chisq Pr(&gt;Chisq)    
+## 1   8 -897.76                         
+## 2  12 -637.29  4 520.95  &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+]
+]
+
+???
+
+And what would happen if you did a likelihood ratio test on model 2 and 3?
+
+We can also do a Wald test here, though Brian Ripley 
+(who led R development for a while before he got sick and wrote books on neural networks)
+argued:
+"it is also a mistake to use Wald tests for multinom fits, since they suffer from the same (potentially severe) problems as binomial fits. Use profile-likelihood confidence intervals (for which the package does provide software), or if you must test, likelihood-ratio tests (ditto)."
+
+---
+
+.pull-left[
+
+### Confusion matrices
+
+When developing models for prediction, 
+a critical metric is how well the model does in predicting the target variable. 
+The process involves using the model estimates to predict values on the training set, 
+then compare the predicted target variable versus the observed values for each observation. 
+
+Here our model accurately predicted 72.5% of observations,
+doing particularly well in discriminating between Bush and Clinton votes,
+but had some trouble with Clinton and Perot.
+
+Here we have evaluated the in-sample prediction rates,
+but we can do the same with out-of-sample observations too.
+Indeed, this can be a better test of the generalisability of the model.
+
+]
+
+.pull-right[
+.tiny[
+
+```r
+library(e1071)
+pred &lt;- predict(mnl2)
+confusionMatrix(data=pred, vote92$vote)
+```
+
+```
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction Perot Clinton Bush
+##    Perot      12      13    3
+##    Clinton    84     373   33
+##    Bush       87      30  274
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.725           
+##                  95% CI : (0.6947, 0.7538)
+##     No Information Rate : 0.4576          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.5419          
+##                                           
+##  Mcnemar's Test P-Value : &lt; 2.2e-16       
+## 
+## Statistics by Class:
+## 
+##                      Class: Perot Class: Clinton Class: Bush
+## Sensitivity               0.06557         0.8966      0.8839
+## Specificity               0.97796         0.7627      0.8047
+## Pos Pred Value            0.42857         0.7612      0.7008
+## Neg Pred Value            0.80590         0.8974      0.9305
+## Prevalence                0.20132         0.4576      0.3410
+## Detection Rate            0.01320         0.4103      0.3014
+## Detection Prevalence      0.03080         0.5391      0.4301
+## Balanced Accuracy         0.52177         0.8297      0.8443
+```
+]
+]
+
+---
+## Reporting
+
+.small[
+
+]
+
+
+.small[
+
+```r
+stargazer::stargazer(mnl1, mnl2, mnl3, type = "html", style = "io",
+                     single.row = T, align = T,
+                     intercept.bottom = F, model.numbers = F,
+                     column.labels = c("Model 1","Model2","Model 3"),
+                     column.separate = c(2,2,2))
+```
+
+
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="7" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;td&gt;Bush&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;td&gt;Bush&lt;/td&gt;&lt;td&gt;Perot&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;Model 1&lt;/td&gt;&lt;td colspan="2"&gt;Model2&lt;/td&gt;&lt;td colspan="2"&gt;Model 3&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="7" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;CONSTANT&lt;/td&gt;&lt;td&gt;0.064 (0.178)&lt;/td&gt;&lt;td&gt;0.660&lt;sup&gt;***&lt;/sup&gt; (0.154)&lt;/td&gt;&lt;td&gt;-0.629&lt;sup&gt;**&lt;/sup&gt; (0.315)&lt;/td&gt;&lt;td&gt;-0.762&lt;sup&gt;**&lt;/sup&gt; (0.363)&lt;/td&gt;&lt;td&gt;0.762&lt;sup&gt;**&lt;/sup&gt; (0.363)&lt;/td&gt;&lt;td&gt;0.133 (0.387)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;FEMALE1&lt;/td&gt;&lt;td&gt;0.494&lt;sup&gt;***&lt;/sup&gt; (0.183)&lt;/td&gt;&lt;td&gt;0.306 (0.194)&lt;/td&gt;&lt;td&gt;0.288 (0.206)&lt;/td&gt;&lt;td&gt;0.450&lt;sup&gt;**&lt;/sup&gt; (0.212)&lt;/td&gt;&lt;td&gt;-0.450&lt;sup&gt;**&lt;/sup&gt; (0.212)&lt;/td&gt;&lt;td&gt;-0.163 (0.232)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;PERSFINANCE&lt;/td&gt;&lt;td&gt;-0.159 (0.113)&lt;/td&gt;&lt;td&gt;0.234&lt;sup&gt;*&lt;/sup&gt; (0.120)&lt;/td&gt;&lt;td&gt;-0.089 (0.128)&lt;/td&gt;&lt;td&gt;0.141 (0.131)&lt;/td&gt;&lt;td&gt;-0.141 (0.131)&lt;/td&gt;&lt;td&gt;-0.230 (0.144)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;NATLECON&lt;/td&gt;&lt;td&gt;-0.675&lt;sup&gt;***&lt;/sup&gt; (0.187)&lt;/td&gt;&lt;td&gt;0.501&lt;sup&gt;***&lt;/sup&gt; (0.164)&lt;/td&gt;&lt;td&gt;-0.568&lt;sup&gt;***&lt;/sup&gt; (0.209)&lt;/td&gt;&lt;td&gt;0.422&lt;sup&gt;**&lt;/sup&gt; (0.178)&lt;/td&gt;&lt;td&gt;-0.422&lt;sup&gt;**&lt;/sup&gt; (0.178)&lt;/td&gt;&lt;td&gt;-0.990&lt;sup&gt;***&lt;/sup&gt; (0.219)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;DEM1&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;1.730&lt;sup&gt;***&lt;/sup&gt; (0.293)&lt;/td&gt;&lt;td&gt;-0.243 (0.414)&lt;/td&gt;&lt;td&gt;0.243 (0.414)&lt;/td&gt;&lt;td&gt;1.974&lt;sup&gt;***&lt;/sup&gt; (0.405)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;REP1&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.938&lt;sup&gt;***&lt;/sup&gt; (0.337)&lt;/td&gt;&lt;td&gt;1.934&lt;sup&gt;***&lt;/sup&gt; (0.358)&lt;/td&gt;&lt;td&gt;-1.934&lt;sup&gt;***&lt;/sup&gt; (0.358)&lt;/td&gt;&lt;td&gt;-2.871&lt;sup&gt;***&lt;/sup&gt; (0.392)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Akaike information criterion&lt;/em&gt;&lt;/td&gt;&lt;td&gt;1,811.519&lt;/td&gt;&lt;td&gt;1,811.519&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="7" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="6" style="text-align:left"&gt;&lt;sup&gt;***&lt;/sup&gt;p &lt; .01; &lt;sup&gt;**&lt;/sup&gt;p &lt; .05; &lt;sup&gt;*&lt;/sup&gt;p &lt; .1&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+]
+
+???
+
+Unfortunately, while `sjPlot` is really good for most models,
+and *can* do multinomial logits, its default layout for this model makes things more complicated than they need to be.
+
+That's why I'm using `stargazer` today.
+Note that to return the table and not just the html code,
+I needed to choose `results='asis'` in the code chunk options.
+
+---
+### Interpreting Re: Reference Categories
+
+Often interpreting MNL coefficients is not especially easy (lots of parameters, nonlinear form, etc.). 
+
+Note separate sets of \\(\hat\beta\\)s for each alternative,
+minus the omitted reference category (implicitly restricted to equal zero).
+
+Remember to always bear in mind the **reference category**
+  - R picks a base category for me; all reported results are relative to this (both for DVs and IVs)
+  - Each coefficient reflects the change in the probability of that outcome, *relative to that of the omitted category*, associated with a change in the independent variable.
+  - e.g. if a respondent thinks that the national economy has gotten better over the last year, 
+  then they are more likely to vote for Bush *than Perot* and less likely to vote for Clinton *than Perot*
+  - Similarly, we can only say that there is not a statistically significant effect for a respondent's view of their personal financial situation over the last year *relative to voting for Perot* -- this could still be an important factor between Bush and Clinton...
+
+Changing the “reference” DV changes the coefficients, but yields the same *model*
+- Notice that the AIC is no different between models 2 and 3; nor will the likelihood
+- For Bush and Perot, the coefficients are just the inverse
+- e.g. rather than females more likely to vote for Bush than Perot, they are less likely to vote for Perot than Bush
+
+???
+
+As a matter of practical advice:
+- Always investigate different outcome specifications; your theorized relationship may hold (or make sense) only in specific comparisons.
+- There is no need to report all possible comparison combinations, however.
+
+---
+### Odds Ratios
+
+Remember an easy way to interpret logit results is to exponentialise out of log-odds coefficients to odds ratios (OR).
+
+.small[
+
+```r
+stargazer::stargazer(mnl1, mnl2, mnl3, type = "html", style = "io", single.row = T, align = T, 
+                     apply.coef = exp, intercept.bottom = F, model.numbers = F,
+                     column.labels = c("Model 1","Model2","Model 3"), column.separate = c(2,2,2))
+```
+
+
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="7" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;td&gt;Bush&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;td&gt;Bush&lt;/td&gt;&lt;td&gt;Perot&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;Model 1&lt;/td&gt;&lt;td colspan="2"&gt;Model2&lt;/td&gt;&lt;td colspan="2"&gt;Model 3&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="7" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;CONSTANT&lt;/td&gt;&lt;td&gt;1.066&lt;sup&gt;***&lt;/sup&gt; (0.178)&lt;/td&gt;&lt;td&gt;1.934&lt;sup&gt;***&lt;/sup&gt; (0.154)&lt;/td&gt;&lt;td&gt;0.533&lt;sup&gt;*&lt;/sup&gt; (0.315)&lt;/td&gt;&lt;td&gt;0.467 (0.363)&lt;/td&gt;&lt;td&gt;2.144&lt;sup&gt;***&lt;/sup&gt; (0.363)&lt;/td&gt;&lt;td&gt;1.143&lt;sup&gt;***&lt;/sup&gt; (0.387)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;FEMALE1&lt;/td&gt;&lt;td&gt;1.639&lt;sup&gt;***&lt;/sup&gt; (0.183)&lt;/td&gt;&lt;td&gt;1.358&lt;sup&gt;***&lt;/sup&gt; (0.194)&lt;/td&gt;&lt;td&gt;1.333&lt;sup&gt;***&lt;/sup&gt; (0.206)&lt;/td&gt;&lt;td&gt;1.569&lt;sup&gt;***&lt;/sup&gt; (0.212)&lt;/td&gt;&lt;td&gt;0.637&lt;sup&gt;***&lt;/sup&gt; (0.212)&lt;/td&gt;&lt;td&gt;0.850&lt;sup&gt;***&lt;/sup&gt; (0.232)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;PERSFINANCE&lt;/td&gt;&lt;td&gt;0.853&lt;sup&gt;***&lt;/sup&gt; (0.113)&lt;/td&gt;&lt;td&gt;1.263&lt;sup&gt;***&lt;/sup&gt; (0.120)&lt;/td&gt;&lt;td&gt;0.915&lt;sup&gt;***&lt;/sup&gt; (0.128)&lt;/td&gt;&lt;td&gt;1.152&lt;sup&gt;***&lt;/sup&gt; (0.131)&lt;/td&gt;&lt;td&gt;0.868&lt;sup&gt;***&lt;/sup&gt; (0.131)&lt;/td&gt;&lt;td&gt;0.795&lt;sup&gt;***&lt;/sup&gt; (0.144)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;NATLECON&lt;/td&gt;&lt;td&gt;0.509&lt;sup&gt;***&lt;/sup&gt; (0.187)&lt;/td&gt;&lt;td&gt;1.651&lt;sup&gt;***&lt;/sup&gt; (0.164)&lt;/td&gt;&lt;td&gt;0.567&lt;sup&gt;***&lt;/sup&gt; (0.209)&lt;/td&gt;&lt;td&gt;1.525&lt;sup&gt;***&lt;/sup&gt; (0.178)&lt;/td&gt;&lt;td&gt;0.656&lt;sup&gt;***&lt;/sup&gt; (0.178)&lt;/td&gt;&lt;td&gt;0.372&lt;sup&gt;*&lt;/sup&gt; (0.219)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;DEM1&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;5.643&lt;sup&gt;***&lt;/sup&gt; (0.293)&lt;/td&gt;&lt;td&gt;0.784&lt;sup&gt;*&lt;/sup&gt; (0.414)&lt;/td&gt;&lt;td&gt;1.275&lt;sup&gt;***&lt;/sup&gt; (0.414)&lt;/td&gt;&lt;td&gt;7.197&lt;sup&gt;***&lt;/sup&gt; (0.405)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;REP1&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.392 (0.337)&lt;/td&gt;&lt;td&gt;6.914&lt;sup&gt;***&lt;/sup&gt; (0.358)&lt;/td&gt;&lt;td&gt;0.145 (0.358)&lt;/td&gt;&lt;td&gt;0.057 (0.392)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Akaike information criterion&lt;/em&gt;&lt;/td&gt;&lt;td&gt;1,811.519&lt;/td&gt;&lt;td&gt;1,811.519&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="7" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="6" style="text-align:left"&gt;&lt;sup&gt;***&lt;/sup&gt;p &lt; .01; &lt;sup&gt;**&lt;/sup&gt;p &lt; .05; &lt;sup&gt;*&lt;/sup&gt;p &lt; .1&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+]
+
+???
+
+The MNL can be thought of as a log-odds model, 
+where the log of the ratio of two probabilities is a function of the independent variables.
+
+`$$\log\Biggl[\frac{\Pr(Y_i=j|X_i)}{\Pr(Y_i=j'|X_i)}\Biggr] = X_i(\hat\beta_j-\hat\beta_{j'})$$`
+
+If we set the coefficient of one category (let’s say \\(\hat\beta_{j'}\\)) to 0, then we just get:
+
+`$$\log\Biggl[\frac{\Pr(Y_i=j|X_i)}{\Pr(Y_i=1|X_i)}\Biggr] = X_i\hat\beta_j$$`
+
+This makes the odds ratios linear in the variables,
+and we can get the change in the odds ratio for category *j*
+associated with a one-unit change in a particular variable \\(X_k\\),
+relative to the reference category, by just examining:
+
+`$$\exp(\hat\beta_{jk})$$`
+
+These tell us that a female voter increases the odds of voting for Bush rather than Perot by \\(100(1.569-1) = 56.9\\)% and for Clinton rather than Perot by \\(100(1.333-1) = 33.3\\)%, but decreases the odds of voting for Clinton rather than Bush by \\(100(0.850-1) = 15\\)%.
+
+It also tells us that there is a \\(100(0.372-1)2 = 125.6\\)% increase in the odds of a person voting for Clinton over Bush if they are dissatisfied with the recent national economy compared to if they are satisfied with it.
+
+Seems like it is the economy, stupid.
+
+---
+
+.pull-left[
+
+### Marginal Effects
+
+We’re interested in the partial change in \\(\Pr(Y_i=j)\\) for \\(X_i\\).
+
+Note that the marginal effect varies as a function of a bunch of things, including
+- The probability itself,
+- The value of the coefficient estimate,
+- The sums of the other coefficients for that covariate.
+
+This means that the marginal effect may not even have the same sign as the coefficient estimate itself, and the sign may change over the value of the variable in question.
+
+Note that there are separate plots for each of the *J* possible outcomes.
+
+]
+
+.pull-right[
+Yay, we can use `sjPlot` again!
+
+
+```r
+sjPlot::plot_model(mnl2, type = "pred",
+     terms = c("natlecon","female"),
+    colors = c("blue","red")) + 
+  xlab("National Economy") + 
+  ylab("Vote Probability")
+```
+
+&lt;img src="STAT_L6_Multinomial_files/figure-html/marginal-1.png" width="504" /&gt;
+]
+
+???
+
+We can use the basic probability statement of the MNL model to generate predictions for the probability of each category, a la binary logit/probit.
+
+
+```
+## [1] Bush    Bush    Clinton Bush    Clinton Clinton
+## Levels: Perot Clinton Bush
+```
+
+As in those models, we’re required to select and set the values of the other independent variables (typically means or medians). We can then do the usual stuff:
+- Examine predictions across ranges of independent variables.
+- Examine changes in predictions with unit/std. dev./min-max changes in independent variables.
+- Plot any/all of the above, as well as their confidence intervals.
+
+Feel free to use marginal effects in MNL models, 
+but be careful as it is not always straightforward.
+
+Actually, sjPlot is calling the `ggeffects` package here,
+but let's not confuse things.
+
+What can we learn from this plot?
+- Females certainly seem to prefer both Bush and Clinton over Perot,
+though the difference is smallest for Clinton
+- How a voter feels about the state of the economy is an important
+pivot point between Clinton and Bush
+- There is no real difference whether males are ambivalent or positive about the state of the economy in their vote for Perot
+
+---
+
+.pull-left[
+### Ternary Plots
+
+
+```r
+library(plot3logit)
+gg3logit(field3logit(mnl2, 'natlecon')) + 
+  stat_3logit()
+```
+
+&lt;img src="STAT_L6_Multinomial_files/figure-html/ternary1-1.png" width="504" /&gt;
+
+```
+## Error in validDetails.text(x): invalid 'rot' value
+```
+]
+
+.pull-right[
+
+```r
+refpoint &lt;- list(c(0.5, 0.5, 0.5))
+natl &lt;- field3logit(mnl2, 'natlecon', label = 'National Economy', p0 = refpoint, narrows = 2)
+pers &lt;- field3logit(mnl2, 'persfinance', label = 'Personal Finance', p0 = refpoint, narrows = 2)
+female &lt;- field3logit(mnl2, 'female1', label = 'Female', p0 = refpoint, narrows = 1)
+dem &lt;- field3logit(mnl2, 'dem1', label = 'Democratic', p0 = refpoint, narrows = 1)
+rep &lt;- field3logit(mnl2, 'rep1', label = 'Republican', p0 = refpoint, narrows = 1)
+gg3logit(natl + pers + female + dem + rep) + 
+  stat_3logit(aes(colour = label))
+```
+
+&lt;img src="STAT_L6_Multinomial_files/figure-html/ternary2-1.png" width="504" /&gt;
+
+```
+## Error in validDetails.text(x): invalid 'rot' value
+```
+]
+
+???
+
+I'll admit these were rather new plots to me; 
+I haven't seen them used in published work much.
+
+The idea, as Ward and Ahlquist explain, 
+is to display the combination of probabilities simultaneously.
+I couldn't replicate their plot, however.
+
+What I found for you is the `plot3logit` package.
+This represents the vector field of changing probabilities
+as one or more given variables increase.
+
+Note that for a dummy variable, 
+you will need to specify 1 or 0 at the end of the variable name for it to appear.
+
+Probably the most useful application of this is in comparing 
+the relative importance of each of the predictors.
+
+We can do this by creating a limited vector field from a reference point
+for each predictor and then plotting them together.
+
+Here we learn that, apart from party affiliation,
+the only thing that matters is the **economy**.
+
+---
+### Wald tests
+
+Lastly, we can test the hypothesis that some variables are jointly significant.
+
+When might you want to do this? 
+Perhaps you have a theory that it is not so much party affiliation that matters
+in a 3-party election, but that it is the economy that matters...
+
+
+```r
+library(survey)
+regTermTest(mnl2, ~dem+rep)
+```
+
+```
+## Wald test for dem rep
+##  in multinom(formula = vote ~ female + persfinance + natlecon + dem + 
+##     rep, data = vote92, Hess = T, model = T)
+## F =  0.4133427  on  2  and  2715  df: p= 0.66148
+```
+
+```r
+regTermTest(mnl2, ~natlecon+persfinance)
+```
+
+```
+## Wald test for natlecon persfinance
+##  in multinom(formula = vote ~ female + persfinance + natlecon + dem + 
+##     rep, data = vote92, Hess = T, model = T)
+## F =  6.074215  on  2  and  2715  df: p= 0.0023328
+```
+
+---
+class: center, middle
+
+.pull-1[.circleon[![](https://www.dictionary.com/e/wp-content/uploads/2018/04/Sophies-choice.jpg)]]
+.pull-1[.circleon[![](https://imgaz1.staticbg.com/thumb/view/oaupload/banggood/images/7D/F5/55632c9a-6d5a-4a7e-acf8-37642e2dc570.JPG)]]
+.pull-1[.circleon[![](https://lh3.googleusercontent.com/proxy/WL-jUWXU8Rd5FuSUvXHIX8zxtlR42VpkXVKIsnrXkAj0H3MC9EQ7lZNF5tEPn3vfw_JQKIMf1khAAchgOOFQNgLG2GeE-tR38DcEmOHUyz5zjA)]]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>` "
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
