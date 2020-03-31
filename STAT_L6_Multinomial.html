@@ -31,7 +31,7 @@ class: center, middle
 
 .pull-1[.circleon[![](https://www.dictionary.com/e/wp-content/uploads/2018/04/Sophies-choice.jpg)]]
 .pull-1[.circleon[![](https://imgaz1.staticbg.com/thumb/view/oaupload/banggood/images/7D/F5/55632c9a-6d5a-4a7e-acf8-37642e2dc570.JPG)]]
-.pull-1[.circleon[![](https://lh3.googleusercontent.com/proxy/WL-jUWXU8Rd5FuSUvXHIX8zxtlR42VpkXVKIsnrXkAj0H3MC9EQ7lZNF5tEPn3vfw_JQKIMf1khAAchgOOFQNgLG2GeE-tR38DcEmOHUyz5zjA)]]
+.pull-1[.circleon[![](https://cdn.shopify.com/s/files/1/0080/8372/products/tattly_triangle_yoko_sakao_ohama_00_1024x1024@2x.png?v=1575322215)]]
 
 ---
 class: center, middle
@@ -39,7 +39,7 @@ class: center, middle
 
 .pull-1[.circleon[![](https://www.dictionary.com/e/wp-content/uploads/2018/04/Sophies-choice.jpg)]]
 .pull-1[.circleoff[![](https://imgaz1.staticbg.com/thumb/view/oaupload/banggood/images/7D/F5/55632c9a-6d5a-4a7e-acf8-37642e2dc570.JPG)]]
-.pull-1[.circleoff[![](https://lh3.googleusercontent.com/proxy/WL-jUWXU8Rd5FuSUvXHIX8zxtlR42VpkXVKIsnrXkAj0H3MC9EQ7lZNF5tEPn3vfw_JQKIMf1khAAchgOOFQNgLG2GeE-tR38DcEmOHUyz5zjA)]]
+.pull-1[.circleoff[![](https://cdn.shopify.com/s/files/1/0080/8372/products/tattly_triangle_yoko_sakao_ohama_00_1024x1024@2x.png?v=1575322215)]]
 
 ---
 ## Multiple category (nominal) data
@@ -381,7 +381,7 @@ class: center, middle
 
 .pull-1[.circleoff[![](https://www.dictionary.com/e/wp-content/uploads/2018/04/Sophies-choice.jpg)]]
 .pull-1[.circleon[![](https://imgaz1.staticbg.com/thumb/view/oaupload/banggood/images/7D/F5/55632c9a-6d5a-4a7e-acf8-37642e2dc570.JPG)]]
-.pull-1[.circleoff[![](https://lh3.googleusercontent.com/proxy/WL-jUWXU8Rd5FuSUvXHIX8zxtlR42VpkXVKIsnrXkAj0H3MC9EQ7lZNF5tEPn3vfw_JQKIMf1khAAchgOOFQNgLG2GeE-tR38DcEmOHUyz5zjA)]]
+.pull-1[.circleoff[![](https://cdn.shopify.com/s/files/1/0080/8372/products/tattly_triangle_yoko_sakao_ohama_00_1024x1024@2x.png?v=1575322215)]]
 
 ---
 ## MNL as
@@ -559,13 +559,9 @@ but we're going to use the easiest (though most limited) one from `nnet`:
 
 ```r
 library(nnet)
-mnl1 &lt;- multinom(vote ~ female + persfinance + natlecon, vote92, Hess = T, model = T)
-mnl2 &lt;- multinom(vote ~ female + persfinance + natlecon + dem + rep, vote92, Hess = T, model = T)
-mnl3 &lt;- multinom(relevel(vote, ref = "Bush") ~ female + persfinance + natlecon + dem + rep, vote92, Hess = T, model = T)
-
-# mnl1 &lt;- multinom(partyid ~ age + sex + race, pew)
-# mnl2 &lt;- multinom(partyid ~ age + sex + race + educ + income, pew)
-# mnl3 &lt;- multinom(partyid ~ age + sex + race + educ + income + ideo, pew)
+mnl1 &lt;- multinom(vote ~ female + persfinance + natlecon, vote92)
+mnl2 &lt;- multinom(vote ~ female + persfinance + natlecon + dem + rep, vote92)
+mnl3 &lt;- multinom(relevel(vote, ref = "Bush") ~ female + persfinance + natlecon + dem + rep, vote92)
 ```
 
 ---
@@ -575,7 +571,7 @@ class: center, middle
 
 .pull-1[.circleoff[![](https://www.dictionary.com/e/wp-content/uploads/2018/04/Sophies-choice.jpg)]]
 .pull-1[.circleoff[![](https://imgaz1.staticbg.com/thumb/view/oaupload/banggood/images/7D/F5/55632c9a-6d5a-4a7e-acf8-37642e2dc570.JPG)]]
-.pull-1[.circleon[![](https://lh3.googleusercontent.com/proxy/WL-jUWXU8Rd5FuSUvXHIX8zxtlR42VpkXVKIsnrXkAj0H3MC9EQ7lZNF5tEPn3vfw_JQKIMf1khAAchgOOFQNgLG2GeE-tR38DcEmOHUyz5zjA)]]
+.pull-1[.circleon[![](https://cdn.shopify.com/s/files/1/0080/8372/products/tattly_triangle_yoko_sakao_ohama_00_1024x1024@2x.png?v=1575322215)]]
 
 ---
 .pull-left-1[
@@ -975,7 +971,7 @@ regTermTest(mnl2, ~dem+rep)
 ```
 ## Wald test for dem rep
 ##  in multinom(formula = vote ~ female + persfinance + natlecon + dem + 
-##     rep, data = vote92, Hess = T, model = T)
+##     rep, data = vote92)
 ## F =  0.4133427  on  2  and  2715  df: p= 0.66148
 ```
 
@@ -986,7 +982,7 @@ regTermTest(mnl2, ~natlecon+persfinance)
 ```
 ## Wald test for natlecon persfinance
 ##  in multinom(formula = vote ~ female + persfinance + natlecon + dem + 
-##     rep, data = vote92, Hess = T, model = T)
+##     rep, data = vote92)
 ## F =  6.074215  on  2  and  2715  df: p= 0.0023328
 ```
 
@@ -995,7 +991,7 @@ class: center, middle
 
 .pull-1[.circleon[![](https://www.dictionary.com/e/wp-content/uploads/2018/04/Sophies-choice.jpg)]]
 .pull-1[.circleon[![](https://imgaz1.staticbg.com/thumb/view/oaupload/banggood/images/7D/F5/55632c9a-6d5a-4a7e-acf8-37642e2dc570.JPG)]]
-.pull-1[.circleon[![](https://lh3.googleusercontent.com/proxy/WL-jUWXU8Rd5FuSUvXHIX8zxtlR42VpkXVKIsnrXkAj0H3MC9EQ7lZNF5tEPn3vfw_JQKIMf1khAAchgOOFQNgLG2GeE-tR38DcEmOHUyz5zjA)]]
+.pull-1[.circleon[![](https://cdn.shopify.com/s/files/1/0080/8372/products/tattly_triangle_yoko_sakao_ohama_00_1024x1024@2x.png?v=1575322215)]]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="libs/remark-latest.min.js"></script>
