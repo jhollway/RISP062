@@ -14,7 +14,7 @@ unnamed-chunk-9	::
 unnamed-chunk-10	::
 unnamed-chunk-11	<=	a1	a2	aes	dist	filter	geom_abline	geom_point	ggplot	grid	rank	sim1	x	y
 unnamed-chunk-12	$	aes	c	geom_abline	geom_point	ggplot	measure_distance	optim	sim1	x	y
-twoModels	%>%	<	==	>	$	a1	a2	aes	c	data.frame	F	filter	geom_abline	geom_point	geom_rect	ggplot	models	pmax	pmin	scale_x_continuous	scale_y_continuous	sim1	slice	x	y
+twoModels	%>%	<	==	>	$	a1	a2	aes	c	data.frame	F	filter	geom_abline	geom_point	geom_rect	ggplot	library	models	pmax	pmin	scale_x_continuous	scale_y_continuous	sim1	slice	x	y
 setup	::	$	library	options	theme_minimal	theme_set
 unnamed-chunk-13	~	coef	lm	sim1
 unnamed-chunk-14	apply	data	iris	library	nearZeroVar	var

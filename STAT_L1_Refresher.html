@@ -12,7 +12,7 @@
 class: center, middle, inverse, title-slide
 
 # Statistics for International Relations Research II
-## 1. Refresher
+## Refresher
 ### <large>James Hollway</large>
 
 ---
@@ -32,6 +32,10 @@ class: center, middle
 .pull-1[.circleon[![](https://graduateinstitute.ch/sites/default/files/styles/medium/public/2019-01/James%20Hollway.jpg?itok=1Yw0keum)]]
 .pull-1[.circleoff[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fmedia.istockphoto.com%2Fvectors%2Fgrade-a-plus-result-vector-icon-school-red-mark-handwriting-a-plus-in-vector-id1136966571%3Fk%3D6%26m%3D1136966571%26s%3D612x612%26w%3D0%26h%3DS3pDI_xutxq1nLoWAW_D3h5j9wfwkVhWe7LSoVJRA00%3D&amp;f=1&amp;nofb=1)]]
 .pull-1[.circleoff[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fc%2Fcf%2FRewind_button.svg%2F240px-Rewind_button.svg.png&amp;f=1&amp;nofb=1)]]
+
+---
+background-image: url(https://media.giphy.com/media/lQPHNPMPZ7tcIwseGn/giphy.gif)
+background-size: contain
 
 ---
 class: center, middle, inverse, iheid-red
@@ -59,6 +63,10 @@ juliette.ganne@ graduateinstitute.ch
 Office hours: Wednesdays, 14-16
 ]
 ]
+
+---
+background-image: url(https://media.giphy.com/media/b7sNm0aR2EOqI/giphy.gif)
+background-size: contain
 
 ---
 ## You
@@ -213,6 +221,8 @@ All additional required and recommended readings are provided in electronic form
 ## Software
 
 The software used in the class is `\(\mathcal{R}\)`. It is free. And very powerful.
+
+&lt;!-- ![:scale 20%](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2F1%2F1b%2FR_logo.svg%2F1200px-R_logo.svg.png&amp;f=1&amp;nofb=1) --&gt;
 
 .center[
 
@@ -498,6 +508,25 @@ $$ y = a + b_1 x $$
 ![](STAT_L1_Refresher_files/figure-html/linearRegression-1.png)&lt;!-- --&gt;
 ]
 
+???
+
+R uses a formula system for specifying a model.
+
+- You put the outcome variable on the left
+- A tilde (`~`) is used for saying "predicted by"
+- Exclude an intercept term by adding `-1` to your formula
+- You can use a `.` to predict by all other variables e.g. `y ~ .`
+- Use a `+` to provide multiple independent variables e.g. `y ~ a + b`
+- You can use a `:` to use the interaction of two variables e.g. `y ~ a:b`
+- You can use a `*` to use two variables and their interaction e.g. `y ~ a*b` (equivalent to `y ~ a + b + a:b`)
+- You can construct features on the fly e.g. `y ~ log(x)` or use `I()` when adding values e.g. `y ~ I(a+b)`
+
+For more info, check out `?formula`
+
+Some other useful parameters
+- `na.action` can be set to amend the handling of missings in the data
+- `model`,`x`,`y` controls whether you get extra info about the model and data back. Setting these to `FALSE` saves space
+
 ---
 ## Interpretation
 
@@ -671,9 +700,10 @@ but to conclude today I want to highlight three extra conditions concerning the 
 
 --
 
-1. Random sample
+1. Independent:
   - Sampling theory vs stochastic theory
   - SRS
+  - independent and identically distributed (IID or iid)
   
 --
 
@@ -699,6 +729,7 @@ What questions do you have for me?
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="libs/remark-latest.min.js"></script>
+<script src="macros.js"></script>
 <script>var slideshow = remark.create({
 "ratio": "16:9",
 "highlightStyle": "github",
