@@ -44,7 +44,7 @@ class: center, middle
 ---
 ## Multiple category (nominal) data
 
-Of course, not all discrete categorical data is binary/dictomous, 
+Of course, not all discrete categorical data is binary/dichotomous, 
 and not all polychotomous categorical data is equal.
 
 Ordered response variables are where there is a clear ordering to the categories;
@@ -103,8 +103,8 @@ E.g., the Whitten and Palmer article:
 ```r
 data("vote92", package = "pscl")
 vote92 &lt;- vote92 %&gt;%
-  mutate(female = as_factor(female),
-         dem = as_factor(dem),rep = as_factor(rep))
+* mutate(female = as_factor(female),
+*        dem = as_factor(dem), rep = as_factor(rep))
 table1::table1(~female+dem+rep+persfinance+natlecon|vote, vote92)
 ```
 
@@ -404,7 +404,7 @@ To ensure each probability is positive, we use the exponential function, \\(P_{i
 
 But it (by definition) has to. So we rescale the probabilities by dividing each by the sum of all them.
 
-`$$\Pr(Y_i = j) \equiv P_{ij} = \frac{\exp(X_i\beta_j)}{\sum_{j=1}^J\exp(X_i\beta_j)}$$`
+`$$\Pr(Y_i = j) \equiv P_{ij} = \frac{\exp(X_i\beta_j)}{\sum_{j=1}^J\exp(X_i\beta_j)}\tag{1}\label{1}$$`
 
 ]
 
@@ -413,7 +413,7 @@ But it (by definition) has to. So we rescale the probabilities by dividing each 
 That way, observation *i*’s probability associated with category *j* is expressed as 
 a fraction of the sum of all of observation *i*’s probabilities across the various categories *J*. 
 
-That provides us with our primary statement of probability for the MNL and ensures that 
+Equation `\(\ref{1}\)` provides us with our primary statement of probability for the MNL and ensures that 
 
 `$$\Pr(Y_i=j) \in (0,1)$$` and:
 
@@ -517,7 +517,7 @@ Any multinomial model can be reestimated with a different reference category.
 
 .pull-left[
 
-Either way we motivate the model, we can estimate it using MLE. Remember:
+Either way we motivate the model, we can estimate it using MLE. Remember equation `\(\ref{1}\)`:
 
 `$$\Pr(Y_i = j) \equiv P_{ij} = \frac{\exp(X_i\beta_j)}{\sum_{j=1}^J\exp(X_i\beta_j)}$$`
 
@@ -561,7 +561,8 @@ but we're going to use the easiest (though most limited) one from `nnet`:
 library(nnet)
 mnl1 &lt;- multinom(vote ~ female + persfinance + natlecon, vote92)
 mnl2 &lt;- multinom(vote ~ female + persfinance + natlecon + dem + rep, vote92)
-mnl3 &lt;- multinom(relevel(vote, ref = "Bush") ~ female + persfinance + natlecon + dem + rep, vote92)
+*mnl3 &lt;- multinom(relevel(vote, ref = "Bush") ~ female +
+                   persfinance + natlecon + dem + rep, vote92)
 ```
 
 ---
@@ -785,7 +786,7 @@ Remember an easy way to interpret logit results is to exponentialise out of log-
 
 ```r
 stargazer::stargazer(mnl1, mnl2, mnl3, type = "html", style = "io", single.row = T, align = T, 
-                     apply.coef = exp, intercept.bottom = F, model.numbers = F,
+*                    apply.coef = exp, intercept.bottom = F, model.numbers = F,
                      column.labels = c("Model 1","Model2","Model 3"), column.separate = c(2,2,2))
 ```
 
@@ -808,11 +809,11 @@ stargazer::stargazer(mnl1, mnl2, mnl3, type = "html", style = "io", single.row =
 The MNL can be thought of as a log-odds model, 
 where the log of the ratio of two probabilities is a function of the independent variables.
 
-`$$\log\Biggl[\frac{\Pr(Y_i=j|X_i)}{\Pr(Y_i=j'|X_i)}\Biggr] = X_i(\hat\beta_j-\hat\beta_{j'})$$`
+`$$\log\Biggl[\frac{\Pr(Y_i=j \mid X_i)}{\Pr(Y_i=j' \mid X_i)}\Biggr] = X_i(\hat\beta_j-\hat\beta_{j'})$$`
 
 If we set the coefficient of one category (let’s say \\(\hat\beta_{j'}\\)) to 0, then we just get:
 
-`$$\log\Biggl[\frac{\Pr(Y_i=j|X_i)}{\Pr(Y_i=1|X_i)}\Biggr] = X_i\hat\beta_j$$`
+`$$\log\Biggl[\frac{\Pr(Y_i=j \mid X_i)}{\Pr(Y_i=1 \mid X_i)}\Biggr] = X_i\hat\beta_j$$`
 
 This makes the odds ratios linear in the variables,
 and we can get the change in the odds ratio for category *j*
