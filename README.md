@@ -16,3 +16,5 @@ The course is hosted at https://jhollway.github.io/statsII/
 [Lecture 5](https://jhollway.github.io/statsII/STAT_L5_Binary.html)
 
 [Lecture 6](https://jhollway.github.io/statsII/STAT_L6_Multinomial.html)
+
+[Lecture 7](https://jhollway.github.io/statsII/STAT_L7_Count.html)
