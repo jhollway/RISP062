@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Statistics for International Relations Research II</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="James Hollway" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://raw.githack.com/jhollway/iheidmyninja/master/iheid-xaringan-style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistics for International Relations Research II
+## Assumptions
+### <large>James Hollway</large>
+
+---
+
+class: center, middle
+
+.pull-1[.circleon[![](https://www.dictionary.com/e/wp-content/uploads/2018/04/Sophies-choice.jpg)]]
+.pull-1[.circleon[![](https://imgaz1.staticbg.com/thumb/view/oaupload/banggood/images/7D/F5/55632c9a-6d5a-4a7e-acf8-37642e2dc570.JPG)]]
+.pull-1[.circleon[![](https://cdn.shopify.com/s/files/1/0080/8372/products/tattly_triangle_yoko_sakao_ohama_00_1024x1024@2x.png?v=1575322215)]]
+
+
+
+---
+class: center, middle
+
+.pull-1[.circleon[![](https://static.turbosquid.com/Preview/2016/07/05__06_16_48/FishSkeletonb.jpg46B6AAD0-198F-40AC-B932-1768C4B0F869Zoom.jpg)]]
+.pull-1[.circleon[![](https://www.psassets.ch/thumbs/2e/1d/08716b4f86e44e119ac2ec013b10-909889.jpg)]]
+.pull-1[.circleon[![](https://static.toiimg.com/thumb/imgsize-5231,msid-35966935,width-400,resizemode-4/35966935.jpg)]]
+
+???
+
+Ok, so this week we'll talk about the following:
+
+- What are event counts (and what not)?
+- Theory and estimation of the Poisson model for event counts
+
+- Violations of the Poisson assumptions.
+- Over- and underdispersion.
+- Theory and estimation of the Negative Binomial model.
+
+- Zero-inflated issues and estimation.
+- Hurdle models
+
+---
+class: center, middle
+# Event counts and the Poisson model
+
+.pull-1[.circleon[![](https://static.turbosquid.com/Preview/2016/07/05__06_16_48/FishSkeletonb.jpg46B6AAD0-198F-40AC-B932-1768C4B0F869Zoom.jpg)]]
+.pull-1[.circleoff[![](https://www.psassets.ch/thumbs/2e/1d/08716b4f86e44e119ac2ec013b10-909889.jpg)]]
+.pull-1[.circleoff[![](https://static.toiimg.com/thumb/imgsize-5231,msid-35966935,width-400,resizemode-4/35966935.jpg)]]
+
+---
+## Event counts
+
+Event count models are models where the dependent variable, *Y*, 
+is a non-negative integer count of events `\(\in 0,1,2,...,\infty\)`, 
+bounded at zero below, unbounded above.
+
+--
+
+Political scientific count data is often related to (supposedly) indivisible units,
+like individuals or states,
+or in relation to discrete events that occur.
+
+--
+
+Note some data that looks like count should still be treated differently: 
+- Binary data that expresses successes/failures of known number of trials best estimated with binomial model
+- Ordinal data like Likert scales may look like counts but best estimated with ordinal logit instead
+
+---
+## Today's data
+
+.pull-left[
+
+
+```r
+# install.packages("devtools")
+# devtools::install_github("RamiKrispin/coronavirus")
+library(coronavirus)
+# update_datasets()
+covid &lt;- coronavirus %&gt;% gr
+  oup_by(Country.Region, type) %&gt;%
+  summarise(total_cases = sum(cases)) %&gt;%
+  pivot_wider(names_from = type,
+              values_from = total_cases) %&gt;%
+  rename(Death = death, Confirmed = confirmed, Recovered = recovered) %&gt;%
+  arrange(-Confirmed)
+
+library(ggplot2)
+ggplot(covid, aes(Death)) + 
+  geom_histogram()
+```
+
+]
+
+.pull-right[
+
+&lt;img src="STAT_L7_Count_files/figure-html/covid-1.png" width="504" /&gt;
+
+]
+
+???
+
+Ok, I couldn't resist any longer. 
+We'll do coronavirus data.
+It's all on our minds anyway.
+
+---
+### Adding some additional data
+
+
+```r
+library(countrycode)
+library(wbstats)
+# wbcache(lang = "en")
+covid &lt;- covid %&gt;% 
+  mutate(iso3c = countrycode(Country.Region, "country.name", "iso3c"))
+wbdata &lt;- wb(country = "countries_only",
+  indicator = c("SP.POP.TOTL", "AG.LND.TOTL.K2", "EN.POP.DNST", 
+                "EN.URB.LCTY", "NY.GDP.PCAP.KD"),
+  startdate = 2018, enddate = 2020, return_wide = TRUE)
+covid &lt;- left_join(covid, wbdata, by = "iso3c") %&gt;%
+  mutate(Population = SP.POP.TOTL/1000000, # millions of people
+         Land = AG.LND.TOTL.K2/1000000, # millions of square kilometers
+         LargestCity = EN.URB.LCTY/1000000, # millions of people in largest city
+         Density = EN.POP.DNST/1000, # thousands of people per square kilometer
+         GDPpc = NY.GDP.PCAP.KD/1000) # thousands of US$ per person
+```
+
+---
+### Why not use OLS?
+
+Event counts have a few interesting properties that can make them hard to deal with:
+- they are discrete (meaning they only take on integer values)
+- they are strictly non-negative (meaning they only take on positive values, or zero)
+
+--
+
+This makes using OLS on event counts a bad idea (King 1988) because it yields estimates that are:
+- Inaccurate (e.g. OLS can predict negative counts)
+- Inefficient (because they fail to account for the heteroskedastic nature of event counts)
+
+???
+
+More on the last thing in a bit...
+
+---
+## What's the alternative? The Poisson process
+
+Suppose we are interested in studying events, and that those events occur over time.
+
+We will consider the rate at which events occur `\(\lambda\)`.
+
+It’s useful to think of `\(\lambda\)` as the expected number of events in any particular time “period” of length *h*.
+
+Imagine further that the events in question are independent; 
+that is, the occurrence of one event has no bearing on the probability that another will occur.
+
+--
+
+If the process that gives rise to the events in question (aka our event process) conforms to these assumptions, 
+then it’s pretty straightforward to show that as the length of the interval `\(h \to 0\)`,
+- `\(\Pr(Y = 1|(t,t+h]) = \lambda h\)`
+- `\(\Pr(Y = 0|(t,t+h]) = 1 - \lambda h\)`
+
+Such a variable is known as a .red[Poisson process]: 
+events occur independently with a constant probability equal to `\(\lambda\)` times the length of the interval (that is, `\(\lambda h\)`).
+
+---
+### The Poisson distribution
+
+Consider our outcome variable *Y* as the number of events that have occurred in the interval `\((t,t+h]\)`.
+
+For such a process, the probability that the number of events occurring equals some value in the set `\({0,1,2,3,...}\)` is:
+
+`$$\Pr(Y_t=y) = \frac{\exp(-\lambda h)\lambda h^y}{y!}\tag{1}\label{1}$$`
+
+If all the intervals are of the same length (and equal to 1), this reduces to: 
+
+`$$\Pr(Y_t=y) = \frac{\exp(-\lambda)\lambda^y}{y!}\tag{2}\label{2}$$`
+
+This is the way we typically see the Poisson distribution written.
+By this logic, the Poisson distribution is the limiting distribution for the number of independent events 
+occurring in some fixed period of length *h* (Eq. \ref{1}) or 1 (Eq. \ref{2}).
+
+Therefore the assumptions underlying the *Poisson process* – 
+constant arrival rates, and independence across events – 
+are key to deriving the *Poisson distribution* in this way.
+
+Relaxing these assumptions results in other distributions...
+
+---
+### Characteristics of the Poisson distribution
+
+.pull-left[
+
+&lt;img src="STAT_L7_Count_files/figure-html/poissondis-1.png" width="504" /&gt;
+
+]
+
+.pull-right[
+
+The Poisson distribution is a discrete probability distribution, with support on non-negative integers.
+
+The “rate” `\(\lambda\)` can be interpreted as the expected number of events during an observation period.
+
+As `\(\lambda\)` increases, 
+- the mean/mode of the distribution gets larger
+- the variance of the distribution gets larger too
+  - makes sense: it is bounded from below
+  - in fact, for the Poisson, the mean equals the variance `\(E(Y) = Var(Y) = \lambda\)`
+- the distribution becomes more normal
+
+]
+
+
+???
+
+So what kind of odd fish is this 'Poisson' anyway?
+
+Note also that the Poisson distribution is not preserved under affine transformations.
+That is, affine transformations of Poisson variates are not themselves (necessarily) Poisson variates as well.
+
+It is preserved under addition (convolution) provided that the components are independent.
+That is, for two Poisson variates `\(X \sim Poisson(\lambda_x)\)` and `\(Y \sim Poisson(\lambda_y)\)`,
+`\(Z = X + Y \sim Poisson(\lambda_{x+y})\)` if *X* and *Y* are independent.
+
+However, the same is not true for differences of Poisson variates.
+
+---
+### The Poisson regression model
+
+If we assume our event count is distributed according to a Poisson distribution, 
+then the next thing we probably want to know is the effect of covariates *X*
+on (the expected value of) *Y*.
+
+Since we know `\(E(Y)&gt;0\)`, 
+we need to restrict the “link” to be positive.
+The exponential is the standard one for this.
+
+So, we have
+
+`$$E(Y_i) \equiv \lambda_i = \exp(X_i\beta)\tag{3}\label{3}$$`
+
+Incorporating this into Eq. \ref{2}, 
+this yields a probability model that looks like this:
+
+`$$\Pr(Y_i = y|X_i,\beta) = \frac{\exp[-\exp(X_i\beta)][\exp(X_i\beta)^y]}{y!} \tag{4}\label{4}$$`
+
+Making the usual i.i.d. assumptions yields a pretty simple likelihood:
+
+`$$L = \prod_{i=1}^N \frac{[\exp-\exp(X_i\beta)][\exp(X_i\beta)^{y_i}]}{y_i!} \tag{5}\label{5}$$`
+
+And an equally simple log-likelihood:
+
+`$$\log L = \sum_{i=1}^N -\exp(X_i\beta) + Y_i X_i \beta - \log(Y_i!) \tag{6}\label{6}$$`
+
+Where the last term `\(- \log(Y_i!)\)` can be omitted because it doesn’t vary with `\(\beta\)`.
+
+???
+
+It’s actually pretty easy to demonstrate that this log-likelihood is globally concave, 
+and so estimation is really easy and reliable 
+using more-or-less any optimizer we care to adopt. 
+We’ll talk about some tinkering with this model a bit later.
+
+---
+## Estimation
+
+Ok, so let's try estimating a Poisson model for our data now.
+
+
+```r
+library(sjPlot)
+poi1 &lt;- glm(Death ~ Population + Land + Density + LargestCity + GDPpc, covid, family = poisson)
+tab_model(poi1, vcov.fun = "HC", vcov.type = "HC3", transform = NULL, digits = 4,
+          show.aic = T, show.loglik = T)
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Death&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Log-Mean&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;4.6231&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;2.9788&amp;nbsp;&amp;ndash;&amp;nbsp;6.2674&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Population&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.0013&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.0028&amp;nbsp;&amp;ndash;&amp;nbsp;0.0055&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.529&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Land&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.0222&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.2844&amp;nbsp;&amp;ndash;&amp;nbsp;0.3288&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.886&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Density&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.3594&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.4069&amp;nbsp;&amp;ndash;&amp;nbsp;0.6880&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.498&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;LargestCity&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.0403&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.2487&amp;nbsp;&amp;ndash;&amp;nbsp;0.3293&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.783&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;GDPpc&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.0403&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.0178&amp;nbsp;&amp;ndash;&amp;nbsp;0.0628&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;139&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; Nagelkerke&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;1.000&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;AIC&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;204793.499&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;log-Likelihood&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;-102390.750&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+```r
+lmtest::lrtest(poi1)
+```
+
+```
+## Likelihood ratio test
+## 
+## Model 1: Death ~ Population + Land + Density + LargestCity + GDPpc
+## Model 2: Death ~ 1
+##   #Df  LogLik Df Chisq Pr(&gt;Chisq)    
+## 1   6 -102391                        
+## 2   1 -143635 -5 82488  &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+???
+
+If we are concerned that maybe our assumptions are mildly violated, 
+we can use robust standard errors.
+
+Note that we can also print out all the usual goodness-of-fit checks for the model,
+including a global LR test (usual F-type test against the global null),
+AIC etc, and pseudo-R2s, for what they're worth.
+
+In terms of 'sign-ificance',
+the signs of the `\(\beta\)`s indicate the effect on the expected number of counts.
+
+So, positive signs indicate positive effects – 
+higher values of *X* drive *Y* (the count) higher – 
+while the opposite is true for negative signs.
+
+So here GDP per capita seems to matter: the richer countries are hit with more coronavirus deaths, it seems.
+
+---
+### Incident rate ratios
+
+As described here, the Poisson model is a log-linear model not unlike the various flavors of logit we talked about before.
+
+This means that (surprise, surprise!) there is something like an odds-ratio interpretation of Poisson regression coefficients here too.
+
+In the Poisson case, the quantity of interest is known as the incident rate - that is, `\(\hat\lambda\)`.
+The natural way to compare two observations, then, is the incidence rate ratio (or IRR).
+For a binary covariate `\(X_D\)` this would look like:
+
+`$$\frac{\hat\lambda\mid X_D=1}{\hat\lambda\mid X_D=0} = \frac{\exp(\hat\beta_0+\bar{X}\hat\beta+(X_D=1)\hat\beta_0{X_D})}{\exp(\hat\beta_0+\bar{X}\hat\beta+(X_D=0)\hat\beta_0{X_D})} = \exp(\hat\beta_{X_D})$$`
+
+That is, we can tell the relative change in incidence rate for a one-unit change in any given variable by simply exponentiating its coefficient estimate.
+
+---
+
+Fortunately, `sjPlot` even offers IRRs by default.
+
+
+```r
+tab_model(poi1, vcov.fun = "HC", vcov.type = "HC3", digits = 4,
+          show.aic = T, show.loglik = T)
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Death&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Incidence Rate Ratios&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;101.8072&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;19.6638&amp;nbsp;&amp;ndash;&amp;nbsp;527.0949&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Population&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.0013&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.9972&amp;nbsp;&amp;ndash;&amp;nbsp;1.0055&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.529&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Land&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.0225&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.7525&amp;nbsp;&amp;ndash;&amp;nbsp;1.3893&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.886&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Density&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.6981&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.2449&amp;nbsp;&amp;ndash;&amp;nbsp;1.9897&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.498&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;LargestCity&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.0411&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.7798&amp;nbsp;&amp;ndash;&amp;nbsp;1.3900&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.783&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;GDPpc&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.0411&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.0180&amp;nbsp;&amp;ndash;&amp;nbsp;1.0648&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;139&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; Nagelkerke&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;1.000&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;AIC&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;204793.499&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;log-Likelihood&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;-102390.750&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+Substantively, this means that a one-unit () increase in GDP per capita results in a exp(0.04) = 1.04 = 4% increase in the IRR.
+
+---
+### Predicted counts
+
+We can also calculate the predicted counts at each level of prog, holding all other variables at their mean, and even graph the counts.
+
+
+```r
+plot_model(poi1, terms = "GDPpc", type = "pred")
+```
+
+&lt;img src="STAT_L7_Count_files/figure-html/margins-1.png" width="504" /&gt;
+
+---
+## Exposure
+
+Of course, you can't die from coronavirus if you don't have coronavirus.
+So maybe the association between GDP per capita and deaths is just because
+richer countries have more cases (so far).
+
+Note that the general format for the Poisson distribution in \ref{1}
+takes into account the extent of “exposure” of each subject *i*.
+We have been assuming that the number of "Bernoulli trials" `\(M \to \infty\)`,
+but there's an upper limit in our case:
+If a state has 3000 (cumulative) cases, it *cannot* have 4000 deaths.
+Moreover, a state that has 200 fatalities from 2000 cases is different from
+a state that has 200 fatalities from 4000 cases.
+Their *rates* of fatality clearly differ,
+and so we have an exposure issue to treat.
+
+Formally, if observations don’t have the same exposure, 
+then the expected count is proportional to the exposure.
+
+As a result, the amount of exposure needs to be accounted for in some way, 
+or the model is misspecified.
+The easiest way to do this is to include an offset.
+
+???
+
+King (2001, 124-126) says that we can think of the exposure issue 
+as being an unequal observation interval issue.
+So far we have assumed that each of our observations of event counts 
+come from intervals of time that have the same length.
+
+---
+### Offsets
+
+An offset is a predictor variable whose coefficient is fixed at 1. So, using the standard setup for a Poisson regression with a log link, we have:
+
+`$$\log E(Y) = \beta X + \log(\epsilon)$$`
+
+where `\(\epsilon\)` is the offset/exposure variable. This can be rewritten as
+
+`$$\log E(Y) - \log(\epsilon) = \beta X$$`
+
+`$$\log E(Y/\epsilon) = \beta X$$`
+
+Your underlying random variable is still *Y*, but by dividing by `\(\epsilon\)` we've converted the LHS into a *rate* of events per unit exposure.
+Since this division also alters the variance of the response, we'd need to reweight by `\(\epsilon\)` or just declare an offset.
+
+
+```r
+poi2 &lt;- glm(Death/Confirmed ~ Population + Land + Density + LargestCity + GDPpc, 
+*           weights = Confirmed,
+		    covid, family = poisson)
+poi3 &lt;- glm(Death ~ Population + Land + Density + LargestCity + GDPpc, 
+*           offset = log(Confirmed),
+            covid, family = poisson)
+tab_model(poi2, poi3, vcov.fun = "HC", vcov.type = "HC3", digits = 4,
+          show.aic = T, show.loglik = T, show.r2 = F)
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Death/Confirmed&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Death&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Incidence Rate Ratios&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Incidence Rate Ratios&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col7"&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.0720&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.0277&amp;nbsp;&amp;ndash;&amp;nbsp;0.1868&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.0720&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.0277&amp;nbsp;&amp;ndash;&amp;nbsp;0.1868&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Population&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.0003&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.9991&amp;nbsp;&amp;ndash;&amp;nbsp;1.0015&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.602&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.0003&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.9991&amp;nbsp;&amp;ndash;&amp;nbsp;1.0015&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;0.602&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Land&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.8563&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.7752&amp;nbsp;&amp;ndash;&amp;nbsp;0.9458&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.002&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.8563&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.7752&amp;nbsp;&amp;ndash;&amp;nbsp;0.9458&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;0.002&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Density&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.6162&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.0963&amp;nbsp;&amp;ndash;&amp;nbsp;3.9435&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.607&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.6162&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.0963&amp;nbsp;&amp;ndash;&amp;nbsp;3.9416&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;0.607&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;LargestCity&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.0187&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.9487&amp;nbsp;&amp;ndash;&amp;nbsp;1.0938&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.608&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.0187&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.9487&amp;nbsp;&amp;ndash;&amp;nbsp;1.0938&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;0.608&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;GDPpc&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.9993&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.9844&amp;nbsp;&amp;ndash;&amp;nbsp;1.0144&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.927&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.9993&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.9844&amp;nbsp;&amp;ndash;&amp;nbsp;1.0144&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;0.927&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;139&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;139&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;AIC&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;Inf&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;21098.745&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;log-Likelihood&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;-Inf&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;-10543.373&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+Now it looks like GDP per capita is no longer significant (as we thought), but land is, and negative.
+
+???
+
+Note that exposure only really matters if:
+- observations have very different exposure, and/or
+- observations have different proportions of exposure
+
+---
+class: center, middle
+# Overdispersion and the Negative Binomial model
+
+.pull-1[.circleoff[![](https://static.turbosquid.com/Preview/2016/07/05__06_16_48/FishSkeletonb.jpg46B6AAD0-198F-40AC-B932-1768C4B0F869Zoom.jpg)]]
+.pull-1[.circleon[![](https://www.psassets.ch/thumbs/2e/1d/08716b4f86e44e119ac2ec013b10-909889.jpg)]]
+.pull-1[.circleoff[![](https://static.toiimg.com/thumb/imgsize-5231,msid-35966935,width-400,resizemode-4/35966935.jpg)]]
+
+---
+## Beyond fishy assumptions
+
+Of course, some of the assumptions underlying the Poisson may not be appropriate for most IRPS count data.
+
+Recall that event count models are similar to logits and probits in that 
+they can be characterized as a realization of a latent process.
+In the event count case, what is latent is the rate at which events occur.
+
+We might say there are four assumptions about this latent process:
+1. We observe from the start of the period (or account for how many events occurred before start of study period)
+1. Periods are all of the same length (though we can account for this with an offset)
+1. Events can't occur at the same time (here we're treating fatalities as if they were occurring in continuous time)
+1. Probability of an event is constant across a period and independent of other events in the same period
+
+If these assumptions hold, for `\(\lambda&gt;0\)` and `\(y\in 0,1,2,3,...\)`:
+
+`$$\Pr(Y_t = y) = \frac{\exp(-\lambda)\lambda^y}{y!}$$`
+
+Where the parameter `\(\lambda\)` is 
+1. the unobserved “rate” of occurrence
+2. the expected value of the variable Y, *and*
+3. the variance of the variable Y
+
+---
+## Overdispersion
+
+This last part, that `\(\lambda = E(Y) = Var(Y)\)`, doesn't always make sense...
+
+Often the variance is (much) more than the mean (overdispersion), or,
+less often, the variance is less than the mean (underdispersion).
+
+Underdispersion would be observed where there are remarkably uniform observations.
+Overdispersion is often observed where there are large asymmetries in event counts,
+as there often are in political science.
+
+This could be due to groupings, contagion, or other reinforcement effects
+that affect our assumption that these observations are independent.
+
+A non-constant rate induces greater random variability in Y than would a constant `\(\lambda\)`.
+
+???
+
+An example could be observations of cats, antelopes and foxes in our backyard each day.
+
+Let's say we observe 
+1. cats: Y = 0,1,1,0,2,0,1,0,3,1,2,1,0,2 ($\mu = 1$, `\(\sigma = 0.92\)`)
+2. antelope: Y = 0,0,0,0,0,0,0,0,0,0,0,0,7,7 ($\mu = 1$, `\(\sigma = 6.46\)`)
+3. foxes: Y = 1,0,1,1,1,1,1,2,1,1,1,1,1,1 ($\mu = 1$, `\(\sigma = 0.15\)`)
+
+Cats seem like a rather independent process,
+but antelope cluster or come together in groups,
+and foxes are usually solitary and almost never seen together.
+
+The first is an example of Poisson dispersion: `\(E(Y) = Var(y) \equiv \sigma = 1\)`
+The second is an example of overdispersion: `\(E(Y) = Var(y) \equiv \sigma &gt; 1\)`
+The third is an example of underdispersion: `\(E(Y) = Var(y) \equiv 0 &lt; \sigma &lt; 1\)`
+
+Generally, political science data are not Poisson distributed, even conditionally.
+- We typically study dependent processes (vs., say, engineers or physicists), 
+and we regularly fail to measure stuff, leading to unobserved heterogeneity.
+- Or, at best, we measure it badly 
+(and, in fact, measurement error in right-hand-side variables also yields overdispersion – see Prentice 1986).
+
+When we introduce covariates, we are factoring out some of the heterogeneity in the data 
+(that is, it is no longer unobserved, but now part of the systematic part of the model).
+
+So, as model specification gets better, we often see our data go from overdispersed, to Poisson, to underdispersed. 
+
+---
+### Diagnosing overdispersion
+
+We can test for overdispersion pretty easily.
+
+Recall that, when speaking of over– or underdispersion, 
+we usually mean conditional on the effects of the independent variables [i.e. `\(Var(Y \mid X,\beta)\)`]
+
+You could estimate a Poisson model and see whether the (squared) “errors” have a variance statistically different from `\(\lambda\)`.
+But a better way is to do a posthoc test based on the results of the negative binomial:
+
+
+```r
+library(pscl); library(lmtest)
+nb1 &lt;- glm.nb(Death ~ Population + Land + Density + LargestCity + GDPpc + offset(log(Confirmed)),
+            covid)
+odTest(nb1) # = lrtest(poi3, nb1)
+```
+
+```
+## Likelihood ratio test of H0: Poisson, as restricted NB model:
+## n.b., the distribution of the test-statistic under H0 is non-standard
+## e.g., see help(odTest) for details/references
+## 
+## Critical value of test statistic at the alpha= 0.05 level: 2.7055 
+## Chi-Square Test Statistic =  20057.972 p-value = &lt; 2.2e-16
+```
+
+???
+
+Simply estimate Poisson and negative-binomial models, and then calculate −2 × (𝑙𝑛𝐿􏲬􏱭􏰒􏱫􏱫􏱭􏰃 − ln𝐿􏰦􏱲); 
+this test is distributed χ􏰌; larger values of the test reject the null hypothesis of no overdispersion. 
+Note as well that a t-test of 𝛼􏰨 = 0 will, asymptotically, give the same results.
+
+---
+### So what if there is overdispersion?
+
+So dispersion can indicate dependence that needs to be taken care of.
+After all, all of the systematic influences on `\(\lambda\)` are supposed to be included in `\(X\beta\)` so that only (constant) random noise remains.
+
+Fitting a Poisson model to these data imposes `\(\lambda = E(Y) = Var(Y)\)`.
+
+This artificially overestimates the variability in Y,
+leading us to overestimate the standard errors, 
+and underestimate our precision/confidence in the model parameters.
+
+Overdispersion is much more common in social scientific settings than is underdispersion.
+
+The larger point is that the mean-variance equality restriction of the standard Poisson distribution 
+is a direct result of the assumptions we make about the process generating the events.
+
+Moreover, in most instances where we have covariates 𝑋􏰒 , what we really care about is conditional over- or underdispersion; 
+that is, over- or underdispersion in the errors/residuals.
+
+---
+## Models for overdispersed counts
+
+To address the idea of heterogeneity, 
+we drop the assumption that `\(\lambda\)` is constant within an observation, 
+and add a random variable that expresses that variance.
+The result is that we have the usual conditional Poisson variate, but with a random error term:
+
+`$$E(Y_i) \equiv \exp(X_i \beta + u_i) = \exp(X_i \beta)\exp(u_i) = \lambda_i v_i$$`
+
+With this approach, we then have to specify the distribution of `\(u_i\)` to identify the model. 
+We usually use the Gamma distribution because:
+1. It is nonnegative
+2. It has a nice (if complicated) closed-form solution
+
+If the *v*s in \ref{6} are assumed to be randomly distributed according to a 
+one-parameter Gamma distribution with `\(E(v) = 1\)` and `\(Var(v) \equiv \sigma^2 = \frac{1}{\theta}\)`, 
+then the marginal density of *Y* is .red[negative binomial]:
+
+`$$\Pr(Y_i = y \mid \lambda_i,\theta) = \Bigl(\frac{\Gamma(\theta^{-1}+Y_i)}{\Gamma(\theta^{-1})\Gamma(Y_i+1)}\Bigr)\Bigl(\frac{\theta^{-1}}{\theta^{-1}+\lambda_i}\Bigr)^{\theta^{-1}}\Bigl(\frac{\lambda_i}{\lambda_i+\theta^{-1}}\Bigr)^{Y_i}\tag{7}\label{7}$$`
+
+where `\(\Gamma\)` is the Gamma function:
+
+`$$\Gamma(\theta)=\lim_0^\infty \exp(-t)t^{\theta-1}dt$$`
+
+---
+### Estimation
+
+To summarize: If we assume an event count process with gamma heterogeneity in the rate of event arrivals, 
+the resulting event count will follow a negative binomial distribution.
+
+With `\(\lambda_i = \exp(X_i \beta)\)` we get the log-likelihood:
+
+`$$\log L_{NB} = \sum_{i=1}^N \Bigl[ \Bigl(\sum_{j=0}^{Y_i-1} \log(j+\theta^{-1})\Bigr) -\log Y_i! - (Y_i - \theta^{-1}) \log[1+\theta \exp(X_i\beta)] + Y_i \log \theta + Y_iX_i\beta\Bigr]$$`
+
+We still model `\(\lambda_i = \exp(X_i \beta)\)`, but `\(E(Y) = \lambda(1+\theta\lambda)\)` where `\(\theta&gt;0\)`. This means:
+- the model remains log-linear (which means IRR and predicted count interpretations remain open)
+- variance can be greater than mean
+- variance still depends on mean (which we want for an event count model)
+- larger values of `\(\theta\)` means greater dispersion
+- the model reduces to a Poisson when `\(\theta=0\)`
+- because `\(\theta&gt;0\)`, R estimates `\(\frac{1}{\theta}\)` or `\(\log(\frac{1}{\theta})\)`
+
+???
+
+For underdispersion, you will need to use the “continuous parameter binomial” (CPB). 
+It is a variant of the binomial distribution which is “scaled” to ensure that probabilities sum to 1.0.
+It has `\(E(Y_i)=\lambda_i\)` again and `\(Var(Y)=\lambda_i\theta\)` with `\(0&lt;\theta&lt;1\)`.
+It also reduces to the standard Poisson when `\(\theta=1\)`.
+The CPB distribution therefore imposes a theoretical “upper limit” on the count variable.
+This limit is due to the fact that the variability of *Y* is constrained by `\(\theta\)`;
+as `\(\theta \to 1\)` the upper limit disappears (i.e. goes to infinity).
+
+---
+
+.pull-left-1[
+## Comparing Poisson and NB models
+
+Note that the significant theta in the NB model indicates overdispersion.
+
+The log-likelihoods and AICs confirm that we should prefer the NB here.
+
+Also the coefficients changed quite a bit.
+- pop and gdppc no longer significant (Poisson's tend to underestimate ses)
+- largest city seems to have grown in relative importance
+
+]
+
+.pull-right-2[
+.small[
+
+```r
+stargazer::stargazer(poi3, nb1, type = "html", style = "io", single.row = T, align = T, intercept.bottom = F, model.numbers = F)
+```
+
+
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;Death&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;Poisson&lt;/em&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;negative&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;&lt;/em&gt;&lt;/td&gt;&lt;td&gt;&lt;em&gt;binomial&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;CONSTANT&lt;/td&gt;&lt;td&gt;-2.631&lt;sup&gt;***&lt;/sup&gt; (0.016)&lt;/td&gt;&lt;td&gt;-3.606&lt;sup&gt;***&lt;/sup&gt; (0.129)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;POPULATION&lt;/td&gt;&lt;td&gt;0.0003&lt;sup&gt;***&lt;/sup&gt; (0.00002)&lt;/td&gt;&lt;td&gt;0.0001 (0.001)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;LAND&lt;/td&gt;&lt;td&gt;-0.155&lt;sup&gt;***&lt;/sup&gt; (0.003)&lt;/td&gt;&lt;td&gt;-0.082&lt;sup&gt;**&lt;/sup&gt; (0.039)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;DENSITY&lt;/td&gt;&lt;td&gt;-0.484&lt;sup&gt;***&lt;/sup&gt; (0.040)&lt;/td&gt;&lt;td&gt;-0.258&lt;sup&gt;**&lt;/sup&gt; (0.117)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;LARGESTCITY&lt;/td&gt;&lt;td&gt;0.018&lt;sup&gt;***&lt;/sup&gt; (0.001)&lt;/td&gt;&lt;td&gt;0.037&lt;sup&gt;**&lt;/sup&gt; (0.016)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;GDPPC&lt;/td&gt;&lt;td&gt;-0.001&lt;sup&gt;**&lt;/sup&gt; (0.0003)&lt;/td&gt;&lt;td&gt;0.002 (0.004)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Observations&lt;/em&gt;&lt;/td&gt;&lt;td&gt;139&lt;/td&gt;&lt;td&gt;139&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Log likelihood&lt;/em&gt;&lt;/td&gt;&lt;td&gt;-10,543.370&lt;/td&gt;&lt;td&gt;-515.387&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;theta&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;1.454&lt;sup&gt;***&lt;/sup&gt; (0.212)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Akaike information criterion&lt;/em&gt;&lt;/td&gt;&lt;td&gt;21,098.740&lt;/td&gt;&lt;td&gt;1,042.773&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:left"&gt;&lt;sup&gt;***&lt;/sup&gt;p &lt; .01; &lt;sup&gt;**&lt;/sup&gt;p &lt; .05; &lt;sup&gt;*&lt;/sup&gt;p &lt; .1&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+]
+]
+
+---
+class: center, middle
+# Zero-Inflation and the Hurdle model
+
+.pull-1[.circleoff[![](https://static.turbosquid.com/Preview/2016/07/05__06_16_48/FishSkeletonb.jpg46B6AAD0-198F-40AC-B932-1768C4B0F869Zoom.jpg)]]
+.pull-1[.circleoff[![](https://www.psassets.ch/thumbs/2e/1d/08716b4f86e44e119ac2ec013b10-909889.jpg)]]
+.pull-1[.circleon[![](https://static.toiimg.com/thumb/imgsize-5231,msid-35966935,width-400,resizemode-4/35966935.jpg)]]
+
+---
+## Heaps of zeros
+
+.pull-left[
+
+Ok, let's go back to the start.
+We've taken care of the large dispersion in this distribution,
+but there is still a literal heap of zeros...
+
+Indeed 25% have not had any fatalities yet
+(tragically subject to change, I'm sure).
+
+That is more than we'd expect from such an overdispersed distribution with a reasonably high `\(\lambda\)`.
+We can thus characterise this as an excessive number of zero outcomes for the distribution,
+or an 'inflation' of zeros.
+]
+
+.pull-right[
+
+&lt;img src="STAT_L7_Count_files/figure-html/rehisto-1.png" width="504" /&gt;
+
+]
+
+---
+## Zero-Inflation
+
+We may have two different reasons for observing a 0 here:
+1. some zeros are quite possible due to the main count/Poisson process
+  - i.e. the rate is running, but just hasn't led to fatalities yet
+2. other zeros might be due to some other, often unobserved process
+  - i.e. (this is a bit of a stretch) reporting differences in coronavirus fatalities due to capacity or governmental edict
+
+A zero-inflated model assumes that 0s are due to two different processes:
+1. a count model (usually NB because zero-inflation often goes hand-in-hand with overdispersion, but could be a Poisson)
+2. a binary model (usually a logit) to model whether a zero observation is part of the first or the second population
+
+The zero-inflated negative binomial regression generates two separate models and then combines them.
+1. a logit model is generated for the "certain zero" cases described above, 
+predicting whether or not a country-year would be in this group
+2. a negative binomial model is generated predicting the counts for country-years that are not certain zeros
+3. the two models are combined; the expected count is expressed as a combination of the two processes.
+
+---
+## Estimating a ZINB
+
+When running the zero-inflated negative binomial in R, we must specify both models: 
+first the count model, then the model predicting the certain zeros.
+If you don't, R will apply the same formula to both parts of the model.
+Sometimes this is what you want, but you *can* specify them differently.
+
+
+```r
+library(pscl)
+zinb1 &lt;- zeroinfl(Death ~ Population + Land + Density + LargestCity + GDPpc + offset(log(Confirmed)),
+            covid, dist = "negbin")
+```
+
+In this example, we are predicting the count with all previous covariates, 
+and predicting the certain zeros with them as well (depending on our expectations we can also include less).
+
+This is the response variable predicted by the full model.
+This refers to the logistic model predicting whether or not a country-year is a certain zero.
+This is the natural log of alpha.
+This is the dispersion parameter of the count model.
+We are mostly interested in the first part of the estimation (and report that).
+But the logistic model could be of interest as well. However, none of our variables seems to be associated to structural absence/presence of refugees.
+Nonetheless, the alpha and lnalpha are different from 0, so we know there is dispersion and a Poisson would be inappropriate.
+
+---
+### Diagnosing zero-inflation
+
+To know whether the ZINB was actually necessary, we use the Vuong test on both fitted models.
+
+
+```r
+vuong(nb1, zinb1)
+```
+
+```
+## Vuong Non-Nested Hypothesis Test-Statistic: 
+## (test-statistic is asymptotically distributed N(0,1) under the
+##  null that the models are indistinguishible)
+## -------------------------------------------------------------
+##               Vuong z-statistic             H_A    p-value
+## Raw                  -2.3858147 model2 &gt; model1  0.0085207
+## AIC-corrected         0.3284238 model1 &gt; model2  0.3712956
+## BIC-corrected         4.3108548 model1 &gt; model2 8.1312e-06
+```
+
+The significant p-value shows us that we were right in going with the ZINB instead of a regular NB.
+
+---
+## REALLY two processes
+
+Zero-inflated models are based around the idea that there are two processes: 
+a model for the general count (that can include some zeros) and a model for the 'extra' zeros.
+
+--
+
+But what if they are **really** two processes?
+
+That is, that there is a process for whether or not there are any,
+and then if there are some how many.
+
+This is called a .red[hurdle model], 
+since the first process represents a hurdle that must be crossed 
+before another (count) process engages.
+
+
+```r
+hur1 &lt;- hurdle(Death ~ Population + Land + Density + LargestCity + GDPpc + offset(log(Confirmed)),
+            covid, dist = "negbin")
+```
+
+---
+
+.tiny[
+
+```r
+texreg::htmlreg(list(poi3, nb1, zinb1, hur1), digits = 4, single.row = T, doctype = F,
+ custom.model.names = c("Poisson","Negative Binomial","Zero-Inflated NB","Hurdle"))
+```
+
+
+&lt;table cellspacing="0" align="center" style="border: none;"&gt;
+&lt;caption align="bottom" style="margin-top:0.3em;"&gt;Statistical models&lt;/caption&gt;
+&lt;tr&gt;
+&lt;th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;"&gt;&lt;b&gt;&lt;/b&gt;&lt;/th&gt;
+&lt;th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;"&gt;&lt;b&gt;Poisson&lt;/b&gt;&lt;/th&gt;
+&lt;th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;"&gt;&lt;b&gt;Negative Binomial&lt;/b&gt;&lt;/th&gt;
+&lt;th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;"&gt;&lt;b&gt;Zero-Inflated NB&lt;/b&gt;&lt;/th&gt;
+&lt;th style="text-align: left; border-top: 2px solid black; border-bottom: 1px solid black; padding-right: 12px;"&gt;&lt;b&gt;Hurdle&lt;/b&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;(Intercept)&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-2.6315 (0.0157)&lt;sup style="vertical-align: 0px;"&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-3.6058 (0.1287)&lt;sup style="vertical-align: 0px;"&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Population&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.0003 (0.0000)&lt;sup style="vertical-align: 0px;"&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.0001 (0.0006)&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Land&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-0.1552 (0.0026)&lt;sup style="vertical-align: 0px;"&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-0.0822 (0.0393)&lt;sup style="vertical-align: 0px;"&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Density&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-0.4841 (0.0403)&lt;sup style="vertical-align: 0px;"&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-0.2577 (0.1166)&lt;sup style="vertical-align: 0px;"&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;LargestCity&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.0185 (0.0011)&lt;sup style="vertical-align: 0px;"&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.0365 (0.0162)&lt;sup style="vertical-align: 0px;"&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;GDPpc&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-0.0007 (0.0003)&lt;sup style="vertical-align: 0px;"&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.0016 (0.0040)&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Count model: (Intercept)&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-3.5396 (0.1396)&lt;sup style="vertical-align: 0px;"&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-3.6630 (0.1503)&lt;sup style="vertical-align: 0px;"&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Count model: Population&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.0001 (0.0005)&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.0002 (0.0006)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Count model: Land&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-0.0827 (0.0444)&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-0.0892 (0.0442)&lt;sup style="vertical-align: 0px;"&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Count model: Density&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-0.2500 (0.1212)&lt;sup style="vertical-align: 0px;"&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-0.2722 (0.1275)&lt;sup style="vertical-align: 0px;"&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Count model: LargestCity&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.0332 (0.0185)&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.0383 (0.0194)&lt;sup style="vertical-align: 0px;"&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Count model: GDPpc&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.0004 (0.0041)&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.0030 (0.0042)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Count model: Log(theta)&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.4006 (0.1451)&lt;sup style="vertical-align: 0px;"&gt;**&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.3717 (0.1675)&lt;sup style="vertical-align: 0px;"&gt;*&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Zero model: (Intercept)&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;130.1756 (12.2067)&lt;sup style="vertical-align: 0px;"&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-3.6424 (0.5258)&lt;sup style="vertical-align: 0px;"&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Zero model: Population&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.3628&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-0.0064 (0.0041)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Zero model: Land&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-45.1725 (12.1865)&lt;sup style="vertical-align: 0px;"&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;1.0116 (0.7045)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Zero model: Density&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;107.8707 (40.8595)&lt;sup style="vertical-align: 0px;"&gt;**&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-0.0068 (0.9325)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Zero model: LargestCity&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-3.3828 (3.9407)&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.1326 (0.1551)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Zero model: GDPpc&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-215.1866 (4.7755)&lt;sup style="vertical-align: 0px;"&gt;***&lt;/sup&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;0.0019 (0.0432)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="border-top: 1px solid black;"&gt;AIC&lt;/td&gt;
+&lt;td style="border-top: 1px solid black;"&gt;21098.7451&lt;/td&gt;
+&lt;td style="border-top: 1px solid black;"&gt;1042.7731&lt;/td&gt;
+&lt;td style="border-top: 1px solid black;"&gt;1044.2251&lt;/td&gt;
+&lt;td style="border-top: 1px solid black;"&gt;1048.3435&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;BIC&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;21116.3520&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;1063.3144&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Log Likelihood&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-10543.3726&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-514.3866&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-509.1126&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;-511.1718&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;Deviance&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;20538.1600&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;149.2866&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;td style="padding-right: 12px; border: none;"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="border-bottom: 2px solid black;"&gt;Num. obs.&lt;/td&gt;
+&lt;td style="border-bottom: 2px solid black;"&gt;139&lt;/td&gt;
+&lt;td style="border-bottom: 2px solid black;"&gt;139&lt;/td&gt;
+&lt;td style="border-bottom: 2px solid black;"&gt;139&lt;/td&gt;
+&lt;td style="border-bottom: 2px solid black;"&gt;139&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="padding-right: 12px; border: none;" colspan="6"&gt;&lt;span style="font-size:0.8em"&gt;&lt;sup style="vertical-align: 0px;"&gt;***&lt;/sup&gt;p &amp;lt; 0.001, &lt;sup style="vertical-align: 0px;"&gt;**&lt;/sup&gt;p &amp;lt; 0.01, &lt;sup style="vertical-align: 0px;"&gt;*&lt;/sup&gt;p &amp;lt; 0.05&lt;/span&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+]
+
+---
+class: center, middle
+
+# Summary
+
+.pull-1[.circleon[![](https://static.turbosquid.com/Preview/2016/07/05__06_16_48/FishSkeletonb.jpg46B6AAD0-198F-40AC-B932-1768C4B0F869Zoom.jpg)]]
+.pull-1[.circleon[![](https://www.psassets.ch/thumbs/2e/1d/08716b4f86e44e119ac2ec013b10-909889.jpg)]]
+.pull-1[.circleon[![](https://static.toiimg.com/thumb/imgsize-5231,msid-35966935,width-400,resizemode-4/35966935.jpg)]]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>` "
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
