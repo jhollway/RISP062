@@ -69,7 +69,7 @@ or in relation to discrete events that occur.
 
 --
 
-Note some data that looks like count should still be treated differently: 
+Some data that looks like count should still be treated differently: 
 - Binary data that expresses successes/failures of known number of trials best estimated with binomial model
 - Ordinal data like Likert scales may look like counts but best estimated with ordinal logit instead
 
@@ -94,14 +94,18 @@ covid &lt;- coronavirus %&gt;% gr
 
 library(ggplot2)
 ggplot(covid, aes(Death)) + 
-  geom_histogram()
+  geom_histogram(binwidth = 200, fill = "orange") + 
+  ylab("Number of states")
+ggplot(covid, aes(Death)) + 
+  geom_histogram(binwidth = 200, fill = "orange") + 
+  ylab("Number of states") + scale_y_sqrt()
 ```
 
 ]
 
 .pull-right[
 
-&lt;img src="STAT_L7_Count_files/figure-html/covid-1.png" width="504" /&gt;
+&lt;img src="STAT_L7_Count_files/figure-html/covid-1.png" width="504" /&gt;&lt;img src="STAT_L7_Count_files/figure-html/covid-2.png" width="504" /&gt;
 
 ]
 
@@ -130,21 +134,21 @@ covid &lt;- left_join(covid, wbdata, by = "iso3c") %&gt;%
          Land = AG.LND.TOTL.K2/1000000, # millions of square kilometers
          LargestCity = EN.URB.LCTY/1000000, # millions of people in largest city
          Density = EN.POP.DNST/1000, # thousands of people per square kilometer
-         GDPpc = NY.GDP.PCAP.KD/1000) # thousands of US$ per person
+         GDPpc = NY.GDP.PCAP.KD/1000) # thousands of 2010 US$ per person
 ```
 
 ---
 ### Why not use OLS?
 
-Event counts have a few interesting properties that can make them hard to deal with:
-- they are discrete (meaning they only take on integer values)
-- they are strictly non-negative (meaning they only take on positive values, or zero)
+Event counts can be a bit hard to deal with because they are:
+- *Discrete* (meaning they only take on integer values)
+- *Strictly non-negative* (meaning they only take on positive values, or zero)
 
 --
 
 This makes using OLS on event counts a bad idea (King 1988) because it yields estimates that are:
-- Inaccurate (e.g. OLS can predict negative counts)
-- Inefficient (because they fail to account for the heteroskedastic nature of event counts)
+- *Inaccurate* (e.g. OLS can predict negative counts)
+- *Inefficient* (because they fail to account for the heteroskedastic nature of event counts)
 
 ???
 
@@ -156,21 +160,16 @@ More on the last thing in a bit...
 Suppose we are interested in studying events, and that those events occur over time.
 
 We will consider the rate at which events occur `\(\lambda\)`.
-
 It’s useful to think of `\(\lambda\)` as the expected number of events in any particular time “period” of length *h*.
 
-Imagine further that the events in question are independent; 
-that is, the occurrence of one event has no bearing on the probability that another will occur.
-
---
-
-If the process that gives rise to the events in question (aka our event process) conforms to these assumptions, 
-then it’s pretty straightforward to show that as the length of the interval `\(h \to 0\)`,
+If, in the data-generating process (DGP) that gives rise to the events in question, 
+the events are or can be considered to be independent (that is `\(\Pr(event_i) = \Pr(event_i|event_j)\)`),
+we can conceive of this as a .red[Poisson process]: 
+events occur independently with a constant probability equal to `\(\lambda\)` times the length of the interval (that is, `\(\lambda h\)`):
 - `\(\Pr(Y = 1|(t,t+h]) = \lambda h\)`
 - `\(\Pr(Y = 0|(t,t+h]) = 1 - \lambda h\)`
 
-Such a variable is known as a .red[Poisson process]: 
-events occur independently with a constant probability equal to `\(\lambda\)` times the length of the interval (that is, `\(\lambda h\)`).
+&lt;!-- Then as the length of the interval `\(h \to 0\)`, `\(\lambda\)` will just be the rate. --&gt;
 
 ---
 ### The Poisson distribution
@@ -193,6 +192,8 @@ Therefore the assumptions underlying the *Poisson process* –
 constant arrival rates, and independence across events – 
 are key to deriving the *Poisson distribution* in this way.
 
+???
+
 Relaxing these assumptions results in other distributions...
 
 ---
@@ -206,7 +207,7 @@ Relaxing these assumptions results in other distributions...
 
 .pull-right[
 
-The Poisson distribution is a discrete probability distribution, with support on non-negative integers.
+The Poisson distribution is a discrete probability distribution, with *support* on non-negative integers.
 
 The “rate” `\(\lambda\)` can be interpreted as the expected number of events during an observation period.
 
@@ -243,19 +244,23 @@ on (the expected value of) *Y*.
 Since we know `\(E(Y)&gt;0\)`, 
 we need to restrict the “link” to be positive.
 The exponential is the standard one for this.
+So, we have `\(E(Y_i) \equiv \lambda_i = \exp(X_i\beta)\)`.
 
-So, we have
+.pull-left[
 
-`$$E(Y_i) \equiv \lambda_i = \exp(X_i\beta)\tag{3}\label{3}$$`
-
-Incorporating this into Eq. \ref{2}, 
-this yields a probability model that looks like this:
+Incorporating this into Eq. \ref{2} yields a probability model that looks like this:
 
 `$$\Pr(Y_i = y|X_i,\beta) = \frac{\exp[-\exp(X_i\beta)][\exp(X_i\beta)^y]}{y!} \tag{4}\label{4}$$`
+
+]
+
+.pull-right[
 
 Making the usual i.i.d. assumptions yields a pretty simple likelihood:
 
 `$$L = \prod_{i=1}^N \frac{[\exp-\exp(X_i\beta)][\exp(X_i\beta)^{y_i}]}{y_i!} \tag{5}\label{5}$$`
+
+]
 
 And an equally simple log-likelihood:
 
@@ -273,13 +278,13 @@ We’ll talk about some tinkering with this model a bit later.
 ---
 ## Estimation
 
-Ok, so let's try estimating a Poisson model for our data now.
-
+.small[
 
 ```r
 library(sjPlot)
 poi1 &lt;- glm(Death ~ Population + Land + Density + LargestCity + GDPpc, covid, family = poisson)
-tab_model(poi1, vcov.fun = "HC", vcov.type = "HC3", transform = NULL, digits = 4,
+*tab_model(poi1, transform = NULL, digits = 4,
+*         vcov.fun = "HC", vcov.type = "HC3",
           show.aic = T, show.loglik = T)
 ```
 
@@ -348,24 +353,11 @@ tab_model(poi1, vcov.fun = "HC", vcov.type = "HC3", transform = NULL, digits = 4
 &lt;/tr&gt;
 
 &lt;/table&gt;
-
-```r
-lmtest::lrtest(poi1)
-```
-
-```
-## Likelihood ratio test
-## 
-## Model 1: Death ~ Population + Land + Density + LargestCity + GDPpc
-## Model 2: Death ~ 1
-##   #Df  LogLik Df Chisq Pr(&gt;Chisq)    
-## 1   6 -102391                        
-## 2   1 -143635 -5 82488  &lt; 2.2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-```
+]
 
 ???
+
+Ok, so let's try estimating a Poisson model for our data now.
 
 If we are concerned that maybe our assumptions are mildly violated, 
 we can use robust standard errors.
@@ -386,8 +378,7 @@ So here GDP per capita seems to matter: the richer countries are hit with more c
 ---
 ### Incident rate ratios
 
-As described here, the Poisson model is a log-linear model not unlike the various flavors of logit we talked about before.
-
+The Poisson model is a log-linear model not unlike the various flavors of logit we talked about before.
 This means that (surprise, surprise!) there is something like an odds-ratio interpretation of Poisson regression coefficients here too.
 
 In the Poisson case, the quantity of interest is known as the incident rate - that is, `\(\hat\lambda\)`.
@@ -400,10 +391,9 @@ That is, we can tell the relative change in incidence rate for a one-unit change
 
 ---
 
-Fortunately, `sjPlot` even offers IRRs by default.
-
 
 ```r
+# Fortunately, `sjPlot` even offers IRRs by default.
 tab_model(poi1, vcov.fun = "HC", vcov.type = "HC3", digits = 4,
           show.aic = T, show.loglik = T)
 ```
@@ -474,12 +464,14 @@ tab_model(poi1, vcov.fun = "HC", vcov.type = "HC3", digits = 4,
 
 &lt;/table&gt;
 
-Substantively, this means that a one-unit () increase in GDP per capita results in a exp(0.04) = 1.04 = 4% increase in the IRR.
+???
+
+Substantively, this means that a one-unit ($1000) increase in GDP per capita results in a exp(0.04) = 1.04 = 4% increase in the IRR.
 
 ---
 ### Predicted counts
 
-We can also calculate the predicted counts at each level of prog, holding all other variables at their mean, and even graph the counts.
+We can also calculate and graph the predicted counts, holding all other variables at their mean.
 
 
 ```r
@@ -495,22 +487,26 @@ Of course, you can't die from coronavirus if you don't have coronavirus.
 So maybe the association between GDP per capita and deaths is just because
 richer countries have more cases (so far).
 
-Note that the general format for the Poisson distribution in \ref{1}
-takes into account the extent of “exposure” of each subject *i*.
+--
+
+Note that the format for the Poisson distribution in \ref{1}
+includes *h* as a time interval, 
+and we've been assuming that this is constant/shared for all.
+We can conceive of this as the “exposure” each subject *i* has that they can generate a count from.
+
 We have been assuming that the number of "Bernoulli trials" `\(M \to \infty\)`,
 but there's an upper limit in our case:
-If a state has 3000 (cumulative) cases, it *cannot* have 4000 deaths.
-Moreover, a state that has 200 fatalities from 2000 cases is different from
+If a state has 3000 cases, it *cannot* have 4000 deaths.
+
+This upper limit can change our interpretation.
+A state that has 200 fatalities from 2000 cases is different from
 a state that has 200 fatalities from 4000 cases.
+
+Lastly, states have different numbers of cases,
+and so the 200/4000 fatalities is clearly doing better than the 200/2000.
 Their *rates* of fatality clearly differ,
-and so we have an exposure issue to treat.
-
-Formally, if observations don’t have the same exposure, 
-then the expected count is proportional to the exposure.
-
-As a result, the amount of exposure needs to be accounted for in some way, 
+and so the amount of exposure needs to be accounted for in some way, 
 or the model is misspecified.
-The easiest way to do this is to include an offset.
 
 ???
 
@@ -522,27 +518,38 @@ come from intervals of time that have the same length.
 ---
 ### Offsets
 
-An offset is a predictor variable whose coefficient is fixed at 1. So, using the standard setup for a Poisson regression with a log link, we have:
+An offset is a predictor variable whose coefficient is fixed at 1. 
+Let's add `\(Z\)`, an offset/exposure variable, to our standard Poisson regression setup:
 
-`$$\log E(Y) = \beta X + \log(\epsilon)$$`
+`$$\begin{align}
+\log E(Y) &amp; = \beta X + \log(Z)\\
+\log E(Y) - \log(Z) &amp; = \beta X\\
+\log E(Y/Z) &amp; = \beta X\\
+\end{align}$$`
 
-where `\(\epsilon\)` is the offset/exposure variable. This can be rewritten as
-
-`$$\log E(Y) - \log(\epsilon) = \beta X$$`
-
-`$$\log E(Y/\epsilon) = \beta X$$`
-
-Your underlying random variable is still *Y*, but by dividing by `\(\epsilon\)` we've converted the LHS into a *rate* of events per unit exposure.
-Since this division also alters the variance of the response, we'd need to reweight by `\(\epsilon\)` or just declare an offset.
+Your underlying random variable is still *Y*, 
+but by dividing by `\(Z\)` we've converted the LHS into a *rate* of events per unit exposure.
+Formally, if observations don’t have the same exposure, 
+then the expected count is proportional to the exposure.
+Since this division also alters the variance of the response, 
+we'd need to reweight by `\(Z\)` or just declare an offset.
 
 
 ```r
-poi2 &lt;- glm(Death/Confirmed ~ Population + Land + Density + LargestCity + GDPpc, 
+*poi2 &lt;- glm(Death/Confirmed ~
+              Population + Land + Density + LargestCity + GDPpc, 
 *           weights = Confirmed,
 		    covid, family = poisson)
-poi3 &lt;- glm(Death ~ Population + Land + Density + LargestCity + GDPpc, 
+poi3 &lt;- glm(Death ~ 
+              Population + Land + Density + LargestCity + GDPpc, 
 *           offset = log(Confirmed),
             covid, family = poisson)
+```
+
+---
+
+
+```r
 tab_model(poi2, poi3, vcov.fun = "HC", vcov.type = "HC3", digits = 4,
           show.aic = T, show.loglik = T, show.r2 = F)
 ```
@@ -651,15 +658,11 @@ class: center, middle
 .pull-1[.circleoff[![](https://static.toiimg.com/thumb/imgsize-5231,msid-35966935,width-400,resizemode-4/35966935.jpg)]]
 
 ---
-## Beyond fishy assumptions
+## Some fishy assumptions
 
 Of course, some of the assumptions underlying the Poisson may not be appropriate for most IRPS count data.
 
-Recall that event count models are similar to logits and probits in that 
-they can be characterized as a realization of a latent process.
-In the event count case, what is latent is the rate at which events occur.
-
-We might say there are four assumptions about this latent process:
+We might say there are four assumptions about the latent process underlying the Poisson distribution:
 1. We observe from the start of the period (or account for how many events occurred before start of study period)
 1. Periods are all of the same length (though we can account for this with an offset)
 1. Events can't occur at the same time (here we're treating fatalities as if they were occurring in continuous time)
@@ -674,59 +677,58 @@ Where the parameter `\(\lambda\)` is
 2. the expected value of the variable Y, *and*
 3. the variance of the variable Y
 
----
-## Overdispersion
-
-This last part, that `\(\lambda = E(Y) = Var(Y)\)`, doesn't always make sense...
-
-Often the variance is (much) more than the mean (overdispersion), or,
-less often, the variance is less than the mean (underdispersion).
-
-Underdispersion would be observed where there are remarkably uniform observations.
-Overdispersion is often observed where there are large asymmetries in event counts,
-as there often are in political science.
-
-This could be due to groupings, contagion, or other reinforcement effects
-that affect our assumption that these observations are independent.
-
-A non-constant rate induces greater random variability in Y than would a constant `\(\lambda\)`.
-
 ???
 
-An example could be observations of cats, antelopes and foxes in our backyard each day.
+Recall that event count models are similar to logits and probits in that 
+they can be characterized as a realization of a latent process.
+In the event count case, what is latent is the rate at which events occur.
 
-Let's say we observe 
-1. cats: Y = 0,1,1,0,2,0,1,0,3,1,2,1,0,2 ($\mu = 1$, `\(\sigma = 0.92\)`)
-2. antelope: Y = 0,0,0,0,0,0,0,0,0,0,0,0,7,7 ($\mu = 1$, `\(\sigma = 6.46\)`)
-3. foxes: Y = 1,0,1,1,1,1,1,2,1,1,1,1,1,1 ($\mu = 1$, `\(\sigma = 0.15\)`)
+---
+## Dispersion
+
+This last part, `\(\lambda = E(Y) = Var(Y)\)`, doesn't always make sense...
+--
+
+- often there is *overdispersion*: `\(\lambda = E(Y) &lt; Var(Y)\)`
+- less often there is *underdispersion*: `\(\lambda = E(Y) &gt; Var(Y)\)`
+
+An example could be observations of cats, antelopes and foxes in our backyard each day:
+1. cats: Y = 0,1,1,0,2,0,1,0,3,1,2,1,0,2 
+  - `\(\mu = 1\)`, `\(\sigma = 0.92\)`, i.e. Poisson dispersion: `\(E(Y) = Var(y) \equiv \sigma = 1\)`
+2. antelope: Y = 0,0,0,0,0,0,0,0,0,0,0,0,7,7 
+  - `\(\mu = 1\)`, `\(\sigma = 6.46\)`, i.e. overdispersion: `\(E(Y) = Var(y) \equiv \sigma &gt; 1\)`
+3. foxes: Y = 1,0,1,1,1,1,1,2,1,1,1,1,1,1 
+  - `\(\mu = 1\)`, `\(\sigma = 0.15\)`, i.e. underdispersion: `\(E(Y) = Var(y) \equiv 0 &lt; \sigma &lt; 1\)`
+  
+Note what we are interested in here is whether data is *conditionally* Poisson distributed, 
+i.e. conditional on the effects of the independent variables [i.e. `\(Var(Y \mid X,\beta)\)`].
+When we introduce covariates, we factor out some of the heterogeneity in the data.
+So, as model specification gets better, 
+our data can go from overdispersed, to Poisson, to underdispersed. 
+
+But political science data are often not Poisson distributed, even conditionally.
+We regularly study dependent processes leaded to unobserved heterogeneity or our measures are noisy (see Prentice 1986).
+
+???
 
 Cats seem like a rather independent process,
 but antelope cluster or come together in groups,
 and foxes are usually solitary and almost never seen together.
 
-The first is an example of Poisson dispersion: `\(E(Y) = Var(y) \equiv \sigma = 1\)`
-The second is an example of overdispersion: `\(E(Y) = Var(y) \equiv \sigma &gt; 1\)`
-The third is an example of underdispersion: `\(E(Y) = Var(y) \equiv 0 &lt; \sigma &lt; 1\)`
+Underdispersion would be observed where there are remarkably uniform observations.
+Overdispersion is often observed where there are large asymmetries in event counts,
+as there often are in political science.
 
-Generally, political science data are not Poisson distributed, even conditionally.
-- We typically study dependent processes (vs., say, engineers or physicists), 
-and we regularly fail to measure stuff, leading to unobserved heterogeneity.
-- Or, at best, we measure it badly 
-(and, in fact, measurement error in right-hand-side variables also yields overdispersion – see Prentice 1986).
+Overdispersion is much more common in social scientific settings than is underdispersion.
 
-When we introduce covariates, we are factoring out some of the heterogeneity in the data 
-(that is, it is no longer unobserved, but now part of the systematic part of the model).
-
-So, as model specification gets better, we often see our data go from overdispersed, to Poisson, to underdispersed. 
+This could be due to groupings, contagion, or other reinforcement effects
+that affect our assumption that these observations are independent.
+A non-constant rate induces greater random variability in Y than would a constant `\(\lambda\)`.
 
 ---
 ### Diagnosing overdispersion
 
 We can test for overdispersion pretty easily.
-
-Recall that, when speaking of over– or underdispersion, 
-we usually mean conditional on the effects of the independent variables [i.e. `\(Var(Y \mid X,\beta)\)`]
-
 You could estimate a Poisson model and see whether the (squared) “errors” have a variance statistically different from `\(\lambda\)`.
 But a better way is to do a posthoc test based on the results of the negative binomial:
 
@@ -749,54 +751,48 @@ odTest(nb1) # = lrtest(poi3, nb1)
 
 ???
 
-Simply estimate Poisson and negative-binomial models, and then calculate −2 × (𝑙𝑛𝐿􏲬􏱭􏰒􏱫􏱫􏱭􏰃 − ln𝐿􏰦􏱲); 
-this test is distributed χ􏰌; larger values of the test reject the null hypothesis of no overdispersion. 
-Note as well that a t-test of 𝛼􏰨 = 0 will, asymptotically, give the same results.
+Note that a t-test of 𝛼􏰨 = 0 will, `\(\theta\)` will, asymptotically, give the same results.
 
 ---
 ### So what if there is overdispersion?
 
-So dispersion can indicate dependence that needs to be taken care of.
-After all, all of the systematic influences on `\(\lambda\)` are supposed to be included in `\(X\beta\)` so that only (constant) random noise remains.
+Dispersion can indicate dependence that needs to be taken care of.
+After all, all of the systematic influences on `\(\lambda\)` are supposed to be included in `\(X\beta\)` 
+so that only (constant) random noise remains.
+(So your first option is to improve model specification.)
 
-Fitting a Poisson model to these data imposes `\(\lambda = E(Y) = Var(Y)\)`.
+Continuing to fit a Poisson model to these data imposes `\(\lambda = E(Y) = Var(Y)\)`,
+(the mean-variance equality restriction).
 
 This artificially overestimates the variability in Y,
 leading us to overestimate the standard errors, 
 and underestimate our precision/confidence in the model parameters.
 
-Overdispersion is much more common in social scientific settings than is underdispersion.
-
-The larger point is that the mean-variance equality restriction of the standard Poisson distribution 
-is a direct result of the assumptions we make about the process generating the events.
-
-Moreover, in most instances where we have covariates 𝑋􏰒 , what we really care about is conditional over- or underdispersion; 
-that is, over- or underdispersion in the errors/residuals.
-
 ---
 ## Models for overdispersed counts
 
-To address the idea of heterogeneity, 
+To address dispersion, 
 we drop the assumption that `\(\lambda\)` is constant within an observation, 
 and add a random variable that expresses that variance.
 The result is that we have the usual conditional Poisson variate, but with a random error term:
 
 `$$E(Y_i) \equiv \exp(X_i \beta + u_i) = \exp(X_i \beta)\exp(u_i) = \lambda_i v_i$$`
 
-With this approach, we then have to specify the distribution of `\(u_i\)` to identify the model. 
+We then have to specify the distribution of `\(u_i\)` to identify the model. 
 We usually use the Gamma distribution because:
 1. It is nonnegative
 2. It has a nice (if complicated) closed-form solution
 
-If the *v*s in \ref{6} are assumed to be randomly distributed according to a 
-one-parameter Gamma distribution with `\(E(v) = 1\)` and `\(Var(v) \equiv \sigma^2 = \frac{1}{\theta}\)`, 
+If *v*s are assumed to be randomly distributed according to a 
+one-parameter Gamma distribution with `\(E(v) = 1\)` and 
+`\(Var(v) \equiv \sigma^2 = \frac{1}{\theta}\)`, 
 then the marginal density of *Y* is .red[negative binomial]:
 
 `$$\Pr(Y_i = y \mid \lambda_i,\theta) = \Bigl(\frac{\Gamma(\theta^{-1}+Y_i)}{\Gamma(\theta^{-1})\Gamma(Y_i+1)}\Bigr)\Bigl(\frac{\theta^{-1}}{\theta^{-1}+\lambda_i}\Bigr)^{\theta^{-1}}\Bigl(\frac{\lambda_i}{\lambda_i+\theta^{-1}}\Bigr)^{Y_i}\tag{7}\label{7}$$`
 
 where `\(\Gamma\)` is the Gamma function:
 
-`$$\Gamma(\theta)=\lim_0^\infty \exp(-t)t^{\theta-1}dt$$`
+`$$\Gamma(\theta)=\int^\infty \exp(-t)t^{\theta-1}dt$$`
 
 ---
 ### Estimation
@@ -899,7 +895,7 @@ or an 'inflation' of zeros.
 ]
 
 ---
-## Zero-Inflation
+### Zero-Inflation
 
 We may have two different reasons for observing a 0 here:
 1. some zeros are quite possible due to the main count/Poisson process
