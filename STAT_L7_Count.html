@@ -12,7 +12,7 @@
 class: center, middle, inverse, title-slide
 
 # Statistics for International Relations Research II
-## Assumptions
+## Counts
 ### <large>James Hollway</large>
 
 ---
@@ -795,6 +795,22 @@ where `\(\Gamma\)` is the Gamma function:
 `$$\Gamma(\theta)=\int^\infty \exp(-t)t^{\theta-1}dt$$`
 
 ---
+### The negative binomial distribution
+
+.pull-left[
+
+&lt;img src="STAT_L7_Count_files/figure-html/nbdis1-1.png" width="504" /&gt;
+
+]
+
+.pull-right[
+
+&lt;img src="STAT_L7_Count_files/figure-html/nbdis2-1.png" width="504" /&gt;
+
+]
+
+
+---
 ### Estimation
 
 To summarize: If we assume an event count process with gamma heterogeneity in the rate of event arrivals, 
@@ -984,6 +1000,18 @@ before another (count) process engages.
 hur1 &lt;- hurdle(Death ~ Population + Land + Density + LargestCity + GDPpc + offset(log(Confirmed)),
             covid, dist = "negbin")
 ```
+
+---
+
+
+class:center, middle.pull-left[
+&lt;img src="STAT_L7_Count_files/figure-html/zeroinf-1.png" width="504" /&gt;
+]
+
+.pull-right[
+&lt;img src="STAT_L7_Count_files/figure-html/hurdly-1.png" width="504" /&gt;
+]
+
 
 ---
 
@@ -1177,6 +1205,49 @@ texreg::htmlreg(list(poi3, nb1, zinb1, hur1), digits = 4, single.row = T, doctyp
 &lt;/tr&gt;
 &lt;/table&gt;
 ]
+
+---
+### Rootograms
+
+.pull-left[
+
+```r
+countreg::rootogram(poi3)
+```
+
+&lt;img src="STAT_L7_Count_files/figure-html/root1-1.png" width="504" /&gt;
+
+```r
+# countreg::rootogram(nb1)
+```
+]
+
+.pull-right[
+
+```r
+countreg::rootogram(zinb1)
+```
+
+&lt;img src="STAT_L7_Count_files/figure-html/root2-1.png" width="504" /&gt;
+
+```r
+# countreg::rootogram(hur1)
+```
+]
+
+???
+
+We can use a rootogram to visualize the fit of a count regression model. 
+The `rootogram()` function in the `countreg` package makes this easy.
+
+The counts have been transformed with a square root transformation 
+to prevent smaller counts from getting obscured and overwhelmed by larger counts. 
+The red curved line is the theoretical Poisson fit. 
+
+“Hanging” from each point on the red line is a bar, 
+the height of which represents the difference between expected and observed counts. 
+A bar hanging below 0 indicates underfitting; that is we expected fewer from the model than we observed. 
+A bar hanging above 0 indicates overfitting; that is we expected more from the model than we observed.
 
 ---
 class: center, middle
