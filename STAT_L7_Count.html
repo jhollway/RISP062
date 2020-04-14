@@ -1240,16 +1240,15 @@ countreg::rootogram(zinb1)
 We can use a rootogram to visualize the fit of a count regression model. 
 The `rootogram()` function in the `countreg` package makes this easy.
 
+ThBasically, the function `counter::rootogram(model)` plots the empirical/observed distribution (black bars) as 'hanging' off the predicted distribution (red line). 
+Bars that do not reach zero indicate overprediction (because the model expected more than there were) 
+and bars that reach beyond zero into the negative indicate underprediction (because the model expected fewer than there were). 
+You can use these rootograms to not only establish which fits better overall, but where there are still issues with the fit.
+
 The counts have been transformed with a square root transformation 
 to prevent smaller counts from getting obscured and overwhelmed by larger counts. 
-The red curved line is the theoretical Poisson fit. 
 
-“Hanging” from each point on the red line is a bar, 
-the height of which represents the difference between expected and observed counts. 
-A bar hanging below 0 indicates underfitting; that is we expected fewer from the model than we observed. 
-A bar hanging above 0 indicates overfitting; that is we expected more from the model than we observed.
-
----
+-
 class: center, middle
 
 # Summary
