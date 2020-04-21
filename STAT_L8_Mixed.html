@@ -3,8 +3,9 @@
   <head>
     <title>Statistics for International Relations Research II</title>
     <meta charset="utf-8" />
-    <meta name="author" content="James Hollway" />
+    <meta name="author" content="James Hollway and Juliette Ganne" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/table1/table1_defaults.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://raw.githack.com/jhollway/iheidmyninja/master/iheid-xaringan-style.css" type="text/css" />
   </head>
   <body>
@@ -13,7 +14,7 @@ class: center, middle, inverse, title-slide
 
 # Statistics for International Relations Research II
 ## Panel Models
-### <large>James Hollway</large>
+### <large>James Hollway and Juliette Ganne</large>
 
 ---
 
@@ -44,11 +45,6 @@ class: center, middle
 - How to handle complication? Slow-moving variables, irregular time observations, models for non-continuous DVs.
 
 ---
-# Today's data
-
-
-
----
 class: center, middle
 
 # Data and Error Structures
@@ -60,45 +56,25 @@ class: center, middle
 ---
 ## Notation
 
-In this lecture the emphasis is on data that have both cross-sectional and temporal variation.
+In this lecture, we are interested in data that have both cross-sectional and temporal variation.
 
-Following terminology and notation is useful:
-- "units" are the individual things on which we have data
+The following terminology and notation will be useful:
+- "units" are the individual things on which we have data (countries, clinics, individuals)
   - `\(i \in \mathcal{N}\)`
-- "observations" are the measurements (for each variable) on each unit at a given point of time
+- "observations" are the measurements (for each variable) on each unit at a given point of time (GDP, nb. of successful surgery, wage)
   - `\(t \in \mathcal{T}\)`
 
 This means that the total number of observations is `\(NT\)`.
-Cross-sectional data is just at one point in time ($Nt$),
-whereas time-series data is often just one unit over time ($iT$).
+
+Cross-sectional data is just at one point in time, `\(Nt\)`,
+whereas time-series data is often just one unit over time, `\(iT\)`.
+
 To talk about panel data, we need variation in both.
 
 ---
-## Example data structure
-
-Example here.
-
-Some variables vary over time, while others only over the units,
-and others over both units and time.
-
-Absence of variation on one dimension means there is nothing to say about that phenomenon there,
-and little variation in one dimension means there is little to say about the phenomenon:
-*variation is information*!
-
-This means one needs to consider carefully “where” the variation in one's data is, 
-and (more important) where one's theories suggest we should see variation as well.
-
----
-## Aggregation
-
-Aggregating variation across a dimension can be useful, 
-but can also involve losing important information.
-
-Aggregation can also tempt one to commit the .red[ecological fallacy]:
-inferring individual-level relationships on the basis of aggregate data.
-
----
 ## Types of Data Structures
+
+&lt;!-- Ideally we'd have some figures highlighting these different data structures too --&gt;
 
 .red[Cross-sectional data] consists of observations on different individuals or groups at a single point in time.
 - Examples are R&amp;D spending by firms by industry, immigration policy across 24 European countries, or level of dissident repression among authoritarian regimes.
@@ -112,7 +88,7 @@ inferring individual-level relationships on the basis of aggregate data.
 
 ---
 
-.red[Panel data] generally refers to data which are cross- sectionally dominated; that is, where *N* is significantly larger than *T*. 
+.red[Panel data] generally refers to data which are cross-sectionally dominated; that is, where *N* is significantly larger than *T*. 
 Examples are the ANES panel studies (N = 2000; T = 6) or the Panel Study of Income Dynamics (N = large, T = 12 or so).
 - Such data usually have a fixed T, so that these data's asymptotics are in N, which is important (we'll come back to this).
 - This is a longitudinal type, where the same units i.e. the same households or individuals are captured over time.
@@ -127,99 +103,186 @@ moreover, if we have enough data, we can say something about the time-series pro
 as well as the cross-sectional part.
 
 ---
-## Panel/TSCS Data Structure
+### Comparative Welfare States
 
-Often comes in or is treated as one of two formats: long vs wide.
+.pull-left-1[
+
+<div class="Rtable1"><table class="Rtable1">
+<thead>
+<tr>
+<th class='rowlabel firstrow lastrow'></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Overall<br><span class='stratn'>(N=859)</span></span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>Social expenditure per capita</span></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>14.0 (3.44)</td>
+</tr>
+<tr>
+<td class='rowlabel'>Median [Min, Max]</td>
+<td>14.3 [6.17, 23.1]</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Missing</td>
+<td class='lastrow'>62 (7.2%)</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>Imports</span></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>-0.411 (0.249)</td>
+</tr>
+<tr>
+<td class='rowlabel'>Median [Min, Max]</td>
+<td>-0.360 [-1.47, -0.0829]</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Missing</td>
+<td class='lastrow'>89 (10.4%)</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'><span class='varlabel'>Votes for leftist parties</span></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>37.0 (13.2)</td>
+</tr>
+<tr>
+<td class='rowlabel'>Median [Min, Max]</td>
+<td>39.7 [0, 60.7]</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Missing</td>
+<td class='lastrow'>23 (2.7%)</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+]
+
+.pull-right-2[
+
+&lt;img src="STAT_L8_Mixed_files/figure-html/dataPlot-1.png" width="720" /&gt;
+
+]
+
+???
+
+Some variables vary over time, while others only over the units,
+and others over both units and time.
+
+Absence of variation on one dimension means there is nothing to say about that phenomenon there,
+and little variation in one dimension means there is little to say about the phenomenon:
+*variation is information*!
+
+This means one needs to consider carefully “where” the variation in one's data is, 
+and (more important) where one's theories suggest we should see variation as well.
+
+---
+### Long vs Wide
+
+Panel/TSCS treated in one of two formats: long vs wide.
+Long format is often preferred as more efficient and flexible.
+
+.pull-left[
+
+.red[Long data] has `\(NT\)` rows, with columns for each variable.
+.tiny[
+
+
+```r
+data1 %&gt;% tbl_df %&gt;% select(idn, year, sstran, rgdpecap, leftvot) %&gt;% 
+  print(n=5)
+```
+
+```
+## # A tibble: 859 x 5
+##   idn    year sstran     rgdpecap leftvot   
+##   &lt;fct&gt; &lt;dbl&gt; &lt;labelled&gt;    &lt;dbl&gt; &lt;labelled&gt;
+## 1 1      1980 6.364682     21955. 40.5      
+## 2 1      1981 6.353022     22753. 45.1      
+## 3 1      1982 7.232827     21889. 45.1      
+## 4 1      1983 7.439353     22836. 48.8      
+## 5 1      1984 7.268586     23339. 49.3      
+## # … with 854 more rows
+```
+
+]
+]
+
+.pull-right[
 
 .red[Wide data] has `\(N\)` rows and additional columns for each variable multiplied by `\(T\)`.
 
-.red[Long data] has `\(NT\)` rows, with columns for each variable.
-- Long format is often preferred as more efficient and flexible.
+
+```r
+data1 %&gt;% tbl_df %&gt;% select(idn, year, sstran, rgdpecap, leftvot) %&gt;%
+* pivot_wider(names_from = year,
+*             values_from = c(sstran, rgdpecap, leftvot)) %&gt;%
+  print(n=3)
+```
+
+```
+## # A tibble: 22 x 121
+##   idn   sstran_1980 sstran_1981 sstran_1982 sstran_1983 sstran_1984 sstran_1985
+##   &lt;fct&gt; &lt;labelled&gt;  &lt;labelled&gt;  &lt;labelled&gt;  &lt;labelled&gt;  &lt;labelled&gt;  &lt;labelled&gt; 
+## 1 1      6.364682    6.353022    7.232827    7.439353    7.268586    7.041956  
+## 2 2     16.370188   16.818114   17.164325   17.293337   17.458069   17.804682  
+## 3 3     16.807869   18.029742   18.236084   18.825784   18.163483   17.828126  
+## # … with 19 more rows, and 114 more variables: sstran_1986 &lt;labelled&gt;,
+## #   sstran_1987 &lt;labelled&gt;, sstran_1988 &lt;labelled&gt;, sstran_1989 &lt;labelled&gt;,
+## #   sstran_1990 &lt;labelled&gt;, sstran_1991 &lt;labelled&gt;, sstran_1992 &lt;labelled&gt;,
+## #   sstran_1993 &lt;labelled&gt;, sstran_1994 &lt;labelled&gt;, sstran_1995 &lt;labelled&gt;,
+## #   sstran_1996 &lt;labelled&gt;, sstran_1997 &lt;labelled&gt;, sstran_1998 &lt;labelled&gt;,
+## #   sstran_1999 &lt;labelled&gt;, sstran_2000 &lt;labelled&gt;, sstran_2001 &lt;labelled&gt;,
+## #   sstran_2002 &lt;labelled&gt;, sstran_2003 &lt;labelled&gt;, sstran_2004 &lt;labelled&gt;,
+## #   sstran_2005 &lt;labelled&gt;, sstran_2006 &lt;labelled&gt;, sstran_2007 &lt;labelled&gt;,
+## #   sstran_2008 &lt;labelled&gt;, sstran_2009 &lt;labelled&gt;, sstran_2010 &lt;labelled&gt;,
+## #   sstran_2011 &lt;labelled&gt;, sstran_2012 &lt;labelled&gt;, sstran_2013 &lt;labelled&gt;,
+## #   sstran_2014 &lt;labelled&gt;, sstran_2015 &lt;labelled&gt;, sstran_2016 &lt;labelled&gt;,
+## #   sstran_2017 &lt;labelled&gt;, sstran_2018 &lt;labelled&gt;, sstran_NA &lt;labelled&gt;,
+## #   rgdpecap_1980 &lt;dbl&gt;, rgdpecap_1981 &lt;dbl&gt;, rgdpecap_1982 &lt;dbl&gt;,
+## #   rgdpecap_1983 &lt;dbl&gt;, rgdpecap_1984 &lt;dbl&gt;, rgdpecap_1985 &lt;dbl&gt;,
+## #   rgdpecap_1986 &lt;dbl&gt;, rgdpecap_1987 &lt;dbl&gt;, rgdpecap_1988 &lt;dbl&gt;,
+## #   rgdpecap_1989 &lt;dbl&gt;, rgdpecap_1990 &lt;dbl&gt;, rgdpecap_1991 &lt;dbl&gt;,
+## #   rgdpecap_1992 &lt;dbl&gt;, rgdpecap_1993 &lt;dbl&gt;, rgdpecap_1994 &lt;dbl&gt;,
+## #   rgdpecap_1995 &lt;dbl&gt;, rgdpecap_1996 &lt;dbl&gt;, rgdpecap_1997 &lt;dbl&gt;,
+## #   rgdpecap_1998 &lt;dbl&gt;, rgdpecap_1999 &lt;dbl&gt;, rgdpecap_2000 &lt;dbl&gt;,
+## #   rgdpecap_2001 &lt;dbl&gt;, rgdpecap_2002 &lt;dbl&gt;, rgdpecap_2003 &lt;dbl&gt;,
+## #   rgdpecap_2004 &lt;dbl&gt;, rgdpecap_2005 &lt;dbl&gt;, rgdpecap_2006 &lt;dbl&gt;,
+## #   rgdpecap_2007 &lt;dbl&gt;, rgdpecap_2008 &lt;dbl&gt;, rgdpecap_2009 &lt;dbl&gt;,
+## #   rgdpecap_2010 &lt;dbl&gt;, rgdpecap_2011 &lt;dbl&gt;, rgdpecap_2012 &lt;dbl&gt;,
+## #   rgdpecap_2013 &lt;dbl&gt;, rgdpecap_2014 &lt;dbl&gt;, rgdpecap_2015 &lt;dbl&gt;,
+## #   rgdpecap_2016 &lt;dbl&gt;, rgdpecap_2017 &lt;dbl&gt;, rgdpecap_2018 &lt;dbl&gt;,
+## #   rgdpecap_NA &lt;dbl&gt;, leftvot_1980 &lt;labelled&gt;, leftvot_1981 &lt;labelled&gt;,
+## #   leftvot_1982 &lt;labelled&gt;, leftvot_1983 &lt;labelled&gt;, leftvot_1984 &lt;labelled&gt;,
+## #   leftvot_1985 &lt;labelled&gt;, leftvot_1986 &lt;labelled&gt;, leftvot_1987 &lt;labelled&gt;,
+## #   leftvot_1988 &lt;labelled&gt;, leftvot_1989 &lt;labelled&gt;, leftvot_1990 &lt;labelled&gt;,
+## #   leftvot_1991 &lt;labelled&gt;, leftvot_1992 &lt;labelled&gt;, leftvot_1993 &lt;labelled&gt;,
+## #   leftvot_1994 &lt;labelled&gt;, leftvot_1995 &lt;labelled&gt;, leftvot_1996 &lt;labelled&gt;,
+## #   leftvot_1997 &lt;labelled&gt;, leftvot_1998 &lt;labelled&gt;, leftvot_1999 &lt;labelled&gt;,
+## #   leftvot_2000 &lt;labelled&gt;, leftvot_2001 &lt;labelled&gt;, leftvot_2002 &lt;labelled&gt;,
+## #   leftvot_2003 &lt;labelled&gt;, leftvot_2004 &lt;labelled&gt;, leftvot_2005 &lt;labelled&gt;,
+## #   …
+```
+
+]
+
+???
 
 You can pivot or *reshape* between these two forms using various functions in R.
 
 ---
-## Why not OLS?
-
-`$$Y_i = \alpha + \beta X_i + u_i$$`
-
-Recall that OLS assumes several things:
--all the usual OLS assumptions, plus
--that the constant term is constant across different *i*s
--that the effect of any given variable X on Y is constant across observations 
-(at least to the extent that non-constancy isn't specified in the model, e.g., through interaction terms).
-
-We could model:
-
-`$$Y_{it} = \alpha + \beta X_{it} + u_{it}$$`
-
-But this would make the same assumptions about constants and covariates,
-which are often going to be problematic in a TSCS context because we usually have some reason to believe that 
-there may be differences in either `\(\alpha\)` or `\(\beta\)` over `\(i\)` or `\(t\)`,
-and the violation of which leads to a form of specification bias.
-
----
-## Varying intercepts and slopes
-
-The intercepts vary
-- most commonly because different units have different intercepts because they have different starting points for the (same) slopes
-- but could also vary of time
-If we estimate this model as OLS, we can get biased coefficients.
-
---
-
-The slopes vary
-- again most commonly because different units respond to covariates differently and so the effect of X on Y differs
-- but we could also have variation in `\(\beta\)` over time.
-If we estimate this model as OLS, we'll only get an 'average' of the different slopes,
-and if there are, say, two groups that have radically different responses to a covariate,
-then these can cancel out and we get a Type II error.
-
---
-
-The intercepts and slopes vary
-- this suggests that different units may start in different places and respond to covariates differently
-
----
-## The Error Term
-
-We could instead have different `\(\alpha\)`s and `\(\beta\)`s for each unit, each time point, 
-or every combination of unit and time point, e.g.:
-
-`$$Y_{it} = \alpha_{it} + \beta_{it} + u_{it}$$`
-
-But we've been assuming throughout that `\(u_{it}\)` is homoskedastic and uncorrelated, 
-both within and across `\(i\)` and `\(t\)`, i.e.:
-- no cross-unit heteroskedasticity
-- no temporal heteroskedasticity
-- no autocorrelation
-
-But that's a pretty tall order.
-
-Remember, the error term is supposed to be a stochastic element to the model and should not incorporate any systematic differences
-(those should be in the model). But:
-- Cross-unit differences mean that the model does a better job of explaining some units than others,
-- Time effects (such as socialization, institutionalization, learning, or other such dynamics) cause the model to do a better or worse job of explaining Y over time,
-- Omitted variables lead to residual correlation, either across units or (more commonly) over time.
-
----
-## Two types of errors
-
-We can actually have two different error terms that capture different types of unobserved heterogeneity.
-- `\(u_i\)` the unit-specific error to account for between unit variation
-  - unobserved predictors of Y that are specific to the unit and therefore time-constant.
-- `\(e_{it}\)` the time-varying error to account for within unit variation
-  - unobserved predictors of Y that are specific to the time point and the unit (also referred to as idiosyncratic error).
-
-OLS not biased if we can assume that this unobserved heterogeneity is independent of explanatory variables in the model, but:
-- Estimated standard errors still biased, because most likely still serial correlation
-- Errors will correlate if there is unobserved unit-specific heterogeneity that is constant over time, 
-even if uncorrelated with variables in the model.
-
-Key point: OLS assumptions are violated as measurements over time are not independent.
-
----
-## Time-Constant and Time-Varying Variables
+### Time-Constant and Time-Varying Variables
 
 Three types of explanatory variables that can be located either at the level of units or level of contexts (aka time/group).
 
@@ -233,43 +296,211 @@ Three types of explanatory variables that can be located either at the level of 
 - Can characterize the unit or the context.
 
 .red[Time]: 
-- Debatable whether time itself a real explanatory variable or an indicator for other unobserved characteristics that change over time.
+- Debatable whether time itself really an explanatory variable or an indicator for other unobserved characteristics that change over time.
 - But time may capture possible time trends in the data.
+
+---
+## Pooled OLS
+
+.pull-left[
+
+Now, we could just model this using OLS: `\(Y_i = \alpha + \beta X_i + u_i\)`
+
+Since each observation involves both a unit and a timepoint, it is really:
+
+`$$Y_{it} = \alpha + \beta X_{it} + u_{it}$$`
+
+This basically 'pools' all this information and just concentrates on the relationship
+between explanatory variables and the response variable (here social expenditure).
+
+]
+.pull-right[
+
+
+```r
+ols &lt;- lm(sstran ~ csh_m + leftvot, data1)
+tab_model(ols, digits = 3)
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Social expenditure per&lt;br&gt;capita&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;10.016&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;9.288&amp;nbsp;&amp;ndash;&amp;nbsp;10.743&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Imports&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-3.586&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-4.529&amp;nbsp;&amp;ndash;&amp;nbsp;-2.643&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Votes for leftist parties&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.066&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.049&amp;nbsp;&amp;ndash;&amp;nbsp;0.084&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;738&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.154 / 0.151&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+]
+
+---
+### So why not OLS?
+
+Recall that, in addition to all the usual assumptions, OLS is also assuming that
+- the constant term is constant across different *i*s
+- the effect of any given variable `\(X\)` on `\(Y\)` is constant across observations 
+(at least to the extent that non-constancy isn't specified in the model, e.g., through interaction terms).
+
+But this is usually problematic in a panel/TSCS context,
+because we usually have some reason to believe that there may be differences
+in either `\(\alpha\)` or `\(\beta\)` over `\(i\)` or `\(t\)`,
+which leads to a form of specification bias.
+
+--
+
+While aggregating variation across a dimension can be useful, 
+it can also tempt one to commit the .red[ecological fallacy]:
+inferring individual-level relationships on the basis of aggregate data.
+
+For example, at the individual level, in the US, being wealthier is positively correlated with voting for the Republican party, but at the state level, the poorest states are the ones voting for Republican Presidential candidates. 
+
+---
+### Simpson's Paradox
+
+.pull-left[
+
+&lt;img src="STAT_L8_Mixed_files/figure-html/simpsons1-1.png" width="504" /&gt;
+
+]
+
+--
+
+.pull-right[
+
+&lt;img src="STAT_L8_Mixed_files/figure-html/simpsons2-1.png" width="504" /&gt;
+
+]
+
+---
+### Another example
+
+&lt;img src="STAT_L8_Mixed_files/figure-html/simpsons3-1.png" width="1152" /&gt;
+
+&lt;!-- ![](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3740239/bin/fpsyg-04-00513-g0001.jpg) --&gt;
+
+---
+## Varying intercepts and slopes
+
+*Intercepts may vary*
+- e.g. different units have different starting points for the (same) slopes
+
+If we estimate this model as OLS, we can get biased coefficients.
+
+--
+
+*Slopes may vary*
+- e.g. different units respond to covariates differently and so the effect of X on Y differs
+
+If we estimate this model as OLS, we'll only get an 'average' of the different slopes,
+and if there are, say, two groups that have radically different responses to a covariate,
+then these can cancel out and we could get a Type II error.
+
+--
+
+*Both intercepts and slopes may vary*
+- e.g. different units start in different places *and* respond to covariates differently
+
+???
+
+Though varying intercepts and slopes most commonly used by unit,
+we could also have variation in `\(\alpha\)` or `\(\beta\)` over time.
+
+---
+## The Error Term
+
+Now we could have different `\(\alpha\)`s and `\(\beta\)`s for each unit, each time point, 
+or every combination of unit and time point:
+
+`$$Y_{it} = \alpha_{it} + \beta_{it} + u_{it}$$`
+
+But we've been assuming throughout that `\(u_{it}\)` is homoskedastic and uncorrelated, 
+both within and across `\(i\)` and `\(t\)`, i.e.:
+- no cross-unit heteroskedasticity
+- no temporal heteroskedasticity
+- no autocorrelation
+
+--
+
+That's a pretty tall order.
+
+Remember, the error term is supposed to be a *stochastic* element to the model and should not incorporate any *systematic* differences
+(those should be in the model). But:
+- Cross-unit differences mean that the model does a better job of explaining some units than others
+- Time effects (such as socialization, institutionalization, learning, or other such dynamics) cause the model to do a better or worse job of explaining Y over time,
+- Omitted variables lead to correlation in the residuals, either across units (because time matters) or (more commonly) over time (because units matter).
+
+---
+### Two types of errors
+
+We can actually have two different error terms that capture different types of unobserved heterogeneity.
+1. `\(u_i\)` the unit-specific error to account for between unit variation
+  - unobserved predictors of `\(Y\)` that are specific to the unit and therefore time-constant.
+2. `\(e_{it}\)` the time-varying error to account for within unit variation
+  - unobserved predictors of `\(Y\)` that are specific to the time point and the unit.
+  
+--
+
+Now, this wouldn't be a problem (OLS would not be biased) if this unobserved heterogeneity would be independent of the explanatory variables in the model, but:
+- most likely still serial correlation
+- residuals may still correlate on the basis of unobserved unit-specific heterogeneity, even if uncorrelated with variables in the model.
+
+???
+
+Key point: measurements over time are almost never independent so OLS assumptions violated; i.e. don't use OLS...
+
+---
+class: center, middle
+
+# Fixed Effects
+
+.pull-1[.circleoff[![](https://www.club.cc.cmu.edu/~cmccabe/image/crazy_clock.jpg)]]
+.pull-1[.circleon[![](https://www.fabrikat.ch/media/catalog/product/cache/4/thumbnail/447x/9df78eab33525d08d6e5fb8d27136e95/r/o/rollins_leatherrip_hammer_9_1.jpg)]]
+.pull-1[.circleoff[![](https://www.random.org/analysis/randbitmap-wamp.png)]]
 
 ---
 ## Modeling this
 
 Panel data models differ depending on where we think errors might correlate.
 
-Consider first a general model in which we have these individual (unit-) level effects,
-i.e. that some units/clusters have higher or lower levels of the outcome variable than others:
-
-`$$Y_{it} = \alpha_i + \beta X_{it} + u_{it}$$`
-
-Note the separate intercept term.
-I.e., some clusters tend to have higher values of Y than others.
-This is known as the .red[variable intercept model].
-You can think of it as a model of individual-level heterogeneity (which matters if we have omitted variable bias).
-
-There are different ways in which we can estimate these models:
-- Fixed effects
-- Random effects
-- Mixed effects
-- In-between effects, etc.
-
-???
-
-We'll concentrate on fixed and random effects today, 
+We'll concentrate on .red[fixed effects] and .red[random effects] today, 
 since they are the building block to understanding the rest.
 
----
-class: center, middle
+When random effects are used together with fixed effects, we call this a .red[mixed effects model].
 
-# Fixed Effects (and Other Options)
-
-.pull-1[.circleoff[![](https://www.club.cc.cmu.edu/~cmccabe/image/crazy_clock.jpg)]]
-.pull-1[.circleon[![](https://www.fabrikat.ch/media/catalog/product/cache/4/thumbnail/447x/9df78eab33525d08d6e5fb8d27136e95/r/o/rollins_leatherrip_hammer_9_1.jpg)]]
-.pull-1[.circleoff[![](https://www.random.org/analysis/randbitmap-wamp.png)]]
+There are other names and similar models out there too that you may encounter,
+such as .red[hierarchical models] (a multilevel model with a single nested hierarchy) 
+and .red[multilevel models] (a hierarchical model with multiple non-nested hierarchies).
 
 ---
 ## Introduction to Fixed Effects
@@ -281,133 +512,559 @@ Each entity has its own individual characteristics that may or may not influence
 - The political system of a particular country could have some effect on trade or GDP;
 - Or the business practices of a company may influence its stock price.
 
-This can be a source of unit-level unobserved heterogeneity ($u_i$)
+This can be a source of unit-level unobserved heterogeneity/idiosyncratic error, `\(u_i\)`
 - Easy to fix if we have information about them. Simply put them as another independent variable into our regression model.
 - But what about those factors that are hard to measure or those which we have not yet considered?
 
+Note the separate intercept term.
+i.e., some clusters tend to have higher values of Y than others.
+This is known as the .red[variable intercept model].
+You can think of it as a model of individual-level heterogeneity (which matters if we have omitted variable bias).
+
+???
+
+This unobserved heterogeneity constitute the unobserved factors that influence the DV that changes across units and time.
+
+We do not want to multiply the number of variables making the model too complex, when this could be dealt with all at once. 
+
 ---
+
+.pull-left[
 ## The LSDV Method
 
 Treating the unit effects `\(\alpha_i\)` as fixed values is, in many respects, the simplest thing we can do.
 
-That is, we simply estimate the equation from Slide 4 by including N-1 separate indicator variables, 
-one for each unit, in the model along with the covariates.
+Consider first a general model in which we replace the general intercept
+with individual (unit-) level effects,
+i.e. that some units/clusters have higher or lower levels of the outcome variable than others:
+
+
+`$$Y_{it} = \alpha_i + \beta X_{it} + u_{it}$$`
 
 This is also called the .red[least-squares dummy variables] (LSDV) method.
-- To estimate unit-specific heterogeneity (let’s say countries repeatedly measured over time) we include a dummy for each unit.
-- This dummy works like a sponge – it “soaks up” all potential error that is due to unobserved country-specific characteristics.
+That is, we simply estimate the equation from earlier by including separate dummy variables for each unit in the model along with the covariates.
+
+This dummy works like a sponge – it “soaks up” all potential error that is due to unobserved country-specific characteristics.
+
+
+]
+.pull-right[
+.small[
+
+
+```r
+*lsdv &lt;- lm(sstran ~ 0 + factor(id) + csh_m + leftvot, data1)
+tab_model(lsdv, rm.terms = "factor(id) [BEL,CAN,FIN,FRG,IRE,ITA,LUX,JPN,NOR,SPA,SWE,UKM,FRA,GRE,POR]")
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Social expenditure per&lt;br&gt;capita&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)AUL&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;10.38&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;8.98&amp;nbsp;&amp;ndash;&amp;nbsp;11.78&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)AUS&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;20.89&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;19.33&amp;nbsp;&amp;ndash;&amp;nbsp;22.45&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)DEN&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;19.19&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;17.69&amp;nbsp;&amp;ndash;&amp;nbsp;20.69&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)NET&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;16.28&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;15.07&amp;nbsp;&amp;ndash;&amp;nbsp;17.49&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)NZL&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;14.09&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;12.72&amp;nbsp;&amp;ndash;&amp;nbsp;15.45&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)SWZ&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;12.74&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;11.64&amp;nbsp;&amp;ndash;&amp;nbsp;13.84&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)USA&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;11.28&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;10.63&amp;nbsp;&amp;ndash;&amp;nbsp;11.94&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Imports&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.61&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-2.02&amp;nbsp;&amp;ndash;&amp;nbsp;0.79&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.392&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Votes for leftist parties&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.06&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.09&amp;nbsp;&amp;ndash;&amp;nbsp;-0.04&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;738&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.983 / 0.982&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+]
+]
+
+???
+
+Basically, we create dummy variables for each country, the dummy for Belgium works that all the observations pertaining to Belgium get a 1 and all the observations from other countries get a 0. 
+
+The O at the front of the formula (could be a -1 at the end) is removing all intercepts (as shown in the table) and the creating one time-invariant intercept for each unit with the dummies. 
 
 ---
-## Welfare state spending
+### Comparing Pooled OLS and LSDV
 
-Let’s say we’re interest in the assessment of the impact of globalization on welfare state effort 
-(public spending as % of GDP in the 15 OECD countries (1961-1993).
+.pull-left-1[
 
-There are two diverging hypotheses:
-- The *efficiency hypothesis* states that globalization should exert downward pressure on public spending 
-(because low taxes are needed to be competitive, etc.).
-- The *compensation hypothesis* states that globalization should be associated with higher demand for social security 
-and therefore increase public spending.
+A pooled OLS model ignores the panel structure of the data. 
+- but observations belonging to the same country are not independent!
+- two variables probably do not capture all country-specific heterogeneity.
 
-If the compensation theory were true, 
-then imports from low-wage countries should threaten employment and wage levels in domestic labor markets 
-and create greater demand to balance this out. 
-So the relationship should be positive.
+An LSDV model includes `\(u_i\)` (error to account for the specificities of each country) to adjust for that.
+- Once we add the country-dummies, the effect of imports is smaller and not statistically significant.
+
+]
+
+.pull-right-2[
+.tiny[
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;OLS&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;LSDV&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col7"&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;10.016&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;9.288&amp;nbsp;&amp;ndash;&amp;nbsp;10.743&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Imports&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-3.586&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-4.529&amp;nbsp;&amp;ndash;&amp;nbsp;-2.643&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.614&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-2.020&amp;nbsp;&amp;ndash;&amp;nbsp;0.792&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;0.392&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Votes for leftist parties&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.066&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.049&amp;nbsp;&amp;ndash;&amp;nbsp;0.084&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.064&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.091&amp;nbsp;&amp;ndash;&amp;nbsp;-0.037&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)AUL&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;10.377&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;8.975&amp;nbsp;&amp;ndash;&amp;nbsp;11.778&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)AUS&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;20.890&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;19.334&amp;nbsp;&amp;ndash;&amp;nbsp;22.445&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)DEN&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;19.192&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;17.691&amp;nbsp;&amp;ndash;&amp;nbsp;20.693&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)NET&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;16.281&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;15.074&amp;nbsp;&amp;ndash;&amp;nbsp;17.487&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)NZL&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;14.085&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;12.716&amp;nbsp;&amp;ndash;&amp;nbsp;15.454&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)SWZ&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;12.739&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;11.642&amp;nbsp;&amp;ndash;&amp;nbsp;13.836&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)USA&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;11.283&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;10.627&amp;nbsp;&amp;ndash;&amp;nbsp;11.940&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;738&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;738&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.154 / 0.151&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.983 / 0.982&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;AIC&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3789.171&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3069.280&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+]
+]
+
+???
+
+Pooled OLS estimation is simply an OLS technique run on panel data
+
+Comparing OLS LSDV we see that the latter has no intercept and that the significance of our variables of interest are no longer present.
 
 ---
-## Comparing Pooled OLS and LSDV
 
-A pooled OLS model ignores the panel structure of the data.
-- Coefficient for LWI suggests the efficiency hypothesis is true.
-- But, observations belonging to the same country are not independent!
-- Moreover, the six controls probably do not capture all country-specific heterogeneity.
+.pull-left[
 
-An LSDV model includes `\(u_i\)` to adjust for that.
-- Once we add the country-dummies we see that LWI conveys some of the unmeasured country-specific heterogeneity, 
-and once this is controlled for, its effect is much smaller and not statistically significant anymore.
+
+```r
+plot_model(ols, type = "pred", 
+           terms = c("leftvot"))
+```
+
+&lt;img src="STAT_L8_Mixed_files/figure-html/polsPlot-1.png" width="504" /&gt;
+
+]
+
+.pull-right[
+
+
+```r
+plot_model(lsdv, type = "pred", 
+           terms = c("leftvot"))
+```
+
+&lt;img src="STAT_L8_Mixed_files/figure-html/lsdvPlot1-1.png" width="504" /&gt;
+]
+
+
+
+```r
+plot_model(lsdv, type = "pred", terms = c("leftvot","id"))
+```
+
+&lt;img src="STAT_L8_Mixed_files/figure-html/lsdvPlot2-1.png" width="619.2" /&gt;
+
+]
+]
+
+???
+
+To come back to the Simpson paradox, the OLS was telling us that vote for leftist parties where positively correlated (and significant) with the spcial expenditure per capita, but when we remove the intercept/control for the unit-specific characteristics then the effect is actually negative. We might want to rethinking our hypothesis/variables. 
 
 ---
-## The Within Estimator
+&lt;!-- .pull-left[ --&gt;
+&lt;!-- ## The Within Estimator --&gt;
 
-However, with large datasets the dummy variable approach is not a very practical technique, 
-therefore FE estimates are usually obtained from demeaned data, specifically time-demeaned data.
+&lt;!-- However, with large datasets the dummy variable approach is not very practical.  --&gt;
 
-They measure how the observations in the respective country deviate on average from the reference country 
-while controlling for the other variables in the model.
+&lt;!-- Therefore FE estimates are usually obtained from demeaned data, specifically time-demeaned data. --&gt;
 
-This is akin to centering all measurements on their unit-specific means.
+&lt;!-- They measure how the observations in the respective country deviate on average from this country --&gt;
+&lt;!-- while controlling for the other variables in the model. --&gt;
 
-Since the FE estimates parameters use only variation around the unit-specific means, 
-it is also called the .red[within estimator].
+&lt;!-- This is akin to centering all measurements on their unit-specific means. --&gt;
 
---
+&lt;!-- Since the FE estimates parameters use only variation around the unit-specific means,  --&gt;
+&lt;!-- it is also called the .red[within estimator]. --&gt;
 
-We can write our variable-intercept model as:
+&lt;!-- ] --&gt;
+
+&lt;!-- .pull-right[ --&gt;
+
+&lt;!-- # ```{r means} --&gt;
+&lt;!-- library(gplots) --&gt;
+&lt;!-- plotmeans(sstran ~ id,  --&gt;
+          &lt;!-- main="Heterogeneity across countries",  --&gt;
+          &lt;!-- text.n.label="", --&gt;
+          &lt;!-- data=data1) --&gt;
+&lt;!-- ``` --&gt;
+
+&lt;!-- ] --&gt;
+
+---
+.pull-left[
+
+For large datasets, an alternative is to simply leave the intercept in and then the first country (Australia) is the baseline.
+
+It is called the .red[within estimator]
+
+We measure how the observations in the respective country deviate on average from this country. 
+
+We can write this model as:
 
 `$$Y_{it} = \alpha_i + \beta_B \bar{X}_i + \beta_W (X_{it} - \bar{X}_i) + u_{it}$$`
 
-To the extent there is variation in the X’s across units, it will be captured in the first term ($\beta_B$), 
-while within-unit variation is in the second term  ($\beta_W$).
-
-Moreover, the model reduces to our variable-intercept model from before when `\(\beta_B = \beta_W\)`.
-
----
-## An Identification Problem
-
-The problem is that it is *unidentified*: the `\(\alpha_i\)`s and `\(\bar{X}\)`s are the same thing
-(i.e. the constants within units that vary only across units).
-
-Why is this important to estimation? It allows us to estimate these models in a much easier fashion.
-
-If the “regression line” for each unit is simply the within-unit mean,
-then the “residual” is the difference between the observation and this mean.
-
-We can estimate `\(\beta\)`s by “de-meaning” the variables, 
-`\(Y_{it}^* = Y_{it} - \bar{Y}_i\)` and `\(X_{it}^* = X_{it} - \bar{X}_i\)`,
-and then estimating `\(Y_{it}^* = \beta_{FE} X_{it}^* + u_{it}\)`.
-Looks like OLS (and indeed that’s what we arrive at).
-
---
-
-The important thing about the transformation is that unobserved unit-specific heterogeneity, `\(u_i\)`, has disappeared.
-
-We can safely apply OLS to the demeaned data and obtain estimates of the effects of the X that are unaffected by omitted variable bias at the unit level.
-
-A key thing to keep in mind about our absorbed regression model is that it makes use of only the within- unit variation in the Ys and the Xs.
-
-It ignores cross-unit variation, since the variables `\(Y_{it}^*\)` and `\(X_{it}^*\)` are demeaned.
-
----
-## Comparing Pooled OLS, LSDV, and Within Estimator Models
-
-Now, the regression output actually does report a constant here, which is simply the average of all country effects.
 
 Why are the `\(R^2\)` statistics different?
 - Since LSDV uses the original data, `\(R^2\)` measures the explained proportion of the overall variance.
-- Since the FE model used time- demeaned data, `\(R^2\)` measures the explained portion of the within variance.
+- Since the FE model used time-demeaned data, `\(R^2\)` measures the explained portion of the within variance.
+
+
+&lt;!-- To the extent there is variation in the X’s across units,  --&gt;
+&lt;!-- it will be captured in the first term, `\(\beta_B\)`,  --&gt;
+&lt;!-- while within-unit variation is in the second term, `\(\beta_W\)`. --&gt;
+
+&lt;!-- Moreover, the model reduces to our variable-intercept model from before when `\(\beta_B = \beta_W\)`. --&gt;
+
+]
+
+.pull-right[
+.tiny[
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;LSDV&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Within&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col7"&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)AUL&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;10.377&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;8.975&amp;nbsp;&amp;ndash;&amp;nbsp;11.778&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)AUS&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;20.890&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;19.334&amp;nbsp;&amp;ndash;&amp;nbsp;22.445&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;10.513&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;9.521&amp;nbsp;&amp;ndash;&amp;nbsp;11.505&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)DEN&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;19.192&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;17.691&amp;nbsp;&amp;ndash;&amp;nbsp;20.693&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;8.815&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;7.837&amp;nbsp;&amp;ndash;&amp;nbsp;9.793&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)NET&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;16.281&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;15.074&amp;nbsp;&amp;ndash;&amp;nbsp;17.487&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;5.904&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;4.973&amp;nbsp;&amp;ndash;&amp;nbsp;6.835&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)NZL&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;14.085&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;12.716&amp;nbsp;&amp;ndash;&amp;nbsp;15.454&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;3.709&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;2.812&amp;nbsp;&amp;ndash;&amp;nbsp;4.605&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)SWZ&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;12.739&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;11.642&amp;nbsp;&amp;ndash;&amp;nbsp;13.836&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;2.362&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.303&amp;nbsp;&amp;ndash;&amp;nbsp;3.421&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)USA&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;11.283&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;10.627&amp;nbsp;&amp;ndash;&amp;nbsp;11.940&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.907&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.603&amp;nbsp;&amp;ndash;&amp;nbsp;2.417&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;0.239&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Imports&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.614&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-2.020&amp;nbsp;&amp;ndash;&amp;nbsp;0.792&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.392&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.614&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-2.020&amp;nbsp;&amp;ndash;&amp;nbsp;0.792&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;0.392&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Votes for leftist parties&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.064&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.091&amp;nbsp;&amp;ndash;&amp;nbsp;-0.037&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.064&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.091&amp;nbsp;&amp;ndash;&amp;nbsp;-0.037&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;10.377&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;8.975&amp;nbsp;&amp;ndash;&amp;nbsp;11.778&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;738&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;738&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.983 / 0.982&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.699 / 0.689&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;AIC&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3069.280&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3069.280&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+]
+]
+
+???
+
+Now, the regression output actually does report a constant here, which is simply the basline category Australia.
+
+What we see is that our adjusted `\(R^2\)` is much better for the LSDV, because with LSDV we are interested in the variance overall, while with our within-estimation model explains only the variance within a single unit/country. 
+
+Another difference is the estimates for the dummy variables, but if we look closely, in our LSDV model, this is just estimates+intercept.
+
+Our estimate for our other variables are the same. 
 
 ---
-## Advantages
-- FE estimates are always unbiased. Even if unit effects correlate with a predictor.
-- FE removes the effect of those time-invariant characteristics so we can assess the net effect of the predictors on the outcome variable.
-- When using FE we assume that something within the individual unit may impact or bias the predictor or outcome variables and we need to control for this.
-- They’re generally widely used, they’re established and (almost always) non-controversial.
-- Use fixed-effects (FE) whenever you are only interested in analyzing the impact of variables that vary over time.
 
-## Disadvantages
-- Fixed-effects will not work well with data for which within- cluster variation is minimal or for slow changing variables over time
-because they will be highly collinear with the fixed effects.
-- They kill your covariates, i.e. they cannot be used to investigate time-invariant causes of the dependent variables.
-  - Technically, time-invariant characteristics of the individuals are perfectly collinear with the person [or entity] dummies.
-  - Substantively, fixed-effects models are designed to study the causes of changes within a person (or entity). They enable a closer modeling of causal development, and hence are almost standard in Economics.
-  - If we care about the effects of variables that don’t change over time (i.e. demographics like race and age in panel studies) that can be a big problem.
-- Inefficiency.
-  - Fixed effects models use up a lot of degrees of freedom. This means one’s standard error estimates can be pretty badly affected.
+
+```r
+plot_model(lsdv, type = "pred", terms = c("leftvot","id"))
+```
+
+&lt;img src="STAT_L8_Mixed_files/figure-html/unnamed-chunk-1-1.png" width="504" /&gt;
+
+```r
+plot_model(fe, type = "pred", terms = c("leftvot","id"))
+```
+
+&lt;img src="STAT_L8_Mixed_files/figure-html/unnamed-chunk-1-2.png" width="504" /&gt;
+
+???
+
+ They are the same. 
+
+---
+## Advantages and disadvantages
+
+With FE, we assume some unit characteristics may impact or bias IVs or DVs and we need to control for this.
+FE removes the effect of time-invariant unit characteristics to assess predictors' net effect on the outcome.
+They are therefore used to study the causes of changes within each unit (and are thus broadly used in e.g. economics).
+
+**Advantages**
+1. FE estimates always .blue[BLUE], even if unit effects correlate with a predictor
+1. They’re generally widely used, well established, and (almost always) non-controversial.
+1. Use fixed-effects (FE) whenever you are only interested in analyzing the impact of variables that vary over time
+
+**Disadvantages**
+1. FE models inefficient, using up many degrees of freedom and affecting standard errors
+1. FE will not work well with data for which within-cluster variation is minimal or for investigating variables that do not change over time or only change slowly (e.g. race or age) because they will be highly collinear with the fixed effects.
+1. No out of sample predictions because you are linking your estimates to these particular units 
 
 ---
 class: center, middle
 
-# Random Effects (and Model Choice)
+# Random Effects
 
 .pull-1[.circleoff[![](https://www.club.cc.cmu.edu/~cmccabe/image/crazy_clock.jpg)]]
 .pull-1[.circleoff[![](https://www.fabrikat.ch/media/catalog/product/cache/4/thumbnail/447x/9df78eab33525d08d6e5fb8d27136e95/r/o/rollins_leatherrip_hammer_9_1.jpg)]]
@@ -416,28 +1073,31 @@ class: center, middle
 ---
 ## Introduction to Random Effects
 
-Unlike in the fixed effects model, 
-variation across entities is assumed to be random and uncorrelated with the predictor or independent variables included in the model.
+An alternative to treating units with fixed effects is to treat them with .red[random effects].
+- fixed effects essentially your predictor variables (what you are interested in after accounting for random variability)
+- random effects best defined as noise in your data (arising from uncontrollable variability within the sample)
 
-We consider heterogeneity in our unit-specific error `\(u_i\)` a sort of random disturbance.
-
-This allows for time-invariant variables to play a role as explanatory variables.
-
-If you have reason to believe that differences across entities have some influence on your dependent variable then you should use random effects.
-
-You need to specify those individual characteristics or contexts that may or may not influence the predictor variables.
-
-Let’s assume that unobserved heterogeneity at the unit level is uncorrelated with all the explanatory variables.
-- We have no problem with omitted variable bias.
-- But even if so, unobserved heterogeneity still exists, 
-because not all relevant unit characteristics are likely to be included in the model.
-- As a consequence, measurements over time will be correlated for each unit 
-and the no-autocorrelation/no-serial correlation assumption of OLS estimates is at stake.
+With random effects, 
+across unit variation is assumed to be random and uncorrelated with the predictor or independent variables included in the model.
+That is, heterogeneity in our unit-specific error `\(u_i\)` is a sort of random disturbance.
 
 In the RE model, the `\(u_i\)`s are now seen as one component of the stochastic part of the model (as the realization of a random variable).
+Unlike in the fixed model, 
+we want to estimate error terms `\(u_i\)` and `\(e_{it}\)` which together constitute `\(\epsilon_{it}\)`
 
-Because the overall error term `\(\epsilon_{it}\)` is split into two components, `\(u_i\)` and `\(e_{it}\)` (idiosyncratic error),
-this model is called the error or .red[variance component model].
+`$$Y_{it} - \lambda  \bar{Y}_{i}=  \beta (X_{it}- \lambda \bar X_{i})... + \epsilon_{it}- \lambda \bar \epsilon_{i}$$`
+
+
+???
+
+So in the example for today, one could think that the political system and the unionization covary with the our composite error term which includes both the specificities of the countries themselves and the action of time.
+
+The random effects will create more bias but less variance, which could lead to the estimate being closer to the real parameter value. 
+
+A way to think about RE is to see them in-between FE and pooled OLS. The lambda is partly demeaning the data but not completely. We are taking off a fraction of the time demeaned values. 
+
+---
+## RE assumptions
 
 RE assumes that:
 - `\(u_i\)` and `\(e_{it}\)` are uncorrelated with the explanatory variables, 
@@ -446,19 +1106,256 @@ RE assumes that:
 
 Given this we arrive at `\(\epsilon_{it} = u_i + e_{it}\)`.
 
+Because the overall error term `\(\epsilon_{it}\)` is split into two components, `\(u_i\)` (unit-specific error) and `\(e_{it}\)` (time-varying error),
+this model is also called the error or .red[variance component model].
+
 Then we can get the expected amount of serial correlation by calculating:
 
-`$$\frac{\sigma^2_{u}}{\sigma^2_{u} + \sigma^2_{e}}$$`
+`$$\lambda = 1-\sqrt{\frac{\sigma^2_{u}}{\sigma^2_{u} + T\sigma^2_{e}}}$$`
+
+
+???
+
+If the lambda of this equation is 0 then we should consider pooled OLS rather than RE and if it is closed to 1 then we should go with FE.
+
+Everything is concentrated in this `\(T\sigma^2_{e}\)` 
+- if the number is close to infinity then we need the fixed effect to "soak up" all those specificities linked to the countries. 
+- if the result is 0 than it means that the `\(\sigma^2_{e}\)` is also close to 0 and that our error is unimportant and that our model explains the variation already then we can use OLS. 
+
+If it is in-between 0 and 1 (usually the case), we should consider using RE. With RE, we are taking a part of the mean of our variable but not all (quasi time-demeaned system). 
 
 ---
-## Comparing Pooled OLS, LSVD, FE and RE Models
+
+.pull-left-2[
+.tiny[
+
+
+```r
+rei &lt;- lme4::lmer(sstran ~ csh_m + leftvot + (1|id), data1)
+res &lt;- lme4::lmer(sstran ~ csh_m + leftvot + (1 + leftvot|id), data1)
+rep &lt;- lme4::lmer(sstran ~ csh_m + leftvot + (1 + leftvot + year|id), data1)
+tab_model(rei, res, rep, dv.labels = c("1","2","3"), rm.terms = "id [BEL,CAN,FIN,ITA,LUX,JPN,NOR,NET,SPA,SWE,SWZ,NZL,UKM,FRA,GRE,POR]", digits = 3, show.aic = T)
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;1&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;2&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;3&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col7"&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col8"&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col9"&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  0"&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;15.531&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;13.795&amp;nbsp;&amp;ndash;&amp;nbsp;17.267&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;15.413&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;12.864&amp;nbsp;&amp;ndash;&amp;nbsp;17.962&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;15.501&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;13.682&amp;nbsp;&amp;ndash;&amp;nbsp;17.320&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Imports&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.876&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-2.238&amp;nbsp;&amp;ndash;&amp;nbsp;0.485&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.207&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.101&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-2.511&amp;nbsp;&amp;ndash;&amp;nbsp;0.310&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;0.126&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;-0.811&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;-2.193&amp;nbsp;&amp;ndash;&amp;nbsp;0.571&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;0.250&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Votes for leftist parties&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.054&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.080&amp;nbsp;&amp;ndash;&amp;nbsp;-0.028&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.057&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.115&amp;nbsp;&amp;ndash;&amp;nbsp;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;0.054&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;-0.053&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;-0.083&amp;nbsp;&amp;ndash;&amp;nbsp;-0.023&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td colspan="10" style="font-weight:bold; text-align:left; padding-top:.8em;"&gt;Random Effects&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;&amp;sigma;&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3.62&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3.41&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3.59&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;&amp;tau;&lt;sub&gt;00&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;9.81 &lt;sub&gt;id&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;25.69 &lt;sub&gt;id&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;4.88 &lt;sub&gt;id&lt;/sub&gt;&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;&amp;tau;&lt;sub&gt;11&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.01 &lt;sub&gt;id.leftvot&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.00 &lt;sub&gt;id.leftvot&lt;/sub&gt;&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.00 &lt;sub&gt;id.year&lt;/sub&gt;&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;&amp;rho;&lt;sub&gt;01&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;-0.80 &lt;sub&gt;id&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.51&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;-0.98&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;ICC&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.73&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.77&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.70&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;N&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;22 &lt;sub&gt;id&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;22 &lt;sub&gt;id&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;22 &lt;sub&gt;id&lt;/sub&gt;&lt;/td&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;738&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;738&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;738&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;Marginal R&lt;sup&gt;2&lt;/sup&gt; / Conditional R&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.037 / 0.740&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.038 / 0.779&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.040 / 0.708&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;AIC&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3155.161&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3141.780&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3162.989&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+]
+]
+
+.pull-right-1[
+
+`\(N\)` is our number of units (22 countries)
+
+`\(\tau_{00}\)` is the random intercept for our units
+
+`\(\tau_{11}\)` is the random slopes for our units by variable
+
+`\(\sigma^2\)` is the residual variance
+
+`\(\partial_{01}\)` is the correlation between the intercepts and the coefficients
+
+`\(ICC\)` is the *Intraclass Correlation Coefficient*, the ratio of the between-cluster variance to the total variance 
+
+`\(AIC\)` is as we've already discussed
+
+Marginal `\(R^2\)` only considers the variance of the fixed effects
+
+Conditional `\(R^2\)` takes both fixed and random effects into account
+
+]
+
+???
+
+We are going to use the `lme4` package here to fit linear models with random effects.
+Please note though that there are a host of other packages out there,
+some of which are more flexible or specific.
+`lme4` is a pretty standard package though, so that's what we'll be using here.
+
+Note that in the formulas we have some new additions to our typical syntax.
+In the first model, we're adding a random intercept effect for countries.
+The 1 before the bar/pipe/mid indicates that we want an intercept for our random effect.
+In the second model, we're adding random slopes for the effect of leftist parties by each country.
+And in the third model, we're adding time as an extra random slope.
+To suppress the random intercept, you would do (year - 1|...).
+
+If `\(\partial_{01}\)` is positive, it suggests that those groups with larger intercepts will have steeper slopes,
+whereas if `\(\partial_{01}\)` is negative, it suggests those groups with larger intercepts will have flatter slopes.
+
+The ICC can help determine whether a linear mixed model is even necessary.
+If the correlation were 0, then observations within clusters are no more similar than observations from different clusters,
+and we may as well use a pooled OLS.
+However here it is high (&gt;.75), which suggests there is good reason to be using this.
+There is consistency in grouped observations.
+
+In our 3 model, our fixed effects are explaining most of the variation, while in model 1 and 2, the addition of random effects is greatly improving our explanatory power. 
+This is logical, since in model 3, countries are consider through both random and fixed effects.
+
+Note that we are treating year as a continuous variable here, 
+because to treat as a factor would be to use up too many degrees of freedom.
 
 ---
-## Advantages
-- You can include time-invariant variables (e.g. gender).
-  - In the fixed effects model these variables are absorbed by the intercept.
-- You make gains in error variance as fewer parameters need to be estimated.
-- RE also allows to generalize the inferences beyond the sample used in the model.
+### Varying intercepts and slopes
+
+.pull-left[
+
+
+```r
+plot_model(res, type = "pred", 
+           terms = c("leftvot","id"), 
+           pred.type="re")
+```
+
+&lt;img src="STAT_L8_Mixed_files/figure-html/plotRES-1.png" width="504" /&gt;
+]
+
+.pull-right[
+
+
+```r
+plot_model(rep, type = "pred", 
+           terms = c("leftvot","id","year"), 
+           pred.type="re")
+```
+
+&lt;img src="STAT_L8_Mixed_files/figure-html/plotREP-1.png" width="504" /&gt;
+]
+
+???
+ 
+
+---
+### Why might we want to do this?
+
+**Advantages**
+1. REs provide gains in error variance as fewer parameters need to be estimated.
+1. REs allow time-invariant variables to play a role as explanatory variables (e.g. gender)
+  - in a FE model, these variables would be absorbed by the dummy variables
+1. REs allow us to port our results more readily and make generalizations also to (some) other contexts
   - Under the RE model `\(u_i\)` is assumed to be a random draw 
   from the universe of all possible values of a random variable having a certain distribution 
   (e.g., the normal distribution).
@@ -466,49 +1363,431 @@ Then we can get the expected amount of serial correlation by calculating:
   that is to be estimated from the data of the sampled unit 
   (and hence, may be different in another sample).
 
-## Disadvantages
-- Some variables may not be available to be included or unknown, 
-therefore leading to omitted variable bias in the model.
-- Random effects requires that all unmeasured factors that go in to `\(\alpha_i\)` are uncorrelated with some of the Xs that are in the model.
-  - Outside of experimental method, the chances for that to happen are slim.
+**Disadvantages**
+
+1. REs require that all unmeasured factors that go in to `\(\alpha_i\)` are uncorrelated with some of the `\(X\)`s that are in the model.
+  - Unless experiments, some variables may not unavailable or unknown, leading to OVB
+1. You need to specify those individual characteristics that may or may not influence the predictor variables. 
+There should be no omitted variable.
 
 ---
-# Fixed or Random?
+## Comparing Pooled OLS, LSVD, FE and RE Models
+
+.tiny[
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Pooled OLS&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;LSDV&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Within&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;1&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;2&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;3&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col7"&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col8"&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  col9"&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  0"&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  1"&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  2"&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  3"&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  4"&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  5"&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  6"&gt;p&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  7"&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  8"&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  9"&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;10.016&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;9.288&amp;nbsp;&amp;ndash;&amp;nbsp;10.743&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;10.377&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;8.975&amp;nbsp;&amp;ndash;&amp;nbsp;11.778&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;15.531&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2"&gt;13.795&amp;nbsp;&amp;ndash;&amp;nbsp;17.267&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  4"&gt;15.413&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  5"&gt;12.864&amp;nbsp;&amp;ndash;&amp;nbsp;17.962&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  6"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  7"&gt;15.501&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  8"&gt;13.682&amp;nbsp;&amp;ndash;&amp;nbsp;17.320&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  9"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Imports&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-3.586&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-4.529&amp;nbsp;&amp;ndash;&amp;nbsp;-2.643&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.614&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-2.020&amp;nbsp;&amp;ndash;&amp;nbsp;0.792&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;0.392&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;-0.614&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;-2.020&amp;nbsp;&amp;ndash;&amp;nbsp;0.792&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;0.392&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;-0.876&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2"&gt;-2.238&amp;nbsp;&amp;ndash;&amp;nbsp;0.485&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3"&gt;0.207&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  4"&gt;-1.101&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  5"&gt;-2.511&amp;nbsp;&amp;ndash;&amp;nbsp;0.310&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  6"&gt;0.126&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  7"&gt;-0.811&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  8"&gt;-2.193&amp;nbsp;&amp;ndash;&amp;nbsp;0.571&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  9"&gt;0.250&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Votes for leftist parties&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.066&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.049&amp;nbsp;&amp;ndash;&amp;nbsp;0.084&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.064&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.091&amp;nbsp;&amp;ndash;&amp;nbsp;-0.037&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;-0.064&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;-0.091&amp;nbsp;&amp;ndash;&amp;nbsp;-0.037&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;-0.054&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2"&gt;-0.080&amp;nbsp;&amp;ndash;&amp;nbsp;-0.028&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  4"&gt;-0.057&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  5"&gt;-0.115&amp;nbsp;&amp;ndash;&amp;nbsp;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  6"&gt;0.054&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  7"&gt;-0.053&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  8"&gt;-0.083&amp;nbsp;&amp;ndash;&amp;nbsp;-0.023&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  9"&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)AUL&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;10.377&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;8.975&amp;nbsp;&amp;ndash;&amp;nbsp;11.778&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  4"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  5"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  6"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  7"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  8"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  9"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)AUS&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;20.890&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;19.334&amp;nbsp;&amp;ndash;&amp;nbsp;22.445&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;10.513&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;9.521&amp;nbsp;&amp;ndash;&amp;nbsp;11.505&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  4"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  5"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  6"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  7"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  8"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  9"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)DEN&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;19.192&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;17.691&amp;nbsp;&amp;ndash;&amp;nbsp;20.693&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;8.815&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;7.837&amp;nbsp;&amp;ndash;&amp;nbsp;9.793&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  4"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  5"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  6"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  7"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  8"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  9"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)FRG&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;19.588&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;18.128&amp;nbsp;&amp;ndash;&amp;nbsp;21.047&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;9.211&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;8.313&amp;nbsp;&amp;ndash;&amp;nbsp;10.109&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  4"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  5"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  6"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  7"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  8"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  9"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)IRE&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;13.209&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;12.296&amp;nbsp;&amp;ndash;&amp;nbsp;14.122&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;2.832&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;1.692&amp;nbsp;&amp;ndash;&amp;nbsp;3.973&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  4"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  5"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  6"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  7"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  8"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  9"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;factor(id)USA&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;11.283&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;10.627&amp;nbsp;&amp;ndash;&amp;nbsp;11.940&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;0.907&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;-0.603&amp;nbsp;&amp;ndash;&amp;nbsp;2.417&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;0.239&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  2"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  3"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  4"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  5"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  6"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  7"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  8"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  9"&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td colspan="19" style="font-weight:bold; text-align:left; padding-top:.8em;"&gt;Random Effects&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;&amp;sigma;&lt;sup&gt;2&lt;/sup&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3.62&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3.41&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3.59&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;&amp;tau;&lt;sub&gt;00&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;9.81 &lt;sub&gt;id&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;25.69 &lt;sub&gt;id&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;4.88 &lt;sub&gt;id&lt;/sub&gt;&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;&amp;tau;&lt;sub&gt;11&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.01 &lt;sub&gt;id.leftvot&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.00 &lt;sub&gt;id.leftvot&lt;/sub&gt;&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.00 &lt;sub&gt;id.year&lt;/sub&gt;&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;&amp;rho;&lt;sub&gt;01&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;-0.80 &lt;sub&gt;id&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.51&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;-0.98&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;ICC&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.73&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.77&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.70&lt;/td&gt;
+
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;N&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;22 &lt;sub&gt;id&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;22 &lt;sub&gt;id&lt;/sub&gt;&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;22 &lt;sub&gt;id&lt;/sub&gt;&lt;/td&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;738&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;738&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;738&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;738&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;738&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;738&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.154 / 0.151&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.983 / 0.982&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.699 / 0.689&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.037 / 0.740&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.038 / 0.779&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.040 / 0.708&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;AIC&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3789.171&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3069.280&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3069.280&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3155.161&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3141.780&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;3162.989&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+]
+
+???
+
+Pooled OLS not the best option since observations within the same countries are not independent. 
+
+LSDV, we removed the intercept and we see that some of the IV are not longer significant. High R-square. 
+Within, Australia is our baseline to create the dummy variables (intercept), estimates are the same for our IV, but not for our dummies. 
+Mixed effects/RET, both time and countries are treated with random effects, coefficients are not the same, the question is how different are they? See Hausman test
+
+---
+## Fixed or Random?
 
 There is a lot of discussion about which one to use.
+(And a lot of [confusion about the terms](https://statmodeling.stat.columbia.edu/2005/01/25/why_i_dont_use/) themselves).
 
-For non-linear models, RE effects are the predominant approach.
-- The RE model is more parsimonious and FE is less efficient if it does not capture the true model.
+One option is to use a Hausman test to test how much coefficients under each model differ.
 
-To figure how much coefficients under each model differ, we can run a Hausman test.
-- This test is a very general specification test.
-- The idea is the following: If two estimators are consistent under a given set of assumptions, 
-their estimates should not differ significantly (case A).
-- But this may not be true (case B): If only one of the two estimators provides consistent estimates, 
+The idea is the following: 
+If two estimators are consistent under a given set of assumptions, 
+their estimates should not differ significantly. 
+But if only one of the two estimators provides consistent estimates, 
 then the estimates from both estimators should differ significantly.
 
-In panel model A in which unobserved heterogeneity is uncorrelated with the independent variables in the model, 
-both RE and FE estimates are consistent, with RE estimates being more efficient than FE estimates.
-In panel model B with correlated unobserved heterogeneity, 
-RE estimation provides biased results, while FE estimation is still consistent.
-
 The Hausman test calculates the standard error of the difference between FE and RE and then can be used for a t-test.
+The null hypothesis is that the preferred model is random effects versus the alternative the fixed
+effects. It basically tests whether the unique errors `\(u_i\)` are correlated with the independant variables, 
+the null hypothesis is they are not.
 
 ---
-## Slow-Moving Variables
+
+.tiny[
+
+```r
+hausman_test &lt;- function (lmerMod, lmMod, ...)  {  ## changed function call
+    coef.wi &lt;- coef(lmMod)
+    coef.re &lt;- fixef(lmerMod)  ## changed coef() to fixef() for glmer
+    vcov.wi &lt;- vcov(lmMod)
+    vcov.re &lt;- vcov(lmerMod)
+    names.wi &lt;- names(coef.wi)
+    names.re &lt;- names(coef.re)
+    coef.h &lt;- names.re[names.re %in% names.wi]
+    dbeta &lt;- coef.wi[coef.h] - coef.re[coef.h]
+    dvcov &lt;- vcov.re[coef.h, coef.h] - vcov.wi[coef.h, coef.h]
+    stat &lt;- abs(t(dbeta) %*% as.matrix(solve(dvcov)) %*% dbeta)  ## added as.matrix()
+    pval &lt;- pchisq(stat, df = length(dbeta), lower.tail = FALSE)
+    names(stat) &lt;- "chisq"
+    parameter &lt;- length(dbeta)
+    names(parameter) &lt;- "df"
+    res &lt;- list(statistic = stat, p.value = pval, parameter = parameter, 
+        method = "Hausman Test",  alternative = "one model is inconsistent",
+                data.name=deparse(getCall(lmerMod)$data))  ## changed
+    class(res) &lt;- "htest"
+    return(res)
+}
+hausman_test(rei, fe)
+```
+
+```
+## 
+## 	Hausman Test
+## 
+## data:  data1
+## chisq = 26.787, df = 3, p-value = 6.525e-06
+## alternative hypothesis: one model is inconsistent
+```
+]
+
+???
+
+As we have seen the coeffecients are different depending on the RE and FE models, 
+the question is how much different are they?
+
+If the p-value is significant (for example &lt;0.05) then use fixed effects, if not use random effects.
+
+---
+### Slow-Moving Variables
 
 Now, the Hausman test can only tell you if there is a difference in the coefficients, 
 but that does not mean in consequences that you **HAVE** to use the FE specification.
 
 One case in which we want to weigh the trade-offs between FE and RE more closely, are slow-moving/sluggish variables, 
 i.e. there is little within-unit variation over time.
+Remember, sluggish variables will be highly collinear with the fixed effects.
 
 The inclusion of fixed effects would be problematic, 
-as it potentially discards much of the information and leads to imprecise estimates and large standard errors (Barro, 2012).
-
-Remember, sluggish variables will be highly collinear with the fixed effects 
-(that is, their `\(X^∗\)` values will not vary much, and so will all be close to zero).
-The principle trade-off here is between gains in efficiency and size of bias.
+as it potentially discards much of the information 
+and leads to imprecise estimates and large standard errors (Barro, 2012).
 
 Clark and Linzer (2015) suggest that in deciding between FE and RE, 
 one should also consider the sample size and the correlation between the covariate and unit effects.
@@ -519,47 +1798,53 @@ and when the correlation between the independent variable and unit effects is re
 as the random-effects model does not induce sufficiently high variance reduction to offset its increase in bias.
 
 ---
-## Which model to choose?
+### Which model to choose?
 
 In many cases you also have to decide what is of particular theoretical interest for you.
-- If you are theoretically interested in cross-national variation over variation within states across time, then RE is more appropriate.
-- If you are theoretically interested in variation across time and want to make causal inferences, then FE is more appropriate.
-- If your key IV is time-constant or sluggish, FE will drop this variable from the estimation and you cannot say anything about it.
-- In RE models, we still may have unit-specific autocorrelation and heteroskedasticity. These need to be corrected as well.
+- If you are theoretically interested in cross-national variation over variation within states across time, 
+then RE is more appropriate.
+- If you are theoretically interested in variation across time and want to make causal inferences, 
+then FE is more appropriate.
+- If your key IV is time-constant or sluggish, 
+FE will drop this variable from the estimation and you cannot say anything about it.
+- In RE models, we still may have unit-specific autocorrelation and heteroskedasticity. 
+These need to be corrected as well.
 
----
-## Contemporaneous Correlation
+For non-linear models, RE are the predominant approach: The RE model is more parsimonious and FE is less efficient if it does not capture the true model.
 
-Issues with the errors may not only arise because of serial nature of data, 
-but also because of cross-sectional (i.e. spatial) complications in the data.
-- This arises from some time-related process which affects most units at the same time similarly.
-- In consequence cross-sectional dependence is present, but not part of the model structure.
-- Even if you have modelled serial dependence correctly, cross-sectional dependence may still be present.
+&lt;!-- --- --&gt;
+&lt;!-- ## Contemporaneous Correlation --&gt;
 
-For example, economic shock can affect one nation but also be expected to affect its trading partners. You could model this (if you have the matching theory).
-- And you could dummy time points (which might be sensible if you had many states but only a few time points).
-But if you did neither, you would have contemporaneous correlation of errors across units.
+&lt;!-- Issues with the errors may not only arise because of serial nature of data,  --&gt;
+&lt;!-- but also because of cross-sectional (i.e. spatial) complications in the data. --&gt;
+&lt;!-- - This arises from some time-related process which affects most units at the same time similarly. --&gt;
+&lt;!-- - In consequence cross-sectional dependence is present, but not part of the model structure. --&gt;
+&lt;!-- - Even if you have modelled serial dependence correctly, cross-sectional dependence may still be present. --&gt;
 
-Impact
-- The estimates will be inefficient.
-- Standard error estimates will be biased downward.
-- Therefore, t-tests are overstated and p-estimates smaller than they should be.
+&lt;!-- For example, economic shock can affect one nation but also be expected to affect its trading partners. You could model this (if you have the matching theory). --&gt;
+&lt;!-- - And you could dummy time points (which might be sensible if you had many states but only a few time points). --&gt;
+&lt;!-- But if you did neither, you would have contemporaneous correlation of errors across units. --&gt;
 
-If we want to correct for this, we use panel correction via panel corrected standard errors.
-You need a minimum amount of time points, usually around 20 for PCSE to work correctly.
+&lt;!-- Impact --&gt;
+&lt;!-- - The estimates will be inefficient. --&gt;
+&lt;!-- - Standard error estimates will be biased downward. --&gt;
+&lt;!-- - Therefore, t-tests are overstated and p-estimates smaller than they should be. --&gt;
 
----
-## Non-Continuous Year Coverage
+&lt;!-- If we want to correct for this, we use panel correction via panel corrected standard errors. --&gt;
+&lt;!-- You need a minimum amount of time points, usually around 20 for PCSE to work correctly. --&gt;
 
-What if your data is bi-annual or only collected every four years – e.g. survey waves or election data?
+&lt;!-- --- --&gt;
+&lt;!-- ## Non-Continuous Year Coverage --&gt;
 
-If we pool observations across those waves, the years in fact are not continuous but have gaps.
+&lt;!-- What if your data is bi-annual or only collected every four years – e.g. survey waves or election data? --&gt;
 
-In these cases FE vs RE gets some more complicated. 
-If we do not use FE which controls for omitted variable bias across years and units, 
-then we need to supplement RE with year-dummies.
+&lt;!-- If we pool observations across those waves, the years in fact are not continuous but have gaps. --&gt;
 
-We can also not easily test if there is autocorrelation.
+&lt;!-- In these cases FE vs RE gets some more complicated.  --&gt;
+&lt;!-- If we do not use FE which controls for omitted variable bias across years and units,  --&gt;
+&lt;!-- then we need to supplement RE with year-dummies. --&gt;
+
+&lt;!-- We can also not easily test if there is autocorrelation. --&gt;
 
 ---
 ## Simultaneity Bias
@@ -580,23 +1865,51 @@ between your outcome variable with the predictor of interest for different lag v
 (e.g. correlation between Y and Xt−1, Y and Xt−2, etc.).
 
 ---
-## Lagging the DV
+### Lagging the DV
 
-Used when you understand the underlying process as dynamic, and if you expect that the current level of the DV is heavily determined by its past level (i.e. serial or autocorrelation is very strong).
+Used when you understand the underlying process as dynamic, 
+and if you expect that the current level of the DV is heavily determined by its past level 
+(i.e. serial or autocorrelation is very strong).
 
 Pros:
 - Including the lagged DV will help you overcome omitted variable bias. 
 - You can account for autocorrelation.
+- Parsimonious. 
 
 Cons:
-- Including the lagged DV will take out a lot of your variance and is likely to make your other DV's effects less significant (which means both make the βs smaller and the standard errors bigger). 
+- Including the lagged DV will take out a lot of your variance and is likely to make your other DV's effects less significant (which means both make the `\(\beta\)`s smaller and the standard errors bigger). 
   - In other words, we underestimate the true relationships at play.
-- However, what it will allow you to do is say that those IVs that still influence your outcome have an effect controlling for past value of the DV.
+
+However, what it will allow you to do is say that those IVs that still influence your outcome have an effect controlling for past value of the DV.
 
 ---
-## Non-Continuous DV
+## Extensions
 
-Also in the context of MLE and non-continuous DVs we can model the panel structure.
+Here we have used fixed and random effects in a panel modelling context.
+
+But there are various extensions to...
+- non-continuous dependent variables (generalised linear mixed effect models)
+- non-linear models
+- hierarchical models
+- nested models
+- multilevel models
+- etc.
+
+Mixed effects are the basis for a lot of much broader and more flexible models,
+and really deserve their own course...
+
+&lt;!-- Let’s assume that unobserved heterogeneity at the unit level is uncorrelated with all the explanatory variables. --&gt;
+&lt;!-- - We have no problem with omitted variable bias. --&gt;
+&lt;!-- - But even if so, unobserved heterogeneity still exists,  --&gt;
+&lt;!-- because not all relevant unit characteristics are likely to be included in the model. --&gt;
+&lt;!-- - As a consequence, measurements over time will be correlated for each unit  --&gt;
+&lt;!-- and the no-autocorrelation/no-serial correlation assumption of OLS estimates is at stake. --&gt;
+
+&lt;!-- We can use multilevel analysis.  --&gt;
+
+???
+
+For more, please see Snijders and Bosker (1999).
 
 ---
 class: center, middle
