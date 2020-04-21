@@ -116,7 +116,7 @@ as well as the cross-sectional part.
 </thead>
 <tbody>
 <tr>
-<td class='rowlabel firstrow'><span class='varlabel'>Social expenditure per capita</span></td>
+<td class='rowlabel firstrow'><span class='varlabel'>Social expenditure per GDP</span></td>
 <td class='firstrow'></td>
 </tr>
 <tr>
@@ -325,7 +325,7 @@ tab_model(ols, digits = 3)
 &lt;table style="border-collapse:collapse; border:none;"&gt;
 &lt;tr&gt;
 &lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
-&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Social expenditure per&lt;br&gt;capita&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Social expenditure per&lt;br&gt;GDP&lt;/th&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
@@ -437,6 +437,29 @@ Though varying intercepts and slopes most commonly used by unit,
 we could also have variation in `\(\alpha\)` or `\(\beta\)` over time.
 
 ---
+class: center, middle
+
+# Fixed Effects
+
+.pull-1[.circleoff[![](https://www.club.cc.cmu.edu/~cmccabe/image/crazy_clock.jpg)]]
+.pull-1[.circleon[![](https://www.fabrikat.ch/media/catalog/product/cache/4/thumbnail/447x/9df78eab33525d08d6e5fb8d27136e95/r/o/rollins_leatherrip_hammer_9_1.jpg)]]
+.pull-1[.circleoff[![](https://www.random.org/analysis/randbitmap-wamp.png)]]
+
+---
+## Modeling this
+
+Panel data models differ depending on where we think errors might correlate.
+
+We'll concentrate on .red[fixed effects] and .red[random effects] today, 
+since they are the building block to understanding the rest.
+
+When random effects are used together with fixed effects, we call this a .red[mixed effects model].
+
+There are other names and similar models out there too that you may encounter,
+such as .red[hierarchical models] (a multilevel model with a single nested hierarchy) 
+and .red[multilevel models] (a hierarchical model with multiple non-nested hierarchies).
+
+---
 ## The Error Term
 
 Now we could have different `\(\alpha\)`s and `\(\beta\)`s for each unit, each time point, 
@@ -478,29 +501,6 @@ Now, this wouldn't be a problem (OLS would not be biased) if this unobserved het
 ???
 
 Key point: measurements over time are almost never independent so OLS assumptions violated; i.e. don't use OLS...
-
----
-class: center, middle
-
-# Fixed Effects
-
-.pull-1[.circleoff[![](https://www.club.cc.cmu.edu/~cmccabe/image/crazy_clock.jpg)]]
-.pull-1[.circleon[![](https://www.fabrikat.ch/media/catalog/product/cache/4/thumbnail/447x/9df78eab33525d08d6e5fb8d27136e95/r/o/rollins_leatherrip_hammer_9_1.jpg)]]
-.pull-1[.circleoff[![](https://www.random.org/analysis/randbitmap-wamp.png)]]
-
----
-## Modeling this
-
-Panel data models differ depending on where we think errors might correlate.
-
-We'll concentrate on .red[fixed effects] and .red[random effects] today, 
-since they are the building block to understanding the rest.
-
-When random effects are used together with fixed effects, we call this a .red[mixed effects model].
-
-There are other names and similar models out there too that you may encounter,
-such as .red[hierarchical models] (a multilevel model with a single nested hierarchy) 
-and .red[multilevel models] (a hierarchical model with multiple non-nested hierarchies).
 
 ---
 ## Introduction to Fixed Effects
@@ -560,7 +560,7 @@ tab_model(lsdv, rm.terms = "factor(id) [BEL,CAN,FIN,FRG,IRE,ITA,LUX,JPN,NOR,SPA,
 &lt;table style="border-collapse:collapse; border:none;"&gt;
 &lt;tr&gt;
 &lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
-&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Social expenditure per&lt;br&gt;capita&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Social expenditure per&lt;br&gt;GDP&lt;/th&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
@@ -1319,34 +1319,35 @@ Note that we are treating year as a continuous variable here,
 because to treat as a factor would be to use up too many degrees of freedom.
 
 ---
-### Varying intercepts and slopes
 
 .pull-left[
 
 
 ```r
-plot_model(res, type = "pred", 
-           terms = c("leftvot","id"), 
-           pred.type="re")
+plot_model(rei, type = "pred", terms = c("leftvot","id"), pred.type="re")
 ```
 
-&lt;img src="STAT_L8_Mixed_files/figure-html/plotRES-1.png" width="504" /&gt;
+&lt;img src="STAT_L8_Mixed_files/figure-html/plotREI-1.png" width="504" /&gt;
+
 ]
 
 .pull-right[
 
 
 ```r
-plot_model(rep, type = "pred", 
-           terms = c("leftvot","id","year"), 
-           pred.type="re")
+plot_model(res, type = "pred", terms = c("leftvot","id"), pred.type="re")
 ```
 
-&lt;img src="STAT_L8_Mixed_files/figure-html/plotREP-1.png" width="504" /&gt;
+&lt;img src="STAT_L8_Mixed_files/figure-html/plotRES-1.png" width="504" /&gt;
 ]
 
-???
- 
+
+```r
+plot_model(rep, type = "pred", terms = c("leftvot","id","year"), pred.type="re")
+```
+
+&lt;img src="STAT_L8_Mixed_files/figure-html/plotREP-1.png" width="1008" /&gt;
+
 
 ---
 ### Why might we want to do this?
