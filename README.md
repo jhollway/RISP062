@@ -18,3 +18,5 @@ The course lecture materials are hosted at https://jhollway.github.io/statsII/
 [Lecture 6](https://jhollway.github.io/statsII/STAT_L6_Multinomial.html)
 
 [Lecture 7](https://jhollway.github.io/statsII/STAT_L7_Count.html)
+
+[Lecture 8](https://jhollway.github.io/statsII/STAT_L8_Mixed.html)

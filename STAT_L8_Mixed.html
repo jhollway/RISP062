@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Statistics for International Relations Research II</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="James Hollway" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://raw.githack.com/jhollway/iheidmyninja/master/iheid-xaringan-style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistics for International Relations Research II
+## Panel Models
+### <large>James Hollway</large>
+
+---
+
+class: center, middle
+
+.pull-1[.circleon[![](https://static.turbosquid.com/Preview/2016/07/05__06_16_48/FishSkeletonb.jpg46B6AAD0-198F-40AC-B932-1768C4B0F869Zoom.jpg)]]
+.pull-1[.circleon[![](https://www.psassets.ch/thumbs/2e/1d/08716b4f86e44e119ac2ec013b10-909889.jpg)]]
+.pull-1[.circleon[![](https://static.toiimg.com/thumb/imgsize-5231,msid-35966935,width-400,resizemode-4/35966935.jpg)]]
+
+
+
+---
+class: center, middle
+
+.pull-1[.circleon[![](https://www.club.cc.cmu.edu/~cmccabe/image/crazy_clock.jpg)]]
+.pull-1[.circleon[![](https://www.fabrikat.ch/media/catalog/product/cache/4/thumbnail/447x/9df78eab33525d08d6e5fb8d27136e95/r/o/rollins_leatherrip_hammer_9_1.jpg)]]
+.pull-1[.circleon[![](https://www.random.org/analysis/randbitmap-wamp.png)]]
+
+???
+
+- What is a panel structure?
+- Why not use simple OLS, logits?
+- Different types of variables and potential effects.
+- Issues of serial correlation.
+
+- Motivating and using fixed and random effects models.
+- When to use which model? Panel corrected standard errors
+- How to handle complication? Slow-moving variables, irregular time observations, models for non-continuous DVs.
+
+---
+# Today's data
+
+
+
+---
+class: center, middle
+
+# Data and Error Structures
+
+.pull-1[.circleon[![](https://www.club.cc.cmu.edu/~cmccabe/image/crazy_clock.jpg)]]
+.pull-1[.circleoff[![](https://www.fabrikat.ch/media/catalog/product/cache/4/thumbnail/447x/9df78eab33525d08d6e5fb8d27136e95/r/o/rollins_leatherrip_hammer_9_1.jpg)]]
+.pull-1[.circleoff[![](https://www.random.org/analysis/randbitmap-wamp.png)]]
+
+---
+## Notation
+
+In this lecture the emphasis is on data that have both cross-sectional and temporal variation.
+
+Following terminology and notation is useful:
+- "units" are the individual things on which we have data
+  - `\(i \in \mathcal{N}\)`
+- "observations" are the measurements (for each variable) on each unit at a given point of time
+  - `\(t \in \mathcal{T}\)`
+
+This means that the total number of observations is `\(NT\)`.
+Cross-sectional data is just at one point in time ($Nt$),
+whereas time-series data is often just one unit over time ($iT$).
+To talk about panel data, we need variation in both.
+
+---
+## Example data structure
+
+Example here.
+
+Some variables vary over time, while others only over the units,
+and others over both units and time.
+
+Absence of variation on one dimension means there is nothing to say about that phenomenon there,
+and little variation in one dimension means there is little to say about the phenomenon:
+*variation is information*!
+
+This means one needs to consider carefully “where” the variation in one's data is, 
+and (more important) where one's theories suggest we should see variation as well.
+
+---
+## Aggregation
+
+Aggregating variation across a dimension can be useful, 
+but can also involve losing important information.
+
+Aggregation can also tempt one to commit the .red[ecological fallacy]:
+inferring individual-level relationships on the basis of aggregate data.
+
+---
+## Types of Data Structures
+
+.red[Cross-sectional data] consists of observations on different individuals or groups at a single point in time.
+- Examples are R&amp;D spending by firms by industry, immigration policy across 24 European countries, or level of dissident repression among authoritarian regimes.
+- Endogeneity is difficult to rule out, unless one uses causal estimation models (e.g. matching, or instrumental variables).
+
+.red[Pooled cross-sectional data] describes randomly sampled cross-sections of individuals at different points in time.
+- Example: ESS or ISSP (surveys come in ‘waves’ ask the same questions, but different individuals).
+- Pooling makes sense if cross-sections are randomly sampled (like one big sample), and the units are interchangeable.
+- Time dummy variables can be used to capture structural change over time.
+- Often used to see the impact of policy or programs.
+
+---
+
+.red[Panel data] generally refers to data which are cross- sectionally dominated; that is, where *N* is significantly larger than *T*. 
+Examples are the ANES panel studies (N = 2000; T = 6) or the Panel Study of Income Dynamics (N = large, T = 12 or so).
+- Such data usually have a fixed T, so that these data's asymptotics are in N, which is important (we'll come back to this).
+- This is a longitudinal type, where the same units i.e. the same households or individuals are captured over time.
+- Panel data structure makes it possible to deal with certain types of endogeneity without the use of exogenous instruments.
+
+.red[Time series cross-sectional data] (TSCS) usually refers to data in which either T is dominant, or `\(N \approx T\)`.
+- Common in comparative politics. 
+- It can also refer to data where N is dominant, but T is larger than in panel data 
+(e.g. all-dyads all-years IR data, with N = several thousand and T = 50 or more).
+- Here, N is usually fixed, and the asymptotics are in T; 
+moreover, if we have enough data, we can say something about the time-series properties of the data 
+as well as the cross-sectional part.
+
+---
+## Panel/TSCS Data Structure
+
+Often comes in or is treated as one of two formats: long vs wide.
+
+.red[Wide data] has `\(N\)` rows and additional columns for each variable multiplied by `\(T\)`.
+
+.red[Long data] has `\(NT\)` rows, with columns for each variable.
+- Long format is often preferred as more efficient and flexible.
+
+You can pivot or *reshape* between these two forms using various functions in R.
+
+---
+## Why not OLS?
+
+`$$Y_i = \alpha + \beta X_i + u_i$$`
+
+Recall that OLS assumes several things:
+-all the usual OLS assumptions, plus
+-that the constant term is constant across different *i*s
+-that the effect of any given variable X on Y is constant across observations 
+(at least to the extent that non-constancy isn't specified in the model, e.g., through interaction terms).
+
+We could model:
+
+`$$Y_{it} = \alpha + \beta X_{it} + u_{it}$$`
+
+But this would make the same assumptions about constants and covariates,
+which are often going to be problematic in a TSCS context because we usually have some reason to believe that 
+there may be differences in either `\(\alpha\)` or `\(\beta\)` over `\(i\)` or `\(t\)`,
+and the violation of which leads to a form of specification bias.
+
+---
+## Varying intercepts and slopes
+
+The intercepts vary
+- most commonly because different units have different intercepts because they have different starting points for the (same) slopes
+- but could also vary of time
+If we estimate this model as OLS, we can get biased coefficients.
+
+--
+
+The slopes vary
+- again most commonly because different units respond to covariates differently and so the effect of X on Y differs
+- but we could also have variation in `\(\beta\)` over time.
+If we estimate this model as OLS, we'll only get an 'average' of the different slopes,
+and if there are, say, two groups that have radically different responses to a covariate,
+then these can cancel out and we get a Type II error.
+
+--
+
+The intercepts and slopes vary
+- this suggests that different units may start in different places and respond to covariates differently
+
+---
+## The Error Term
+
+We could instead have different `\(\alpha\)`s and `\(\beta\)`s for each unit, each time point, 
+or every combination of unit and time point, e.g.:
+
+`$$Y_{it} = \alpha_{it} + \beta_{it} + u_{it}$$`
+
+But we've been assuming throughout that `\(u_{it}\)` is homoskedastic and uncorrelated, 
+both within and across `\(i\)` and `\(t\)`, i.e.:
+- no cross-unit heteroskedasticity
+- no temporal heteroskedasticity
+- no autocorrelation
+
+But that's a pretty tall order.
+
+Remember, the error term is supposed to be a stochastic element to the model and should not incorporate any systematic differences
+(those should be in the model). But:
+- Cross-unit differences mean that the model does a better job of explaining some units than others,
+- Time effects (such as socialization, institutionalization, learning, or other such dynamics) cause the model to do a better or worse job of explaining Y over time,
+- Omitted variables lead to residual correlation, either across units or (more commonly) over time.
+
+---
+## Two types of errors
+
+We can actually have two different error terms that capture different types of unobserved heterogeneity.
+- `\(u_i\)` the unit-specific error to account for between unit variation
+  - unobserved predictors of Y that are specific to the unit and therefore time-constant.
+- `\(e_{it}\)` the time-varying error to account for within unit variation
+  - unobserved predictors of Y that are specific to the time point and the unit (also referred to as idiosyncratic error).
+
+OLS not biased if we can assume that this unobserved heterogeneity is independent of explanatory variables in the model, but:
+- Estimated standard errors still biased, because most likely still serial correlation
+- Errors will correlate if there is unobserved unit-specific heterogeneity that is constant over time, 
+even if uncorrelated with variables in the model.
+
+Key point: OLS assumptions are violated as measurements over time are not independent.
+
+---
+## Time-Constant and Time-Varying Variables
+
+Three types of explanatory variables that can be located either at the level of units or level of contexts (aka time/group).
+
+.red[Time-constant variables]: 
+- e.g. ethnicity or gender (individuals), geographical location or type of government (context).
+- Some are treated as time-constant because change is rare or a variable is more or less a stable characteristic.
+- They do not vary over time (obviously) but can vary across units.
+
+.red[Time-varying variables]: 
+- e.g. labor force experience and on the job-training (individual), or economic growth and public spending (context).
+- Can characterize the unit or the context.
+
+.red[Time]: 
+- Debatable whether time itself a real explanatory variable or an indicator for other unobserved characteristics that change over time.
+- But time may capture possible time trends in the data.
+
+---
+## Modeling this
+
+Panel data models differ depending on where we think errors might correlate.
+
+Consider first a general model in which we have these individual (unit-) level effects,
+i.e. that some units/clusters have higher or lower levels of the outcome variable than others:
+
+`$$Y_{it} = \alpha_i + \beta X_{it} + u_{it}$$`
+
+Note the separate intercept term.
+I.e., some clusters tend to have higher values of Y than others.
+This is known as the .red[variable intercept model].
+You can think of it as a model of individual-level heterogeneity (which matters if we have omitted variable bias).
+
+There are different ways in which we can estimate these models:
+- Fixed effects
+- Random effects
+- Mixed effects
+- In-between effects, etc.
+
+???
+
+We'll concentrate on fixed and random effects today, 
+since they are the building block to understanding the rest.
+
+---
+class: center, middle
+
+# Fixed Effects (and Other Options)
+
+.pull-1[.circleoff[![](https://www.club.cc.cmu.edu/~cmccabe/image/crazy_clock.jpg)]]
+.pull-1[.circleon[![](https://www.fabrikat.ch/media/catalog/product/cache/4/thumbnail/447x/9df78eab33525d08d6e5fb8d27136e95/r/o/rollins_leatherrip_hammer_9_1.jpg)]]
+.pull-1[.circleoff[![](https://www.random.org/analysis/randbitmap-wamp.png)]]
+
+---
+## Introduction to Fixed Effects
+
+Fixed effects (FE) explore the relationship between predictor and outcome variables within an entity (country, person, company, etc.).
+
+Each entity has its own individual characteristics that may or may not influence the predictor variables.
+- For example, being a male or female could influence the opinion towards a certain issue;
+- The political system of a particular country could have some effect on trade or GDP;
+- Or the business practices of a company may influence its stock price.
+
+This can be a source of unit-level unobserved heterogeneity ($u_i$)
+- Easy to fix if we have information about them. Simply put them as another independent variable into our regression model.
+- But what about those factors that are hard to measure or those which we have not yet considered?
+
+---
+## The LSDV Method
+
+Treating the unit effects `\(\alpha_i\)` as fixed values is, in many respects, the simplest thing we can do.
+
+That is, we simply estimate the equation from Slide 4 by including N-1 separate indicator variables, 
+one for each unit, in the model along with the covariates.
+
+This is also called the .red[least-squares dummy variables] (LSDV) method.
+- To estimate unit-specific heterogeneity (let’s say countries repeatedly measured over time) we include a dummy for each unit.
+- This dummy works like a sponge – it “soaks up” all potential error that is due to unobserved country-specific characteristics.
+
+---
+## Welfare state spending
+
+Let’s say we’re interest in the assessment of the impact of globalization on welfare state effort 
+(public spending as % of GDP in the 15 OECD countries (1961-1993).
+
+There are two diverging hypotheses:
+- The *efficiency hypothesis* states that globalization should exert downward pressure on public spending 
+(because low taxes are needed to be competitive, etc.).
+- The *compensation hypothesis* states that globalization should be associated with higher demand for social security 
+and therefore increase public spending.
+
+If the compensation theory were true, 
+then imports from low-wage countries should threaten employment and wage levels in domestic labor markets 
+and create greater demand to balance this out. 
+So the relationship should be positive.
+
+---
+## Comparing Pooled OLS and LSDV
+
+A pooled OLS model ignores the panel structure of the data.
+- Coefficient for LWI suggests the efficiency hypothesis is true.
+- But, observations belonging to the same country are not independent!
+- Moreover, the six controls probably do not capture all country-specific heterogeneity.
+
+An LSDV model includes `\(u_i\)` to adjust for that.
+- Once we add the country-dummies we see that LWI conveys some of the unmeasured country-specific heterogeneity, 
+and once this is controlled for, its effect is much smaller and not statistically significant anymore.
+
+---
+## The Within Estimator
+
+However, with large datasets the dummy variable approach is not a very practical technique, 
+therefore FE estimates are usually obtained from demeaned data, specifically time-demeaned data.
+
+They measure how the observations in the respective country deviate on average from the reference country 
+while controlling for the other variables in the model.
+
+This is akin to centering all measurements on their unit-specific means.
+
+Since the FE estimates parameters use only variation around the unit-specific means, 
+it is also called the .red[within estimator].
+
+--
+
+We can write our variable-intercept model as:
+
+`$$Y_{it} = \alpha_i + \beta_B \bar{X}_i + \beta_W (X_{it} - \bar{X}_i) + u_{it}$$`
+
+To the extent there is variation in the X’s across units, it will be captured in the first term ($\beta_B$), 
+while within-unit variation is in the second term  ($\beta_W$).
+
+Moreover, the model reduces to our variable-intercept model from before when `\(\beta_B = \beta_W\)`.
+
+---
+## An Identification Problem
+
+The problem is that it is *unidentified*: the `\(\alpha_i\)`s and `\(\bar{X}\)`s are the same thing
+(i.e. the constants within units that vary only across units).
+
+Why is this important to estimation? It allows us to estimate these models in a much easier fashion.
+
+If the “regression line” for each unit is simply the within-unit mean,
+then the “residual” is the difference between the observation and this mean.
+
+We can estimate `\(\beta\)`s by “de-meaning” the variables, 
+`\(Y_{it}^* = Y_{it} - \bar{Y}_i\)` and `\(X_{it}^* = X_{it} - \bar{X}_i\)`,
+and then estimating `\(Y_{it}^* = \beta_{FE} X_{it}^* + u_{it}\)`.
+Looks like OLS (and indeed that’s what we arrive at).
+
+--
+
+The important thing about the transformation is that unobserved unit-specific heterogeneity, `\(u_i\)`, has disappeared.
+
+We can safely apply OLS to the demeaned data and obtain estimates of the effects of the X that are unaffected by omitted variable bias at the unit level.
+
+A key thing to keep in mind about our absorbed regression model is that it makes use of only the within- unit variation in the Ys and the Xs.
+
+It ignores cross-unit variation, since the variables `\(Y_{it}^*\)` and `\(X_{it}^*\)` are demeaned.
+
+---
+## Comparing Pooled OLS, LSDV, and Within Estimator Models
+
+Now, the regression output actually does report a constant here, which is simply the average of all country effects.
+
+Why are the `\(R^2\)` statistics different?
+- Since LSDV uses the original data, `\(R^2\)` measures the explained proportion of the overall variance.
+- Since the FE model used time- demeaned data, `\(R^2\)` measures the explained portion of the within variance.
+
+---
+## Advantages
+- FE estimates are always unbiased. Even if unit effects correlate with a predictor.
+- FE removes the effect of those time-invariant characteristics so we can assess the net effect of the predictors on the outcome variable.
+- When using FE we assume that something within the individual unit may impact or bias the predictor or outcome variables and we need to control for this.
+- They’re generally widely used, they’re established and (almost always) non-controversial.
+- Use fixed-effects (FE) whenever you are only interested in analyzing the impact of variables that vary over time.
+
+## Disadvantages
+- Fixed-effects will not work well with data for which within- cluster variation is minimal or for slow changing variables over time
+because they will be highly collinear with the fixed effects.
+- They kill your covariates, i.e. they cannot be used to investigate time-invariant causes of the dependent variables.
+  - Technically, time-invariant characteristics of the individuals are perfectly collinear with the person [or entity] dummies.
+  - Substantively, fixed-effects models are designed to study the causes of changes within a person (or entity). They enable a closer modeling of causal development, and hence are almost standard in Economics.
+  - If we care about the effects of variables that don’t change over time (i.e. demographics like race and age in panel studies) that can be a big problem.
+- Inefficiency.
+  - Fixed effects models use up a lot of degrees of freedom. This means one’s standard error estimates can be pretty badly affected.
+
+---
+class: center, middle
+
+# Random Effects (and Model Choice)
+
+.pull-1[.circleoff[![](https://www.club.cc.cmu.edu/~cmccabe/image/crazy_clock.jpg)]]
+.pull-1[.circleoff[![](https://www.fabrikat.ch/media/catalog/product/cache/4/thumbnail/447x/9df78eab33525d08d6e5fb8d27136e95/r/o/rollins_leatherrip_hammer_9_1.jpg)]]
+.pull-1[.circleon[![](https://www.random.org/analysis/randbitmap-wamp.png)]]
+
+---
+## Introduction to Random Effects
+
+Unlike in the fixed effects model, 
+variation across entities is assumed to be random and uncorrelated with the predictor or independent variables included in the model.
+
+We consider heterogeneity in our unit-specific error `\(u_i\)` a sort of random disturbance.
+
+This allows for time-invariant variables to play a role as explanatory variables.
+
+If you have reason to believe that differences across entities have some influence on your dependent variable then you should use random effects.
+
+You need to specify those individual characteristics or contexts that may or may not influence the predictor variables.
+
+Let’s assume that unobserved heterogeneity at the unit level is uncorrelated with all the explanatory variables.
+- We have no problem with omitted variable bias.
+- But even if so, unobserved heterogeneity still exists, 
+because not all relevant unit characteristics are likely to be included in the model.
+- As a consequence, measurements over time will be correlated for each unit 
+and the no-autocorrelation/no-serial correlation assumption of OLS estimates is at stake.
+
+In the RE model, the `\(u_i\)`s are now seen as one component of the stochastic part of the model (as the realization of a random variable).
+
+Because the overall error term `\(\epsilon_{it}\)` is split into two components, `\(u_i\)` and `\(e_{it}\)` (idiosyncratic error),
+this model is called the error or .red[variance component model].
+
+RE assumes that:
+- `\(u_i\)` and `\(e_{it}\)` are uncorrelated with the explanatory variables, 
+- have constant variances `\(\sigma^2_{u}\)` and `\(\sigma^2_{e}\)`
+- and are independent of each other and across units.
+
+Given this we arrive at `\(\epsilon_{it} = u_i + e_{it}\)`.
+
+Then we can get the expected amount of serial correlation by calculating:
+
+`$$\frac{\sigma^2_{u}}{\sigma^2_{u} + \sigma^2_{e}}$$`
+
+---
+## Comparing Pooled OLS, LSVD, FE and RE Models
+
+---
+## Advantages
+- You can include time-invariant variables (e.g. gender).
+  - In the fixed effects model these variables are absorbed by the intercept.
+- You make gains in error variance as fewer parameters need to be estimated.
+- RE also allows to generalize the inferences beyond the sample used in the model.
+  - Under the RE model `\(u_i\)` is assumed to be a random draw 
+  from the universe of all possible values of a random variable having a certain distribution 
+  (e.g., the normal distribution).
+  - Under the FE model `\(u_i\)` is assumed to be a parameter 
+  that is to be estimated from the data of the sampled unit 
+  (and hence, may be different in another sample).
+
+## Disadvantages
+- Some variables may not be available to be included or unknown, 
+therefore leading to omitted variable bias in the model.
+- Random effects requires that all unmeasured factors that go in to `\(\alpha_i\)` are uncorrelated with some of the Xs that are in the model.
+  - Outside of experimental method, the chances for that to happen are slim.
+
+---
+# Fixed or Random?
+
+There is a lot of discussion about which one to use.
+
+For non-linear models, RE effects are the predominant approach.
+- The RE model is more parsimonious and FE is less efficient if it does not capture the true model.
+
+To figure how much coefficients under each model differ, we can run a Hausman test.
+- This test is a very general specification test.
+- The idea is the following: If two estimators are consistent under a given set of assumptions, 
+their estimates should not differ significantly (case A).
+- But this may not be true (case B): If only one of the two estimators provides consistent estimates, 
+then the estimates from both estimators should differ significantly.
+
+In panel model A in which unobserved heterogeneity is uncorrelated with the independent variables in the model, 
+both RE and FE estimates are consistent, with RE estimates being more efficient than FE estimates.
+In panel model B with correlated unobserved heterogeneity, 
+RE estimation provides biased results, while FE estimation is still consistent.
+
+The Hausman test calculates the standard error of the difference between FE and RE and then can be used for a t-test.
+
+---
+## Slow-Moving Variables
+
+Now, the Hausman test can only tell you if there is a difference in the coefficients, 
+but that does not mean in consequences that you **HAVE** to use the FE specification.
+
+One case in which we want to weigh the trade-offs between FE and RE more closely, are slow-moving/sluggish variables, 
+i.e. there is little within-unit variation over time.
+
+The inclusion of fixed effects would be problematic, 
+as it potentially discards much of the information and leads to imprecise estimates and large standard errors (Barro, 2012).
+
+Remember, sluggish variables will be highly collinear with the fixed effects 
+(that is, their `\(X^∗\)` values will not vary much, and so will all be close to zero).
+The principle trade-off here is between gains in efficiency and size of bias.
+
+Clark and Linzer (2015) suggest that in deciding between FE and RE, 
+one should also consider the sample size and the correlation between the covariate and unit effects.
+- In particular in small datasets, and in presence of sluggish variables, 
+the random-effects model will tend to produce superior estimates of `\(\beta\)` when there are few units or observations per unit, 
+and when the correlation between the independent variable and unit effects is relatively low.
+- Otherwise, the fixed-effects model may be preferable, 
+as the random-effects model does not induce sufficiently high variance reduction to offset its increase in bias.
+
+---
+## Which model to choose?
+
+In many cases you also have to decide what is of particular theoretical interest for you.
+- If you are theoretically interested in cross-national variation over variation within states across time, then RE is more appropriate.
+- If you are theoretically interested in variation across time and want to make causal inferences, then FE is more appropriate.
+- If your key IV is time-constant or sluggish, FE will drop this variable from the estimation and you cannot say anything about it.
+- In RE models, we still may have unit-specific autocorrelation and heteroskedasticity. These need to be corrected as well.
+
+---
+## Contemporaneous Correlation
+
+Issues with the errors may not only arise because of serial nature of data, 
+but also because of cross-sectional (i.e. spatial) complications in the data.
+- This arises from some time-related process which affects most units at the same time similarly.
+- In consequence cross-sectional dependence is present, but not part of the model structure.
+- Even if you have modelled serial dependence correctly, cross-sectional dependence may still be present.
+
+For example, economic shock can affect one nation but also be expected to affect its trading partners. You could model this (if you have the matching theory).
+- And you could dummy time points (which might be sensible if you had many states but only a few time points).
+But if you did neither, you would have contemporaneous correlation of errors across units.
+
+Impact
+- The estimates will be inefficient.
+- Standard error estimates will be biased downward.
+- Therefore, t-tests are overstated and p-estimates smaller than they should be.
+
+If we want to correct for this, we use panel correction via panel corrected standard errors.
+You need a minimum amount of time points, usually around 20 for PCSE to work correctly.
+
+---
+## Non-Continuous Year Coverage
+
+What if your data is bi-annual or only collected every four years – e.g. survey waves or election data?
+
+If we pool observations across those waves, the years in fact are not continuous but have gaps.
+
+In these cases FE vs RE gets some more complicated. 
+If we do not use FE which controls for omitted variable bias across years and units, 
+then we need to supplement RE with year-dummies.
+
+We can also not easily test if there is autocorrelation.
+
+---
+## Simultaneity Bias
+
+Simultaneity bias is introduced if we do not account for the fact that some effects unfold not immediately but slowly over time.
+- E.g., an increase in spending on active labor market programs does not lead in one and the same year to a reduction in unemployment. 
+Rather, it may take up to two or more years.
+
+To that end it is a common practice to lag an independent variable, 
+e.g. in cases of GDP measures, expenditure, unemployment, etc.
+
+One key theoretical challenge is to justify the lag structure. 
+Is it 1- year, 2-years, or even 5-years? 
+Depends on your variable of interest.
+
+You can get some information about this by observing the correlation 
+between your outcome variable with the predictor of interest for different lag values 
+(e.g. correlation between Y and Xt−1, Y and Xt−2, etc.).
+
+---
+## Lagging the DV
+
+Used when you understand the underlying process as dynamic, and if you expect that the current level of the DV is heavily determined by its past level (i.e. serial or autocorrelation is very strong).
+
+Pros:
+- Including the lagged DV will help you overcome omitted variable bias. 
+- You can account for autocorrelation.
+
+Cons:
+- Including the lagged DV will take out a lot of your variance and is likely to make your other DV's effects less significant (which means both make the βs smaller and the standard errors bigger). 
+  - In other words, we underestimate the true relationships at play.
+- However, what it will allow you to do is say that those IVs that still influence your outcome have an effect controlling for past value of the DV.
+
+---
+## Non-Continuous DV
+
+Also in the context of MLE and non-continuous DVs we can model the panel structure.
+
+---
+class: center, middle
+
+# Summary
+
+.pull-1[.circleon[![](https://www.club.cc.cmu.edu/~cmccabe/image/crazy_clock.jpg)]]
+.pull-1[.circleon[![](https://www.fabrikat.ch/media/catalog/product/cache/4/thumbnail/447x/9df78eab33525d08d6e5fb8d27136e95/r/o/rollins_leatherrip_hammer_9_1.jpg)]]
+.pull-1[.circleon[![](https://www.random.org/analysis/randbitmap-wamp.png)]]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>` "
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
