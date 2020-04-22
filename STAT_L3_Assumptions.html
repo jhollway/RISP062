@@ -58,7 +58,7 @@ An oft-cited assumption of OLS regression is that:
 &gt; The error term is normally distributed
 
 **Note there is no assumption or requirement that the _features_ or _response_ are normally distributed.**
-It is the conditional distribution y that should be normal.
+It is the conditional distribution *y* that should be normal.
 
 --
 
@@ -66,7 +66,9 @@ There is also another related (though rarely important) assumption:
 
 &gt; The error term has a population mean of zero
 
-If the error term did _not_ have a mean of zero (or very close to it), this would mean that we are systematically under or over predicting, which we call _bias_... and that is bad. 
+If the error term did _not_ have a mean of zero (or very close to it), 
+this would mean that we are systematically under or over predicting, 
+which we call _bias_... and that is bad. 
 It means our model is not correct on average. 
 We want only random error/noise left for the error term. 
 That's what we'll be mostly treating today.
@@ -584,7 +586,13 @@ tab_model(cath2, vcov.fun = "HC", vcov.type = "HC3", show.obs = F, show.r2 = F, 
 
 ???
 
+By default vcovHC() estimates a heteroskedasticity consistent (HC) variance covariance matrix for the parameters. 
+
+There are several ways to estimate such a HC matrix, and by default vcovHC() estimates the “HC3” one. 
+
 Note that STATA uses HC1 by default... but the `sandwich` package recommends HC3.
+
+You can refer to Zeileis (2004) for more details.
 
 ---
 
@@ -737,6 +745,7 @@ The `outliers` package provides useful functions to systematically extract outli
 
 
 ```r
+library(outliers)
 mean(swiss$Fertility)
 ```
 
@@ -1355,7 +1364,7 @@ of population parameters _if_ errors uncorrelated with equal variance and a mean
 
 ]
 
-If these assumptions hold true, OLS gives best possible estimates. 
+If these assumptions hold true, GM shows that, of all possible estimators which are linear functions of the dependent variable and unbiased, OLS has the lowest variance. 
 
 --
 
@@ -1501,6 +1510,17 @@ gvlma::gvlma(catha)
 ]
 
 ---
+## More cheating
+
+
+```r
+library(performance)
+check_model(catha)
+```
+
+&lt;img src="STAT_L3_Assumptions_files/figure-html/checkModel-1.png" width="504" /&gt;
+
+---
 class: center, middle
 # Summary
 
@@ -1527,6 +1547,7 @@ Why can’t we just use OLS?
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="libs/remark-latest.min.js"></script>
+<script src="macros.js"></script>
 <script>var slideshow = remark.create({
 "ratio": "16:9",
 "highlightStyle": "github",
@@ -1573,6 +1594,32 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
 // adds .remark-code-has-line-highlighted class to <pre> parent elements
 // of code chunks containing highlighted lines with class .remark-code-line-highlighted
 (function(d) {
@@ -1590,17 +1637,6 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
-
-<script>
-(function() {
-  var links = document.getElementsByTagName('a');
-  for (var i = 0; i < links.length; i++) {
-    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
-      links[i].target = '_blank';
-    }
-  }
-})();
-</script>
 
 <script>
 slideshow._releaseMath = function(el) {
