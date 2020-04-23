@@ -705,7 +705,10 @@ tab_model(cath2, vcov.fun = "CL", vcov.args = ~ Examination, show.obs = F, show.
 
 ???
 
-Similar to heteroskedasticity-robust standard errors, you want to allow more flexibility in your variance-covariance (VCV) matrix. 
+Similar to heteroskedasticity-robust standard errors, you want to allow more flexibility in your variance-covariance (VCV) matrix.
+
+Note that you want to think about clusters [theoretically](https://blogs.worldbank.org/impactevaluations/when-should-you-cluster-standard-errors-new-wisdom-econometrics-oracle),
+not just include them where they prove to make a difference.
 
 ---
 class: center, middle
