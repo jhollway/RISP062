@@ -1023,7 +1023,9 @@ What we see is that our adjusted `\(R^2\)` is much better for the LSDV, because 
 
 Another difference is the estimates for the dummy variables, but if we look closely, in our LSDV model, this is just estimates+intercept.
 
-Our estimate for our other variables are the same. 
+Our estimate for our other variables are the same.
+
+LSDV (regress with group dummies) and the fixed effects/Within estimator (regress with demeaned variables) are exactly the same. The Within estimator is just a computational trick for estimating the fixed effect.
 
 ---
 
@@ -1277,7 +1279,7 @@ tab_model(rei, res, rep, dv.labels = c("1","2","3"), rm.terms = "id [BEL,CAN,FIN
 
 `\(\sigma^2\)` is the residual variance
 
-`\(\partial_{01}\)` is the correlation between the intercepts and the coefficients
+`\(\varrho_{01}\)` is the correlation between the intercepts and the coefficients
 
 `\(ICC\)` is the *Intraclass Correlation Coefficient*, the ratio of the between-cluster variance to the total variance 
 
@@ -1303,8 +1305,8 @@ In the second model, we're adding random slopes for the effect of leftist partie
 And in the third model, we're adding time as an extra random slope.
 To suppress the random intercept, you would do (year - 1|...).
 
-If `\(\partial_{01}\)` is positive, it suggests that those groups with larger intercepts will have steeper slopes,
-whereas if `\(\partial_{01}\)` is negative, it suggests those groups with larger intercepts will have flatter slopes.
+If `\(\varrho_{01}\)` is positive, it suggests that those groups with larger intercepts will have steeper slopes,
+whereas if `\(\varrho_{01}\)` is negative, it suggests those groups with larger intercepts will have flatter slopes.
 
 The ICC can help determine whether a linear mixed model is even necessary.
 If the correlation were 0, then observations within clusters are no more similar than observations from different clusters,
