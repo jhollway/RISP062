@@ -1198,7 +1198,6 @@ Doesn't seem to be too much of a problem with multicollinearity here fortunately
 ]
 
 ---
-### 4. Visualising VIFs
 
 
 ```r
@@ -1206,7 +1205,7 @@ library(performance)
 plot(check_collinearity(lin_reg))
 ```
 
-&lt;img src="STAT_L2_Modelling_files/figure-html/vvif-1.png" width="504" /&gt;
+&lt;img src="STAT_L2_Modelling_files/figure-html/vvif-1.png" width="1008" /&gt;
 
 ---
 ## So what if there's multicollinearity?
@@ -1223,6 +1222,10 @@ _Imperfect but strong correlations_ in OLS models can be fit, but:
 - SEs will be high and it will be difficult to discern statistically significant results
 - estimates will be highly sensitive to particular sets of data
 - makes it more difficult to interpret regression coefficients since variables (kind of) move together
+
+???
+
+Multicollinearity even more of a problem under iterative estimation techniques because the little independent information makes it more difficult to find the most likely estimates
 
 ---
 ## Dealing with multicollinearity
@@ -1277,6 +1280,10 @@ To lessen the chance of, or amount of, overfitting, one can:
 ![](https://upload.wikimedia.org/wikipedia/commons/6/68/Overfitted_Data.png)
 
 ]
+
+---
+background-image: url(https://imgs.xkcd.com/comics/curve_fitting_2x.png)
+background-size: contain
 
 ---
 ### Adjusting R2
@@ -1514,6 +1521,63 @@ Often coupled with (mistaken) belief that _only_ statistically significant featu
 - __a lack of statistical significance does not mean definitely no effect; it just means we cannot reject the hypothesis that there is no effect__
 - sometimes just an ambiguous relationship, particular if nonlinear/endogeneity/multicollinearity
 - moreover, can lose valuable predictive information from deleting marginally significant variables
+
+---
+
+.pull-left[
+
+```r
+library(olsrr)
+model &lt;- lm(Fertility ~ ., data = swiss)
+ols_step_forward_aic(model)
+```
+
+```
+## 
+##                              Selection Summary                              
+## ---------------------------------------------------------------------------
+## Variable              AIC       Sum Sq       RSS        R-Sq      Adj. R-Sq 
+## ---------------------------------------------------------------------------
+## Education           348.422    3162.719    4015.236    0.44062      0.42818 
+## Catholic            337.564    4123.786    3054.169    0.57451      0.55517 
+## Infant.Mortality    328.668    4755.710    2422.245    0.66254      0.63900 
+## Agriculture         325.241    5019.885    2158.069    0.69935      0.67071 
+## ---------------------------------------------------------------------------
+```
+
+```r
+# ols_step_forward_aic(model, details = T)
+```
+]
+
+.pull-right[
+
+```r
+library(olsrr)
+model &lt;- lm(Fertility ~ ., data = swiss)
+ols_step_backward_aic(model)
+```
+
+```
+## 
+## 
+##                       Backward Elimination Summary                      
+## ----------------------------------------------------------------------
+## Variable         AIC        RSS        Sum Sq      R-Sq      Adj. R-Sq 
+## ----------------------------------------------------------------------
+## Full Model     326.072    2105.043    5072.912    0.70674      0.67097 
+## Examination    325.241    2158.069    5019.885    0.69935      0.67071 
+## ----------------------------------------------------------------------
+```
+
+```r
+# ols_step_backward_aic(model, details = T)
+```
+]
+
+???
+
+For more on `olsrr`'s stepwise functions, see [this link](https://olsrr.rsquaredacademy.com/articles/variable_selection.html).
 
 ---
 ### KISS
