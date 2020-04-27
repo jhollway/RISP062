@@ -879,7 +879,8 @@ The Wald test is a generalised version of the standard t-test.
 ---
 ### Information criteria
 
-The maximised likelihood, _L_, also serves as the basis for AIC and BIC, where _k_ is the number of estimated parameters in the fitted model:
+The maximised likelihood, _L_, also serves as the basis for AIC and BIC, 
+where _k_ is the number of estimated parameters in the fitted model:
 
 AIC
 
@@ -889,11 +890,37 @@ BIC
 
 $$  -2 \log L + k \log n  $$
 
-- Neither are meaningful on their own, only in comparison to other models _on the exact same data_.
-- For both of these information criteria, smaller values are "better".
-- Both AIC and BIC penalise models for greater complexity, unlike LR and other such tests.
-- BIC imposes a higher penalty so long a \\(n ≥ 8\\)
-- AIC even has a version with greater penalisation, the AICc.
+A lower score indicates a more parsimonious model, 
+relative to a model fit with a higher AIC.
+
+Since it is a relative measure of model parsimony, 
+it is only meaningful if we compare the AIC for alternate hypotheses (i.e. different model specifications).
+
+We can compare non-nested models. For instance, we could compare a
+linear to a non-linear model.
+
+Neither are meaningful on their own, only in comparison to other models _on the exact same data_.
+The comparisons are only valid for models that are fit to the same response
+data (ie values of y).
+
+Model selection conducted with the AIC will choose the same model as
+leave-one-out cross validation (where we leave out one data point
+and fit the model, then evaluate its fit to that point) for large
+sample sizes.
+
+You shouldn’t compare too many models with the AIC. You will run
+into the same problems with multiple model comparison as you would
+with p-values, in that you might by chance find a model with the
+lowest AIC, that isn’t truly the most appropriate model.
+
+When using the AIC you might end up with multiple models that
+perform similarly to each other. So you have similar evidence
+weights for different alternate hypotheses.
+
+Both AIC and BIC penalise models for greater complexity, unlike LR and other such tests.
+BIC imposes a higher penalty so long a \\(n ≥ 8\\).
+You should correct for small sample sizes if you use the AIC with
+small sample sizes, by using the AICc statistic.
 
 ---
 ## What if L is wrong?
@@ -993,6 +1020,7 @@ Try to digest all this a bit before next week...
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="libs/remark-latest.min.js"></script>
+<script src="macros.js"></script>
 <script>var slideshow = remark.create({
 "ratio": "16:9",
 "highlightStyle": "github",
@@ -1039,6 +1067,32 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
 // adds .remark-code-has-line-highlighted class to <pre> parent elements
 // of code chunks containing highlighted lines with class .remark-code-line-highlighted
 (function(d) {
@@ -1056,17 +1110,6 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
-
-<script>
-(function() {
-  var links = document.getElementsByTagName('a');
-  for (var i = 0; i < links.length; i++) {
-    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
-      links[i].target = '_blank';
-    }
-  }
-})();
-</script>
 
 <script>
 slideshow._releaseMath = function(el) {
