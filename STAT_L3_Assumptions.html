@@ -1400,6 +1400,51 @@ Efficiency is a statistical concept that compares the quality of the estimates c
 Another benefit of satisfying these assumptions is that as the sample size increases to infinity, the coefficient estimates converge on the actual population parameters.
 
 ---
+
+.pull-left[
+
+### A bit more on the Gauss-Markov Theorem
+
+Suppose, we have the following regression model `\(Y= b_{0} + b_{1} X\)`.
+Let’s start with shortly repeating how the point estimator for `\(b_{0}\)` and `\(b_{1}\)` looks like and how we can obtain the variance of the for the two coefficients:
+
+`$$b_{1}=\frac{\sum(\textbf{X}_{i}-\bar{\textbf{X}})(\textbf{Y}_{i}-\bar{\textbf{Y}})}{\sum(\textbf{X}_{i}-\bar{\textbf{X}})^{2}} = \sum \textbf{k}_{i}\textbf{Y}_{i}, \textbf{k}_{i}=\frac{(\textbf{X}_{i}-\bar{\textbf{X}})}{\sum(\textbf{X}_{i}-\bar{\textbf{X}})^{2}}$$`
+
+`$$b_{0}=\bar{Y}-b_{1}\bar{\textbf{X}}$$`
+
+The variance of `\(b_{1}\)` can be obtained the following way:
+
+`$$\sigma^{2}(b_{1})=\sigma^{2}(\sum \textbf{k}_{i}\textbf{Y}_{i})=\sum \textbf{k}_{i}^{2} \sigma^{2}(\textbf{Y}_{i})=\sigma^{2}(\frac{1}{\sum(\textbf{X}_{i}-\bar{\textbf{X}})^{2}})$$`
+
+]
+
+.pull-right[
+
+Now, the Gauss-Markov Theorem is telling us that if its conditions are met, then `\(b_{1}\)` has the lowest variance among all unbiased linear estimators of the following form: `\(\hat{\beta}_{1} = \sum c_{i}Y_{i}\)`
+
+Hence, the estimator must be unbiased. Given the assumption of unbiasedness we know that `\(E(\hat{\beta}_{1}) =\beta_{1}\)`. Let’s have a closer look:
+
+`$$\begin{aligned}
+E(\hat{\beta}_{1}) &amp; = \sum c_{i}E(Y_{i})\\
+&amp; = \sum c_{i}E(\beta_{0}+\beta_{1}\textbf{X}_{i})\\
+&amp; = \beta_{0} \sum c_{i} + \beta_{1} \sum c_{i} \textbf{X}_{i} = \beta_{1}\\
+&amp; =\beta_{1}\\
+\end{aligned}$$`
+
+If it holds that `\(E(\hat{\beta}_{1}) =\beta_{1}\)`, we know that `\(c_{i}\)` must have certain properties/characteristics, i.e. it means that the assumption of unbiasedness imposes some restrictions on the `\(c_{i}\)`. 
+So ultimately, the Gauss-Markov Theorem puts restictions on `\(c_{i}\)`.
+
+]
+
+???
+
+The Gauss-Markov Theorem is a central theorem for linear regression models that states different conditions that, when met, ensure that your estimator has the lowest variance among all unbiased estimators. 
+
+More formally, the Gauss-Markov Theorem tells us that in a regression model, where the expected value of our error terms is zero, i.e. `\(E(\epsilon_{i}) = 0\)`, and the variance of the error terms is constant and finite, i.e. `\(\sigma^{2}(\epsilon_{i}) = \sigma^{2} &lt; \infty\)` and, `\(\epsilon_{i}\)` and `\(\epsilon_{j}\)` are uncorrelated for all `\(i\)` and `\(j\)` the least squares estimator `\(b_{0}\)` and `\(b_{1}\)` are unbiased and have minimum variance among all unbiased linear estimators. However, note that there might exist biased estimator that have a lower variance.
+
+In case you have not undestood everything, no worries. You can find the exact proof of the Gauss-Markov Theorem [here](https://economictheoryblog.com/2016/02/05/proof-gauss-markov-theorem/).
+
+---
 ## Now for the cheat sheet...
 
 .pull-left-1[
@@ -1454,8 +1499,6 @@ Ok, (of course) our assumptions are not satisfied.
 In fact, all of them are issues here with our simplest model.
 
 Three of the assumptions are not satisfied. This is probably because we have only 50 data points in the data and having even 2 or 3 outliers can impact the quality of the model. So the immediate approach to address this is to remove those outliers and re-build the model. Take a look at the diagnostic plot below to arrive at your own conclusion.
-
-
 
 From the above plot the data points: 23, 35 and 49 are marked as outliers. Lets remove them from the data and re-build the model.
 
