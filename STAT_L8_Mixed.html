@@ -861,6 +861,8 @@ To come back to the Simpson paradox, the OLS was telling us that vote for leftis
 &lt;!-- ] --&gt;
 
 ---
+## Within estimator
+
 .pull-left[
 
 For large datasets, an alternative is to simply leave the intercept in and then the first country (Australia) is the baseline.
@@ -1021,9 +1023,7 @@ Now, the regression output actually does report a constant here, which is simply
 
 What we see is that our adjusted `\(R^2\)` is much better for the LSDV, because with LSDV we are interested in the variance overall, while with our within-estimation model explains only the variance within a single unit/country. 
 
-Another difference is the estimates for the dummy variables, but if we look closely, in our LSDV model, this is just estimates+intercept.
-
-Our estimate for our other variables are the same.
+Another difference is the estimates for the dummy variables, but if we look closely, in our LSDV model, this is just estimates+intercept. Our estimate for our other variables are the same.
 
 LSDV (regress with group dummies) and the fixed effects/Within estimator (regress with demeaned variables) are exactly the same. The Within estimator is just a computational trick for estimating the fixed effect.
 
@@ -1092,11 +1092,64 @@ we want to estimate error terms `\(u_i\)` and `\(e_{it}\)` which together consti
 
 ???
 
+A “fixed variable” is one that is assumed to be measured without error. It is also assumed that the values of a fixed variable in one study are the same as the values of the fixed variable in another study. “Random variables” are assumed to be values that are drawn from a larger population of values and thus will represent them. You can think of the values of random variables as representing a random sample of all possible values or instances of that variable. Thus, we expect to generalize the results obtained with a random variable to all other possible instances of that value (e.g., a job candidate with a strong résumé). Most of the time in ANOVA and regression analysis we assume the independent variables are fixed.
+
+The terms “random” and “fixed” are used in the context of ANOVA and regression models and refer to a certain type of statistical model. Almost always, researchers use fixed effects regression or ANOVA and they are rarely faced with a situation involving random effects analyses. A fixed-effects ANOVA refers to assumptions about the independent variable and that error distribution for the variable. An experimental design is the easiest example for illustrating the principal. Usually, the researcher is interested in only generalizing the results to experimental values used in the study. For instance, a drug study might use 0 mg, 5 mg, and 10 mg of an experimental drug. This is a circumstance when a fixed effects ANOVA would be appropriate. In this example, the extrapolation is to other studies or treatments that might use the same values of the drug (i.e., 0 mg, 5 mg, and 10 mg). However, if the researcher wants to make inferences beyond the particular values of the independent variable used in the study, a random effects model is used. A common example would be the use of public art works representing low, moderate, and high abstractness (e.g., statue of a war hero vs. a pivoting geometric design). The researcher would like to make inferences beyond just one art piece representing each category of abstractness, so the art pieces are conceptualized as pieces randomly drawn from a larger universe of possible pieces that are sampled from the domain for that level of abstractness. For example, one could imagine using several instances of high abstract pieces that are randomly drawn from a larger population of high abstract pieces and are thought to be only a few of the possible particular instances of high abstract art. Thus, the inferences are made to a larger universe of art works with variations of abstractness within each category. Such a generalization is more of an inferential leap, and, consequently, the random effects model is less powerful because we are taking into account some additional expected random variation on the independent variable. Random effects models are sometimes referred to as “Model II” or “variance component models.” Analyses using both fixed and random effects are called “mixed models” or "mixed effects models" which is one of the terms given to multilevel models.
+
 So in the example for today, one could think that the political system and the unionization covary with the our composite error term which includes both the specificities of the countries themselves and the action of time.
 
 The random effects will create more bias but less variance, which could lead to the estimate being closer to the real parameter value. 
 
 A way to think about RE is to see them in-between FE and pooled OLS. The lambda is partly demeaning the data but not completely. We are taking off a fraction of the time demeaned values. 
+
+---
+### Understanding fixed and random effects models
+
+#### Fixed effects models
+
+.small[In fixed-effects models (e.g., regression, ANOVA, generalized linear models), there is only one source of random variability: the random sample we take to measure our variables.
+- e.g. patients in a health facility, with measures of their medical history to estimate their probability of recovery
+- e.g. individual students in a school system, with demographic information to predict their grade point averages
+
+We call the variability across individuals’ “residual” variance (in linear models, this is the estimate of `\(\sigma^2\)`, also called the mean squared error). It’s the variability that was unexplained by the predictors in the model (the fixed effects).]
+
+#### Mixed effects models (with random effects)
+
+.small[Mixed effects models—whether linear or generalized linear—are different in that there is more than one source of random variability in the data.
+- e.g. in addition to patients, there may also be random variability across the doctors of those patients
+- e.g. in addition to students, there may be random variability from the teachers of those students.
+
+Some doctors’ patients may have a greater probability of recovery, and others may have a lower probability, even after we have accounted for the doctors’ experience and other measurable traits. Some teachers’ students will have higher GPAs than other teachers’ students, even after we account for teaching methods.]
+
+???
+
+#### Random Effects: Intercepts and Slopes
+
+We account for these differences through the incorporation of random effects. Random intercepts allow the outcome to be higher or lower for each doctor or teacher; random slopes allow fixed effects to vary for each doctor or teacher.
+
+What do these random effects mean? How do we interpret them? We usually talk about them in terms of their variability, instead of focusing on them individually.
+
+Using the patient/doctor data as an example, this allows us to make “broad level” inferences about the larger population of patients, which do not depend on a particular doctor. In other words, we can now incorporate (instead of ignore) doctor-to-doctor variability in patient recovery, and improve our ability to describe how fixed effects relate to outcomes.
+
+#### Variance of Random Effects
+
+We can also talk directly about the variability of random effects, similar to how we talk about residual variance in linear models.
+
+There is no general measure of whether variability is large or small, but subject-matter experts can consider standard deviations of random effects relative to the outcomes.
+
+For example, if teacher-averaged GPAs only vary from the overall average with an SD of 0.02 GPA points, the teachers may be considered rather uniform; however, if teacher-averaged GPAs varied from the overall average with an SD of 0.5 GPA points, it would seem as if individual teachers could make a large difference in their students’ success.
+
+(For an additional way to look at variability in linear mixed effects models, check out Karen’s blog post on ICC here.)
+
+#### Individual random effects
+
+Finally, we can talk about individual random effects, although we usually don’t.  This was not the original purpose of mixed effects models, although it has turned out to be useful in certain applications. Software programs do provide access to the random effects (best linear unbiased predictors, or BLUPs) associated with each of the random subjects.
+
+BLUPs are the differences between the intercept for each random subject and the overall intercept (or slope for each random subject and the overall slope). In some software, such as SAS, these are accompanied by standard errors, t-tests, and p-values.
+
+In the case of the patient/doctor data set (assuming no random slopes for easier interpretation), a small p-value for an individual doctor’s random intercept would indicate that the doctor’s typical patient recovery probability is significantly different from an average doctor’s typical patient recovery probability.
+
+These standard errors and p-values are adjusted so that they account for all of the fixed effects in the model as well as the random variability among patients. Clearly, this information could be of interest to the doctor’s place of work, or to a patient who is choosing a doctor.
 
 ---
 ## RE assumptions
@@ -1733,6 +1786,19 @@ effects. It basically tests whether the unique errors `\(u_i\)` are correlated w
 the null hypothesis is they are not.
 
 ---
+### Hausman test
+
+More formally, we can test whether a fixed or random effects model is appropriate using a Durbin–Wu–Hausman test.
+
+`$$H_0: \alpha_i \perp X_{it}, Z_i$$`
+
+`$$H_0: \alpha_i \not\perp X_{it}, Z_i$$`
+
+If `\(H_{0}\)` is true, both `\(\widehat {\beta }_{{RE}}\)` and `\(\widehat {\beta }_{{FE}}\)` are consistent, 
+but only `\(\widehat {\beta }_{{RE}}\)` is efficient. 
+If `\(H_{{a}}\)` is true, `\(\widehat {\beta }_{{FE}}\)` is consistent and `\(\widehat {\beta }_{{RE}}\)` is not.
+
+---
 
 .tiny[
 
@@ -1913,6 +1979,8 @@ and really deserve their own course...
 ???
 
 For more, please see Snijders and Bosker (1999).
+
+Some good introductions to multilevel modelling with R more generally are [here](https://data.princeton.edu/pop510/lang1) and [here](https://data.princeton.edu/pop510/egm).
 
 ---
 class: center, middle
