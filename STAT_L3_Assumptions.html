@@ -309,14 +309,14 @@ ols_test_normality(cathe)
 ---
 class: center, middle
 
-# Heteroscedasticity
+# Heteroskedasticity
 
 .pull-1[.circleoff[![](https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcTc5EWzkqd2tomQAKz3aV9rA-Fk_IKD623ZsLLr76-tfkI9Ienf)]]
 .pull-1[.circleon[![](https://api.time.com/wp-content/uploads/2019/11/icecream.jpg?w=800&amp;quality=85)]]
 .pull-1[.circleoff[![](https://thumbs.dreamstime.com/b/isometric-businessman-walking-to-different-way-other-people-think-stand-out-crowd-unique-concept-68511039.jpg)]]
 
 ---
-## Defining heteroscedasticity
+## Defining heteroskedasticity
 
 A more important assumption is that 
 
@@ -334,12 +334,12 @@ If Y is more variable at some levels of X than others, we call this _het-e-ro-sc
 
 .pull-left[
 
-## Diagnosing heteroscedasticity
+## Diagnosing heteroskedasticity
 
 
 ### 1. Interrogate residual plots
 
-Easiest way to see if residuals are homoscedastic is to look at a plot,
+Easiest way to see if residuals are homoskedastic is to look at a plot,
 our old friend "residuals vs fitted".
 
 No longer looking for a bow shape, but a cone shape.
@@ -379,7 +379,7 @@ A standardized residual is a ratio: The difference between the observed count an
 ### 2. Breusch-Pagan test
 
 The _Breusch-Pagan_ tests the null hypothesis that the variance of the residuals is homogenous.
-A p-value below a certain level (like 0.05) indicates we should reject the null in favor of heteroscedasticity.
+A p-value below a certain level (like 0.05) indicates we should reject the null in favor of heteroskedasticity.
 
 .pull-left[
 
@@ -397,7 +397,7 @@ bptest(cath2, data = swiss, studentize = TRUE)
 ## BP = 13.363, df = 2, p-value = 0.001254
 ```
 
-The results indicate that the assumption is not satisfied and we should reject hypothesis of homoscedasticity.
+The results indicate that the assumption is not satisfied and we should reject hypothesis of homoskedasticity.
 
 ]
 .pull-right[
@@ -415,7 +415,7 @@ bptest(cathe, data = swiss, studentize = TRUE)
 ## BP = 3.134, df = 2, p-value = 0.2087
 ```
 
-This is better, the condition of homoscedasticity can be accepted.
+This is better, the condition of homoskedasticity can be accepted.
 
 ]
 
@@ -424,33 +424,33 @@ This is better, the condition of homoscedasticity can be accepted.
 Note there is also another test, the _Goldfeld-Quandt test_, but _Breusch-Pagan_ is generally better.
 
 ---
-## So what if there's heteroscedasticity?
+## So what if there's heteroskedasticity?
 
 Unfortunately, **this matters**.
 
-If residuals more spread out for some values of X than others (heteroscedasticity), standard errors will not be correct.
+If residuals more spread out for some values of X than others (heteroskedasticity), standard errors will not be correct.
 
 This impacts the precision of the estimates, resulting in confidence intervals that are too wide/narrow, as well as potentially messing with out-of-sample predictions.
 
-Another effect of heteroscedasticity might be putting too much weight to a subset of the data when estimating coefficients: the subset in which the error variance was largest.
+Another effect of heteroskedasticity might be putting too much weight to a subset of the data when estimating coefficients: the subset in which the error variance was largest.
 
 If you don’t treat this, you could have results which look statistically significant but are not.
 
 ---
-## Dealing with heteroscedasticity
+## Dealing with heteroskedasticity
 
 ### 1. Deflate time series
 
-Sometimes the heteroscedasticity is due to the effects of time.
+Sometimes the heteroskedasticity is due to the effects of time.
 
 E.g. if dependent variable relates to money, then need to manage inflation somehow on the variable.
 
-Can do this by normalising the variable, or using using ARCH (auto-regressive conditional heteroscedasticity) models to model the error variance.
+Can do this by normalising the variable, or using using ARCH (auto-regressive conditional heteroskedasticity) models to model the error variance.
 
 ---
 ### 2. Log transform dependent variable
 
-If variance in residuals are increasing with regression predictions, taking the log of dependent and/or independent variables may eliminate heteroscedasticity.
+If variance in residuals are increasing with regression predictions, taking the log of dependent and/or independent variables may eliminate heteroskedasticity.
 
 Note that if you have logs on both sides (LHS, RHS) of the equation, a 'log-log model', you are dealing with _elasticities_:
 how a percentage change in x affects the percentage change in y.
@@ -479,11 +479,11 @@ With a log transformed variable, you cannot simply take the exponent of the mean
 .pull-left-1[
 ### 3. Robust standard errors
 
-A popular way to treat heteroscedasticity is using _robust standard errors_.
+A popular way to treat heteroskedasticity is using _robust standard errors_.
 
 Most table packages allow you to report robust standard errors by manipulating the variance-covariance (VCV) matrix. 
 
-Heteroscedastic-consistent errors are generally larger than normal standard errors, and compensate for how at some levels of X there is more variation. 
+Heteroskedastic-consistent errors are generally larger than normal standard errors, and compensate for how at some levels of X there is more variation. 
 
 Because they offer a more conservative estimate, they are by now standard practice (like always opting for two-tailed t-test).
 
@@ -599,7 +599,7 @@ You can refer to Zeileis (2004) for more details.
 .pull-left-1[
 ### 4. Clustering
 
-Lastly, heteroscedasticity can also be explained by data clustering by actor, geographical location, country, etc.
+Lastly, heteroskedasticity can also be explained by data clustering by actor, geographical location, country, etc.
 
 That is, there might be a bunch of covariance structures that vary by a certain characteristic – a “cluster” – but are homoskedastic within each cluster. 
 
@@ -934,7 +934,7 @@ ols_plot_dfbetas(cath)
 ]
 
 ---
-### Distance vs. Leverage
+#### Distance vs. Leverage
 
 
 ```r
@@ -998,6 +998,35 @@ influence.measures(cath)
 - Figure (a): Outlier without influence. Although its Y value is unusual given its X value, it has little influence on the regression line because it is in the middle of the X range
 - Figure (b) High leverage because it has a high value of X. However, because its value of Y puts it in line with the general pattern of the data it has no influence.
 - Figure (c): Combination of discrepancy (unusual Y value) and leverage (unusual X value) results in strong influence. When this case is deleted both the slope and intercept change dramatically.
+
+---
+
+.pull-left[
+### 5. Overview of Outliers (O3)
+
+Lastly, we can also try different sets of variables to see whether there are outliers.
+
+```r
+library(OutliersO3)
+s1 &lt;- O3prep(swiss)
+O3plotT(s1)$gO3
+```
+
+&lt;img src="STAT_L3_Assumptions_files/figure-html/o31-1.png" width="504" /&gt;
+]
+
+.pull-right[
+Six methods from other R packages are included.
+
+```r
+s1 &lt;- O3prep(swiss, 
+             method=c("HDo", "PCS", "BAC", "adjOut", "DDC", "MCD"), 
+             tolHDo=0.05, tolPCS=0.05, tolBAC=0.05, toladj=0.05, tolDDC=0.05, tolMCD=0.05)
+O3plotM(s1)$gO3
+```
+
+&lt;img src="STAT_L3_Assumptions_files/figure-html/o32-1.png" width="504" /&gt;
+]
 
 ---
 ## So what if there are outliers?
@@ -1089,6 +1118,8 @@ First, you may find outliers but decide for theoretical or methodological reason
 
 For example, while they might be high distance or even high leverage observations, perhaps you might expect such outliers to happen sometimes within the data-generating process and so you want to retain them in the training data.
 
+Maybe you recognise that the outliers are the story and you just want to [highlight them visually](https://flowingdata.com/2018/03/07/visualizing-outliers/).
+
 --
 
 Or perhaps you decide that the problem is not the data but the model.
@@ -1137,7 +1168,7 @@ library(MASS)
 cathr &lt;- rlm(Fertility ~ Catholic, swiss)
 ```
 
-Use robust standard errors when heteroscedasticity; use robust regression when high leverage observations.
+Use robust standard errors when heteroskedasticity; use robust regression when high leverage observations.
 
 .pull-left-2[
 
@@ -1332,7 +1363,7 @@ See also least trimmed squares using `ltsReg()` in the `robustbase` package
 
 **Errors**
   1. *Normality Around Zero*
-  1. *Homoscedasticity*
+  1. *Homoskedasticity*
   1. *No Outliers*
 ]
 
@@ -1340,7 +1371,7 @@ See also least trimmed squares using `ltsReg()` in the `robustbase` package
 
 .pull-right[
 
-NB: When errors homoscedastic and no autocorrelation, statisticians call them _spherical errors_.
+NB: When errors homoskedastic and no autocorrelation, statisticians call them _spherical errors_.
 
 The _Gauss-Markov Theorem_ states OLS is the
   - &lt;span style="color:blue"&gt;B&lt;/span&gt;est (minimizes variance)
