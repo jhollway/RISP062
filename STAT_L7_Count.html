@@ -152,6 +152,9 @@ This makes using OLS on event counts a bad idea (King 1988) because it yields es
 
 ???
 
+One obvious reason for not regressing directly against fatalities is that (in our example) fatalities is restricted to be non-negative, a restraint that linear regression can’t enforce. 
+Other reasons include the wide distribution of values and the relative or multiplicative structure of errors on outcomes. 
+
 More on the last thing in a bit...
 
 ---
@@ -648,6 +651,16 @@ Now it looks like GDP per capita is no longer significant (as we thought), but l
 Note that exposure only really matters if:
 - observations have very different exposure, and/or
 - observations have different proportions of exposure
+
+---
+### A bit more on link functions and data transforms
+
+But even among those who recognise that to use OLS here could be an issue,
+there is disagreement about which is the appropriate approach.
+
+Poisson regression is unbiased and calibrated: it preserves the conditional expectations and rollups of the training data. A calibrated model is important in many applications.
+
+Regressing against the log of the outcome will not be calibrated; however it has the advantage that the resulting model will have lower relative error than a Poisson regression against fatalities. Minimizing relative error is appropriate in situations when differences are naturally expressed in percentages rather than in absolute amounts.
 
 ---
 class: center, middle
