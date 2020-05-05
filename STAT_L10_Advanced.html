@@ -569,7 +569,9 @@ What follows is a necessarily incomplete, partial, and probably quite biased lis
 But I want to give you a sense of some different models and what they are good for,
 so that you have some threads to follow if you decide to learn more.
 
-.center[![](https://storage.ning.com/topology/rest/1.0/file/get/2808328386?profile=original)]
+Why is this necessary?
+- knowing what methods are out there can help you decide whether and how you can answer the research question you have
+- perhaps more importantly, knowing what methods are out there can inspire you to consider a research question you hadn't yet considered
 
 ---
 ## 1. Linear Regression
@@ -1413,7 +1415,7 @@ Perhaps in psychology, but more difficult in political science, economics, and s
 - often most important hypotheses could never have been formulated ahead of time; you need to see the data first, e.g. recognising potential non-linearities that suggest interactions
 
 ---
-### Monferroni correction
+### MBnferroni correction
 
 Methods for dealing with multiple testing frequently call for adjusting `\(\alpha\)` in some way, 
 so that the probability of observing at least one significant result due to chance remains below your desired significance level.
@@ -1523,33 +1525,12 @@ background-image: url(https://pbs.twimg.com/media/D85MmnMUYAAAEGk?format=jpg&amp
 background-size: contain
 
 ---
-## Choosing the correct regression model 
+## Choosing the right model 
 
-As much a science as it is an art. Statistical methods can help point you in the right direction but ultimately you’ll need to incorporate other considerations.
+As much a science as it is an art. 
+Statistical methods can help point you in the right direction ...
 
-### Theory
-
-Research what others have done and incorporate those findings into constructing your model. Before beginning the regression analysis, develop an idea of what the important variables are along with their relationships, coefficient signs, and effect magnitudes. Building on the results of others makes it easier both to collect the correct data and to specify the best regression model without the need for data mining.
-
-Theoretical considerations should not be discarded based solely on statistical measures. After you fit your model, determine whether it aligns with theory and possibly make adjustments. For example, based on theory, you might include a predictor in the model even if its p-value is not significant. If any of the coefficient signs contradict theory, investigate and either change your model or explain the inconsistency.
-
-### Complexity
-
-You might think that complex problems require complex models, but many studies show that simpler models generally produce more precise predictions. Given several models with similar explanatory ability, the simplest is most likely to be the best choice. Start simple, and only make the model more complex as needed. The more complex you make your model, the more likely it is that you are tailoring the model to your dataset specifically, and generalizability suffers.
-
-Verify that added complexity actually produces narrower prediction intervals. Check the predicted R-squared and don’t mindlessly chase a high regular R-squared!
-
-### Residual Plots
-
-As you evaluate models, check the residual plots because they can help you avoid inadequate models and help you adjust your model for better results. For example, the bias in underspecified models can show up as patterns in the residuals, such as the need to model curvature. The simplest model that produces random residuals is a good candidate for being a relatively precise and unbiased model.
-
-In the end, no single measure can tell you which model is the best. Statistical methods don't understand the underlying process or subject-area. Your knowledge is a crucial part of the process!
-
----
-## Statisticsal Modelling
-Why is this necessary?
-- knowing what methods are out there can help you decide whether and how you can answer the research question you have
-- perhaps more importantly, knowing what methods are out there can inspire you to consider a research question you hadn't yet considered
+### Data
 
 In some cases, your model choice will be dictated by the type and/or distribution of the dependent variable,
 or, less commonly, the independent variables.
@@ -1559,35 +1540,78 @@ or discrete, non-negative DVs could be modelled with a Poisson regression.
 If the relationship is more difficult, perhaps because there is multicollinearity, a lack of theory, or outliers,
 you might want to use a more robust or regularised form of regression.
 
-More importantly, you will make your choice based on the research question that you have.
-You will see that most of the above models are adapted for particular questions and have particular illustrative cases.
-However, *being familiar with more methods allows you to see more potential research questions as potentially answerable*.
-For example, how can we think of different ways to specify the `swiss` dataset to ask slightly different questions?
-Maybe some of them are more interesting than if we just stuck to the original data given.
+.center[![](https://storage.ning.com/topology/rest/1.0/file/get/2808328386?profile=original)]
 
-The final consideration is the state of the literature to which you are speaking.
+But ultimately you’ll need to incorporate other considerations.
+
+---
+### Residuals
+
+As you evaluate models, check the residual plots because they can help you avoid inadequate models and help you adjust your model for better results. 
+For example, the bias in underspecified models can show up as patterns in the residuals, such as the need to model curvature. 
+The simplest model that produces random residuals is a good candidate for being a relatively precise and unbiased model.
+
+In the end, no single measure can tell you which model is the best. 
+Statistical methods don't understand the underlying process or subject-area. 
+Your knowledge is a crucial part of the process!
+
+---
+### Convention
+
+The next consideration is the state of the literature to which you are speaking.
 There is an argument to be made for sticking with whatever models are conventional in your field.
 After all, you cannot fight all battles all at once with reviewers.
 Try to manage the degrees of innovation in each paper/chapter.
 However, in some cases your point is that the literature have missed something
 or come to the wrong conclusions, and this can be supported by some small methodological innovation.
 
+--
+### Complexity
+
+You might think that complex problems require complex models, but many studies show that simpler models generally produce more precise predictions. 
+Given several models with similar explanatory ability, the simplest is most likely to be the best choice. 
+Start simple, and only make the model more complex as needed. 
+The more complex you make your model, the more likely it is that you are tailoring the model to your dataset specifically, and generalizability suffers.
+
+Verify that added complexity actually produces narrower prediction intervals. 
+Check the predicted R-squared and don’t mindlessly chase a high regular R-squared!
+
+---
+### Question
+
+More importantly, you will make your choice based on the research question that you have.
+You will see that most of the above models are adapted for particular questions and have particular illustrative cases.
+However, *being familiar with more methods allows you to see more potential research questions as potentially answerable*.
+For example, how can we think of different ways to specify the `swiss` dataset to ask slightly different questions?
+Maybe some of them are more interesting than if we just stuck to the original data given.
 
 --
-c## The ABCs of stats
+### Theory
 
-Attend to the details
+Research what others have done and incorporate those findings into constructing your model. 
+Before beginning the regression analysis, develop an idea of what the important variables are along with their relationships, coefficient signs, and effect magnitudes. 
+Building on the results of others makes it easier both to collect the correct data and to specify the best regression model without the need for data mining.
+
+Theoretical considerations should not be discarded based solely on statistical measures. 
+After you fit your model, determine whether it aligns with theory and possibly make adjustments. 
+For example, based on theory, you might include a predictor in the model even if its p-value is not significant. 
+If any of the coefficient signs contradict theory, investigate and either change your model or explain the inconsistency.
+
+---
+## The ABCs of stats
+
+.red[A]ttend to the details
 - Trends and patterns are important, but so are outliers,
 missing data points, and inconsistencies
 
-Be conservative, cautious and careful
+.red[B]e conservative, cautious and careful
 - Always a possibility you are wrong, don’t blind yourself to biases, measurement error etc by an agenda
 
-Contextualise
+.red[C]ontextualise
 - Place your analysis into the bigger picture, look behind and around the data to inform your interpretation
 
 ---
-lass: left, middle
+class: left, middle
 
 .blockquote[It is easy to lie with statistics, but easier without them.
 
