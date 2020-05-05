@@ -1,0 +1,22 @@
+unnamed-chunk-1	data	swiss
+setup	::	$	library	options	theme_minimal	theme_set
+suisse	[<-	data	nrow	sample	swiss
+nomit	library	lm	na.omit	suisse	tab_model	~
+vomit	library	lm	suisse	tab_model	~
+mean	$	::	cbind	library	mean	median	suisse	tail
+accuracy	$	T	is.na	length	library	mean	regr.eval	rep	suisse	swiss
+knn	!	$	anyNA	is.na	knnImputation	library	names	regr.eval	suisse	swiss
+rpart	!	%>%	>	~	$	as_factor	Catholic	if_else	is.na	library	mutate	na.omit	rpart
+mice	!	!=	$	complete	F	is.na	library	mean	mice	names	regr.eval	suisse	swiss
+quantreg	~	cbind	coef	library	rq	swiss
+ridge	^	$	$<-	as.matrix	cv.glmnet	library	predict	seq
+lasso	^	$	as.matrix	cv.glmnet	predict	seq	X	y
+elastic	^	$	as.matrix	cbind	cv.glmnet	lasso_coeff	predict	ridge_coeff	seq	X	y
+pcr	~	library	pcr	predict	summary	swiss	validationplot
+pls	$	library	plsreg1	X
+mdpattern	T	library	md.pattern	suisse
+missmap	library	missmap	suisse
+pbox	T	library	pbox	suisse
+rpartcheck	!=	$	anova_mod	apply	as.factor	class_mod	colnames	is.na	mean	predict	regr.eval	suisse	swiss	which.max
+quantreg2	~	coef	plot	rq	seq	swiss
+quantregplot	~	plot	rq	seq	swiss

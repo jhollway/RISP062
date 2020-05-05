@@ -1,0 +1,22 @@
+unnamed-chunk-1	toy
+setup	old
+suisse	suisse
+nomit	
+vomit	
+mean	
+accuracy	actuals	predicteds
+knn	actuals	knnOutput	predicteds
+rpart	anova_mod	class_mod	suisse	swiss
+mice	actuals	miceOutput	predicteds
+quantreg	model1	model2
+ridge	model	ridge_coeff	swiss	X	y
+lasso	lasso_coeff	model
+elastic	en_coeff	model
+pcr	pcr_model	pred
+pls	pls.model
+mdpattern	
+missmap	
+pbox	
+rpartcheck	actuals	predicteds	reli_pred
+quantreg2	model2	model3
+quantregplot	model3

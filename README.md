@@ -21,4 +21,6 @@ The course lecture materials are hosted at https://jhollway.github.io/statsII/
 
 [Lecture 8](https://jhollway.github.io/statsII/STAT_L8_Mixed.html)
 
-[Lecture 8](https://jhollway.github.io/statsII/STAT_L9_Survival.pdf)
+[Lecture 9](https://jhollway.github.io/statsII/STAT_L9_Survival.pdf)
+
+[Lecture 10](https://jhollway.github.io/statsII/STAT_L10_Advanced.html)

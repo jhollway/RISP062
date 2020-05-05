@@ -1,0 +1,1720 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Statistics for International Relations Research II</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="James Hollway" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://raw.githack.com/jhollway/iheidmyninja/master/iheid-xaringan-style.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Statistics for International Relations Research II
+## Robust Choices
+### <large>James Hollway</large>
+
+---
+
+class: center, middle
+
+.pull-1[.circleon[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.stack.imgur.com%2FLagXU.png&amp;f=1&amp;nofb=1)]]
+.pull-1[.circleon[![](https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Weibull_PDF.svg/325px-Weibull_PDF.svg.png)]]
+.pull-1[.circleon[![](https://img.scoop.it/l_1shTA8p3OoqsS2D_mQajl72eJkfbmt4t8yenImKBVvK0kTmF0xjctABnaLJIm9)]]
+
+
+
+???
+
+Last week, you learned about hazard and survival rates,
+the Kaplan-Meier estimator,
+the Weibull parametric model,
+and the Cox proportional hazards model.
+
+---
+class: center, middle
+
+.pull-1[.circleon[![](https://illustoon.com/photo/1595.png)]]
+.pull-1[.circleon[![](https://us.123rf.com/450wm/alexlaplun/alexlaplun1611/alexlaplun161100019/66579996-cute-funny-confused-man-makes-a-choice-from-the-options-on-the-orange-background-make-a-decision-car.jpg?ver=6)]]
+.pull-1[.circleon[![](https://media.gettyimages.com/photos/field-of-forking-paths-picture-id136140307)]]
+
+???
+
+Today I want to talk to you about three things (surprise, surprise):
+- missing data, especially different ways of how to treat it
+- a non-exhaustive overview of different models we have and haven't covered
+- a bit of discussion about multiple comparison problems,
+the garden of forking paths, and robustness checks
+
+---
+class: center, middle
+
+# Missing Data
+
+.pull-1[.circleon[![](https://illustoon.com/photo/1595.png)]]
+.pull-1[.circleoff[![](https://us.123rf.com/450wm/alexlaplun/alexlaplun1611/alexlaplun161100019/66579996-cute-funny-confused-man-makes-a-choice-from-the-options-on-the-orange-background-make-a-decision-car.jpg?ver=6)]]
+.pull-1[.circleoff[![](https://media.gettyimages.com/photos/field-of-forking-paths-picture-id136140307)]]
+
+---
+## A common problem
+
+Missing values in data is a common phenomenon in real world problems. 
+
+Ward and Ahlquist (2018: 251) suggest that most large databases have 5-10% missing data on every variable, and most units have missing data on one or more variables.
+
+--
+
+Often in R, missing data is designated with an `NA` code.
+- This can be handy, because its special code means functions in R (normally) know how to deal with it.
+- But be aware that different datasets are coded in different ways...
+for example, Polity IV codes special states as -66 (interruptions), -77 (interregnums), and -88 (regime transitions), respectively.
+Be careful!
+
+--
+
+Knowing how to handle missing values effectively is a crucial step to reduce bias and to produce powerful models. 
+
+Let's explore various options of how to deal with missing values and how to implement them.
+
+---
+
+.pull-left-2[
+
+## Diagnosing missingness
+
+
+```r
+data("swiss", package="Zelig")  # load the data
+suisse &lt;- swiss  # backup original data
+suisse[sample(1:nrow(suisse), 4), "Catholic"] &lt;- NA
+suisse[sample(1:nrow(suisse), 4), "Education"] &lt;- NA
+suisse[sample(1:nrow(suisse), 4), "Infant.Mortality"] &lt;- NA
+suisse[sample(1:nrow(suisse), 4), "Examination"] &lt;- NA
+suisse[sample(1:nrow(suisse), 4), "Agriculture"] &lt;- NA
+```
+
+]
+
+.pull-right-1[
+
+
+```r
+library(Amelia)
+missmap(suisse)
+```
+
+&lt;img src="STAT_L10_Advanced_files/figure-html/missmap-1.png" width="504" /&gt;
+
+]
+
+.pull-left-2[
+
+
+```r
+library(VIM)
+pbox(suisse, labels = T)
+```
+
+&lt;img src="STAT_L10_Advanced_files/figure-html/pbox-1.png" width="504" /&gt;
+
+```
+## 
+## Click in in the left margin to switch to the previous variable or in the right margin to switch to the next variable.
+## To regain use of the VIM GUI and the R console, click anywhere else in the graphics window.
+```
+
+```r
+# marginmatrix(suisse)
+```
+
+]
+
+.pull-right-1[
+
+
+```r
+library(mice)
+md.pattern(suisse, rotate.names = T)
+```
+
+&lt;img src="STAT_L10_Advanced_files/figure-html/mdpattern-1.png" width="504" /&gt;
+
+```
+##    Fertility Agriculture Examination Education Catholic Infant.Mortality   
+## 30         1           1           1         1        1                1  0
+## 2          1           1           1         1        1                0  1
+## 4          1           1           1         1        0                1  1
+## 3          1           1           1         0        1                1  1
+## 1          1           1           1         0        1                0  2
+## 3          1           1           0         1        1                1  1
+## 2          1           0           1         1        1                1  1
+## 1          1           0           1         1        1                0  2
+## 1          1           0           0         1        1                1  2
+##            0           4           4         4        4                4 20
+```
+
+]
+
+
+???
+
+This week I'm going back to the start and use the `swiss` dataset.
+Since the original swiss data doesn’t have missing values, 
+I'm going to randomly introduce missing values so we can check how effective different approaches are in reproducing the actual data. 
+
+---
+## So what? A taxonomy of missingness
+
+.red[MCAR] or .red[missing completely at random] is missingness where the probability that any particular value is missing is independent of the values of any of the data, whether missing or observed. Thus the observed data can be treated as a random sample of the complete data:
+
+`$$f(M \mid y, X, \theta) = f(M \mid \theta)$$`
+
+.red[MAR] or .red[missing at random] occurs when missingness is related to observed values but, conditional on observed data, missingness is unrelated to unobserved values:
+
+`$$f(M \mid y, X, \theta) = f(M \mid y_{obs}, X_{obs}, \theta)$$`
+
+Note that MAR is a weaker condition than MCAR. MAR observations can be systematically different from those reporting data. But so long as the availability of data for one observation can be treated as independent of its availability for others and, conditional on the observed data, missingness does not depend on the values of the missing data, then the missingness is MAR.
+
+.red[NMAR] or .red[not missing at random] is missingness that depends on the value of the missing data, even after conditioning on the observed values. Some mechanism is causing the missingness, a mechanism completely separate from that which generates the observed data. Missing values depend on observed variables.
+
+???
+
+This classification from Rubin (1976; 1987; 2002; 2004)
+
+Unfortunately, it is impossible to tell whether missingness is M(C)AR or NMAR.
+It is more of an assumption about the data than a testable proposition.
+
+Assuming MCAR seems heroic, but if MAR is plausible then we can use imputation methods.
+NMAR is a real issue: it suggests that we don't even have information that could lead us to impute what we don't know.
+
+Still, these are "known unknowns" in the typology of Donald Rumsfeld...
+
+---
+## Dealing with missing data
+
+.pull-left[
+### 1. Complete case analysis
+
+If large number of observations in your dataset, 
+where all the classes to be predicted are sufficiently represented in the training data, 
+then try *deleting* (or not including missing values while model building, for example by setting na.action=na.omit) those observations (rows) that contain missing values.
+
+Removing rows with missings means only using complete data, which can be attractive,
+but reduces sample size and therefore potentially statistical power,
+and could introduce bias if there ends up being disproportionate or non-representation of classes
+in the final data modelled.
+]
+
+.pull-right[
+
+
+```r
+library(sjPlot)
+tab_model(lm(Fertility ~ Catholic + Education + Infant.Mortality + Agriculture, 
+             data=suisse, na.action=na.omit))  # though na.omit is default in lm()
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;60.96&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;39.87&amp;nbsp;&amp;ndash;&amp;nbsp;82.05&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.14&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.07&amp;nbsp;&amp;ndash;&amp;nbsp;0.20&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Education&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.90&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.24&amp;nbsp;&amp;ndash;&amp;nbsp;-0.57&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Infant.Mortality&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.02&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.14&amp;nbsp;&amp;ndash;&amp;nbsp;1.90&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.025&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Agriculture&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.12&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.27&amp;nbsp;&amp;ndash;&amp;nbsp;0.04&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.141&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;33&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.749 / 0.713&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+
+]
+
+---
+### 2. Deleting the variable
+
+.pull-left[
+If a paricular variable is having more missing values that rest of the variables in the dataset, and, 
+if by removing that one variable you can save many observations, 
+then you are better off without that variable unless it is a really important predictor that makes a lot of theoretical sense. 
+It is a matter of deciding between the importance of the variable and losing out on a number of observations.
+]
+
+.pull-right[
+
+```r
+library(sjPlot)
+tab_model(lm(Fertility ~ Education + Infant.Mortality + Agriculture, data=suisse))
+```
+
+&lt;table style="border-collapse:collapse; border:none;"&gt;
+&lt;tr&gt;
+&lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
+&lt;th colspan="3" style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm; "&gt;Fertility&lt;/th&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  text-align:left; "&gt;Predictors&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;Estimates&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;CI&lt;/td&gt;
+&lt;td style=" text-align:center; border-bottom:1px solid; font-style:italic; font-weight:normal;  "&gt;p&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;53.09&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;29.20&amp;nbsp;&amp;ndash;&amp;nbsp;76.98&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Education&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.86&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.23&amp;nbsp;&amp;ndash;&amp;nbsp;-0.50&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Infant.Mortality&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.38&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.39&amp;nbsp;&amp;ndash;&amp;nbsp;2.38&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.008&lt;/strong&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Agriculture&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.01&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.18&amp;nbsp;&amp;ndash;&amp;nbsp;0.15&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.890&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="3"&gt;37&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="3"&gt;0.622 / 0.587&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/table&gt;
+]
+
+---
+.pull-left[
+### 3. Mean (or other statistic) imputation
+
+
+```r
+library(Hmisc)
+tail(cbind(suisse$Catholic,
+      Hmisc::impute(suisse$Catholic, mean),  # replace with mean
+      Hmisc::impute(suisse$Catholic, median),  # median
+      Hmisc::impute(suisse$Catholic, 75)))  # replace specific number
+```
+
+```
+##     [,1]     [,2]  [,3]  [,4]
+## 42 16.92 16.92000 16.92 16.92
+## 43  4.97  4.97000  4.97  4.97
+## 44  8.65  8.65000  8.65  8.65
+## 45 42.34 42.34000 42.34 42.34
+## 46    NA 43.47837 16.92 75.00
+## 47 58.33 58.33000 58.33 58.33
+```
+
+```r
+# suisse$Catholic[is.na(suisse$Catholic)] &lt;- mean(suisse$Catholic, na.rm = T)  # or do it manually
+```
+]
+
+.pull-right[
+
+```r
+library(DMwR)
+actuals &lt;- swiss$Catholic[is.na(suisse$Catholic)]
+predicteds &lt;- rep(mean(suisse$Catholic, na.rm=T), length(actuals))
+regr.eval(actuals, predicteds)
+```
+
+```
+##        mae        mse       rmse       mape 
+##   30.90669 1147.12566   33.86924    6.73491
+```
+
+The MAPE can be used to compare the imputation accuracy of different methods.
+Smaller is better.
+
+Replacing the missing values with the mean / median / mode is a crude way of treating missing values: simple to do, but tends to flatten model coefficient for variable
+
+If the variation is low or if the variable has low leverage over the response, 
+such a rough approximation could give satisfactory results.
+]
+
+???
+
+
+Here we are going to use MAPE or the mean absolute percentage error for comparing the imputation accuracy of different methods.
+
+`$$MAPE = \frac{1}{n}\sum_{t=1}^{n} \frac{A_t - P_t}{A_t}$$`
+
+Sometimes this score is multiplied by 100 to give a percentage.
+In any case, smaller is better...
+
+---
+### 4. Multiple imputation (prediction)
+
+Range of methods (only going to cover a few here)
+by which we can replace missing values with more sensible expectations, 
+but this does require more data.
+
+.pull-left-1[
+#### 4.1 kNN Imputation
+
+`DMwR::knnImputation` uses k-Nearest Neighbours approach to impute missing values. 
+It identifies ‘k’ closest observations to every observation to be imputed,
+based on Euclidean distance, and computes their weighted average (based on distance).
+
+The advantage is you can impute all the missing values in all variables with one call to the function.
+But be cautious not to include the response variable while imputing.
+]
+
+.pull-right-2[
+
+
+```r
+library(DMwR)
+knnOutput &lt;- knnImputation(suisse[, !names(suisse) %in% "Fertility"])  # perform knn imputation.
+anyNA(knnOutput)
+```
+
+```
+## [1] FALSE
+```
+
+```r
+# Lets compute the accuracy.
+actuals &lt;- swiss$Catholic[is.na(suisse$Catholic)]
+predicteds &lt;- knnOutput[is.na(suisse$Catholic), "Catholic"]
+regr.eval(actuals, predicteds)
+```
+
+```
+##         mae         mse        rmse        mape 
+##   28.823735 1121.565389   33.489780    5.084545
+```
+
+]
+
+---
+#### 4.2 rpart
+
+.pull-left-2[
+knn cannot treat factor variables, but `rpart` and `mice` can.
+The advantage with `rpart` is that only one variable needs to be non-NA in the predictor fields.
+
+
+```r
+library(rpart)
+swiss &lt;- swiss %&gt;% mutate(Religion = as_factor(if_else(Catholic &gt; 50, "Catholic", "Protestant")))
+suisse &lt;- suisse %&gt;% mutate(Religion = as_factor(if_else(Catholic &gt; 50, "Catholic", "Protestant")))
+
+class_mod &lt;- rpart(Religion ~ . - Fertility - Catholic, data=suisse[!is.na(suisse$Religion), ], # don't train `rpart` on response variable (Fertility).
+                   na.action=na.omit, method="class")  # since Religion is a factor
+anova_mod &lt;- rpart(Catholic ~ . - Fertility, data=suisse[!is.na(suisse$Catholic), ], 
+                   na.action=na.omit, method="anova")  # since Catholic is numeric
+```
+]
+
+.pull-right-1[
+
+
+```r
+actuals &lt;- swiss$Catholic[is.na(suisse$Catholic)]
+predicteds &lt;- predict(anova_mod, suisse[is.na(suisse$Religion), ])
+regr.eval(actuals, predicteds)
+```
+
+```
+##        mae        mse       rmse       mape 
+##  13.953611 436.602141  20.895027   1.092842
+```
+
+```r
+actuals &lt;- swiss$Religion[is.na(suisse$Religion)]
+reli_pred &lt;- predict(class_mod, suisse[is.na(suisse$Catholic), ])
+predicteds &lt;- as.factor(colnames(reli_pred)[apply(reli_pred, 1, which.max)])
+mean(actuals != predicteds)  # compute misclass error.
+```
+
+```
+## [1] 0.25
+```
+]
+
+???
+
+The MAPE has improved, and we see a misclassification error of 25%, which is not bad for a factor variable.
+
+---
+#### 4.3 mice
+
+`mice` is short for Multivariate Imputation by Chained Equations
+and provides advanced missing value treatment. 
+
+It implements imputation in 2-steps, 
+using `mice()` to produces multiple complete copies of df, 
+each with different imputations of the missing data, 
+and `complete()` to return one or several of these data sets, 
+by default the first.
+
+
+```r
+library(mice)
+miceOutput &lt;- complete(mice(suisse[, !names(suisse) %in% "Fertility"], printFlag = F, 
+                            method="rf"))  # based on random forests
+
+# Calculate the accuracy of Catholic.
+actuals &lt;- swiss$Catholic[is.na(suisse$Catholic)]
+predicteds &lt;- miceOutput[is.na(suisse$Catholic), "Catholic"]
+regr.eval(actuals, predicteds)
+```
+
+```
+##         mae         mse        rmse        mape 
+##   37.075000 2763.967250   52.573446    5.224168
+```
+
+```r
+actuals &lt;- swiss$Religion[is.na(suisse$Religion)]
+predicteds &lt;- miceOutput[is.na(suisse$Religion), "Religion"]
+mean(actuals != predicteds)  # compute misclass error.
+```
+
+```
+## [1] 0
+```
+
+???
+
+See also `Amelia`.
+
+Though we have an idea of how each method performs, there is not enough evidence to conclude which method is better or worse. But these are definitely worth testing out the next time you impute missing values.
+
+---
+### 5. Model explicitly
+
+If missingness NMAR, then few choices left. 
+
+--
+
+One option though is to model missingness explicitly.
+
+For example, you could convert the variable in question to a categorical variable (if not already),
+and model the missing category along with any others.
+- **Pro**: we can explicitly model missingness
+- *Con*: information loss on continuous variables
+
+---
+class: center, middle
+
+# Model Choice
+
+.pull-1[.circleoff[![](https://illustoon.com/photo/1595.png)]]
+.pull-1[.circleon[![](https://us.123rf.com/450wm/alexlaplun/alexlaplun1611/alexlaplun161100019/66579996-cute-funny-confused-man-makes-a-choice-from-the-options-on-the-orange-background-make-a-decision-car.jpg?ver=6)]]
+.pull-1[.circleoff[![](https://media.gettyimages.com/photos/field-of-forking-paths-picture-id136140307)]]
+
+---
+## Regression
+
+Regressions are one of the most popular statistical models.
+However, political scientists generally know only 2-3 types of regression (usually linear and logistic regression).
+But there are a huge range of different inferential statistical techniques.
+
+Obviously I cannot hope to teach you all about all of them now.
+What follows is a necessarily incomplete, partial, and probably quite biased list.
+But I want to give you a sense of some different models and what they are good for,
+so that you have some threads to follow if you decide to learn more.
+
+.center[![](https://storage.ning.com/topology/rest/1.0/file/get/2808328386?profile=original)]
+
+---
+## 1. Linear Regression
+
+Linear regression is really the workhorse of statistical modelling.
+
+It assumes a linear relationship between a continuous dependent variable and independent variables,
+but there are ways of modelling nonlinear relationships in similar ways...
+
+It is the oldest type of regression and, by design, 
+computations on small data could be carried out by a human being.
+However, it has many drawbacks when applied to modern data, 
+e.g. sensitivity to both ouliers and cross-correlations (both in the variable and observation domains), 
+and subject to over-fitting. 
+
+--
+
+Variants:
+- .red[Simple linear regression] is when you have only 1 independent variable and 1 dependent variable.
+- .red[Multiple linear regression] is when you have more than 1 independent variable and 1 dependent variable.
+- .red[Polynomial regression] includes a nonlinear transformation of an independent variable.
+- .red[Support vector regression] can uses non-linear kernel functions (such as polynomials) to find the optimal solution for both linear and non-linear models. 
+
+Linear regression is usually fitted by OLS, 
+but this can be shown to be a special case of the more generally applicable MLE anyway.
+
+---
+## 2. Logistic Regression
+
+Used when the response is categorical, 
+especially binary (chance of succeeding or failing, e.g. for new tested drug or credit card transaction). 
+Suffers same drawbacks as linear regression (not robust, model-dependent), and computing regression coeffients involves using complex iterative, numerically unstable algorithm. 
+
+Can approximate with linear regression after transforming the response (logit transform), but:
+- Homoscedasticity assumption is violated.
+- Errors are not normally distributed
+- y follows binomial distribution and hence is not normal.
+
+Variants:
+- .red[logit regression] is most commonly used when the dependent variable is binary in nature (having two categories)
+- .red[probit regression] is an alternative based on the normal distribution
+- .red[ordinal logistic regression] is used for ordinal dependent variables (see `ordinal::clm()`)
+- .red[multinomial logistic regression] is used if you have more than two categories in the dependent variable
+- .red[tobit regression] is used when censoring exists in the dependent variable; it was created by Tobin and is related to the probit, hence the name
+- .red[beta regression] is used to model variables within (0, 1) range
+- .red[logic regression] is a specialized, more robust form of logistic regression for when *all* variables (incl IVs) are binary
+
+???
+
+Logistic regression is the first time we move into the realm of generalized linear models.
+
+NB: The Tobit model makes the same assumptions about error distributions as the OLS model, 
+but it is much more vulnerable to violations of those assumptions.
+In an OLS model with heteroskedastic errors, the estimated standard errors can be too small
+
+---
+## 3. Robust Regression
+
+We have already discussed .red[robust regression] and .red[resilient regression] in an earlier lecture.
+Robust regression	is applicable in all cases where OLS regression can be used, but applies re-weighting to reduce outlier influence.
+Another way of dealing with outliers, high skewness, and heteroskedasticity is .red[quantile regression].
+
+In linear regression, we regress the mean of the dependent variable on given independent variables.
+But the mean does not describe the whole distribution, so it is not a full description of a relationship between dependent and independent variables. 
+So we can use quantile regression in which we try to estimate the quantile of the (continuous) dependent variable given the values of X's.
+
+If we are interested only in the median `\(\tau = 0.5\)`, then we call this median regression or, 
+more commonly, .red[least absolute deviation regression] (LAD).
+This is similar to linear regression but uses absolute values (L1 space, see below) rather than squares (L2 space).
+
+???
+
+Disclaimer on using quantile regression!
+It is to be kept in mind that the coefficients which we get in quantile regression for a particular quantile should differ significantly from those we obtain from linear regression. 
+If not, then our usage of quantile regression isn't justifiable. 
+This can be done by observing the confidence intervals of regression coefficients of the estimates obtained from both the regressions. 
+
+---
+
+.tiny[.pull-left[
+
+```r
+library(quantreg)
+# Using rq function we try to predict the estimate the 25th quantile of Fertility
+model1 = rq(Fertility~., swiss, tau = 0.25) 
+# If q = 0.5 then it becomes median regression (or least absolute deviation regression)
+model2 = rq(Fertility~., swiss, tau = 0.5)
+cbind(coef(model1), coef(model2))
+```
+
+```
+##                         [,1]        [,2]
+## (Intercept)       82.7649744  65.1179705
+## Agriculture       -0.2408109  -0.2311618
+## Examination       -0.7809843  -0.4521523
+## Education         -0.7466415  -0.9309376
+## Catholic           0.2398208   0.2721758
+## Infant.Mortality   0.6021338   1.4649868
+## ReligionCatholic -15.7478278 -15.8027874
+```
+]
+
+.pull-right[
+
+```r
+# We can run quantile regression for multiple quantiles in a single plot. 
+model3 = rq(Fertility~., swiss, tau = seq(0.05,0.95,by = 0.05))
+plot(model3, parm = "Agriculture")
+```
+
+&lt;img src="STAT_L10_Advanced_files/figure-html/quantregplot-1.png" width="504" /&gt;
+]
+]
+
+
+???
+
+Interpreting the coefficients in quantile regression:
+Suppose the regression equation for 25th quantile of regression is: y = 5.2333 + 700.823 x 
+It means that for one unit increase in x the estimated increase in 25th quantile of y by 700.823 units. 
+
+We can also plot the relationship of the quantile regression to OLS.
+Various quantiles are depicted by X axis. 
+The red central line denotes the estimates of OLS coefficients and the dotted red lines are the confidence intervals around those OLS coefficients for various quantiles. 
+The black dotted line are the quantile regression estimates and the gray area is the confidence interval for themfor various quantiles. 
+We can see that for all the variable both the regression estimated coincide for most of the quantiles. 
+Hence our use of quantile regression is not justifiable for such quantiles. 
+In other words we want that both the red and the gray lines should overlap as less as possible to justify our use of quantile regression.
+
+For more see [here](https://data.library.virginia.edu/getting-started-with-quantile-regression/).
+
+---
+## 4. Regularized Regression
+
+When you have a large number of independent variables, 
+few observations compared to the variables, or high multicollinearity,
+there is a danger of over-fitting:
+you fit this particular sample well from the data available, 
+but high variance across training data causes out of sample error to increase.
+
+Regularization helps to solve overfitting problem by adding a penalty term to the objective function to control for model complexity.
+In linear regression, we try to minimise the sum of squares of errors.
+- In .red[lasso regression] or Least Absolute Shrinkage and Selection Operator, 
+we add a penalty term to the sum of the absolute values of coefficients (L1 regularization), aka the least absolute deviations method.
+- In .red[ridge regression] or .red[shrinkage regression], 
+we add a penalty term to the sum of the squares of coefficients (L2 regularization).
+- In .red[elastic net regression], a combination of L1 and L2 regularization is used.
+
+When to use which?
+- none assume normality in the error terms and all are useful in the presence of multicollinearity
+- ridge regression performs better and is more efficient in terms of computation than lasso regression
+- lasso regression has in-built feature selection for sparse feature spaces (lots and lots of variables, most of which you expect not to matter),
+basically allowing coefficients to be zero for some
+- elastic net regression is preferred when one is dealing with highly correlated independent variables
+
+???
+
+See [here](https://uc-r.github.io/regularized_regression) for more.
+
+---
+
+.tiny[
+
+
+```r
+swiss$Religion &lt;- NULL
+X = swiss[,-1] # NB:We do not regularize the intercept term.
+y = swiss[,1]
+library(glmnet)
+model = cv.glmnet(as.matrix(X),y, # Using cv.glmnet( ) function we can do cross validation. 
+                  alpha = 0, # By default alpha = 0 which means we are carrying out ridge regression. 
+                  lambda = 10^seq(4,-1,-0.1)) # lambda is a sequence of various values of lambda which will be used for cross validation.
+ridge_coeff = predict(model, s = model$lambda.min, type = "coefficients")
+```
+
+
+```r
+# For lasso regression we set alpha = 1. By default standardize = TRUE hence we do not need to standardize the variables seperately. 
+model = cv.glmnet(as.matrix(X),y,alpha = 1,lambda = 10^seq(4,-1,-0.1))
+lasso_coeff = predict(model, s = model$lambda.min, type = "coefficients")
+```
+
+
+```r
+# Setting some different value of alpha between 0 and 1 we can carry out elastic net regression. 
+model = cv.glmnet(as.matrix(X),y,alpha = 0.5,lambda = 10^seq(4,-1,-0.1))
+en_coeff = predict(model, s = model$lambda.min, type = "coefficients")
+cbind(ridge_coeff, lasso_coeff, en_coeff)
+```
+
+```
+## 6 x 3 sparse Matrix of class "dgCMatrix"
+##                            1          1           1
+## (Intercept)      64.04610463 65.7672059 64.62206962
+## Agriculture      -0.11977387 -0.1545238 -0.13517804
+## Examination      -0.32588640 -0.2463943 -0.25619904
+## Education        -0.70810982 -0.8433652 -0.79624873
+## Catholic          0.08399457  0.1001456  0.09386653
+## Infant.Mortality  1.09595216  1.0733351  1.07673625
+```
+]
+
+???
+
+How can we choose the regularization parameter λ?
+If we choose lambda = 0 then we get back to the usual OLS estimates. 
+If lambda is chosen to be very large then it will lead to underfitting. 
+Thus it is highly important to determine a desirable value of lambda.
+To tackle this issue, we plot the parameter estimates against different values of lambda and select the minimum value of λ after which the parameters tend to stabilize.
+
+---
+## 5. Feature Extraction
+
+Related to regularization and shrinkage estimators, and also for dealing with many independent variables or multicollinearity,
+are methods for feature extraction.
+
+.red[Principal Components Regression] (PCR) relies on *principal component analysis* to reduce the dimensionality of a dataset,
+thereby removing multicollinearity, and then regress the DV on those new features extracted.
+PCR is not a feature selection, but feature extraction technique:
+each principle component we obtain is a function of all the features.
+Hence one would be unable to explain which original feature is affecting the dependent variable to what extent.
+
+.red[Partial Least Squares Regression] (PLS) is similar,
+but whereas PCR creates components to explain the observed variability in the predictor variables, without considering the response variable at all, 
+PLS takes the dependent variable into account, and therefore often leads to models that are able to fit the dependent variable with fewer components.
+
+.red[Factor analysis] is a statistical method used to describe variability among observed, correlated variables 
+in terms of a potentially lower number of unobserved variables called factors or latent variables.
+Factor analysis is related to principal component analysis (PCA), but the two are not identical.
+
+
+???
+
+What is the difference between a component and a factor?
+With components, you are trying to load observed variables onto a component that summarises all these observed variables.
+These then become index variables (rather than latent variables).
+
+![](https://i2.wp.com/www.theanalysisfactor.com/wp-content/uploads/2016/09/KGM_Sept2016_Image1.png)
+
+With factor analysis you are trying to load the observed variables onto a latent variable that is supposedly driving those observed variables.
+E.g. "intelligence" is a latent variable that drives certain scores, or "depression" drives certain survey responses --
+we can't observe these concepts, but we think they'll drive things we can observe such as a response "The world is worse than it used to be".
+
+![](https://i1.wp.com/www.theanalysisfactor.com/wp-content/uploads/2016/09/KGM_Sept2016_Image2.png)
+
+---
+
+.pull-left[
+
+
+```r
+library(pls) # We use pls package to run PCR
+pcr_model &lt;- pcr(Fertility~., data = swiss, # we are trying to estimate the fertility rate
+                 scale = TRUE, # denotes that we are standardizing the variables
+                 validation = "CV") # denotes applicability of cross-validation
+summary(pcr_model)
+```
+
+```
+## Data: 	X dimension: 47 5 
+## 	Y dimension: 47 1
+## Fit method: svdpc
+## Number of components considered: 5
+## 
+## VALIDATION: RMSEP
+## Cross-validated using 10 random segments.
+##        (Intercept)  1 comps  2 comps  3 comps  4 comps  5 comps
+## CV           12.63    9.635    8.834    8.703    7.947    7.768
+## adjCV        12.63    9.595    8.815    8.659    7.902    7.712
+## 
+## TRAINING: % variance explained
+##            1 comps  2 comps  3 comps  4 comps  5 comps
+## X            52.67    74.11    90.44    96.69   100.00
+## Fertility    45.73    55.55    59.16    67.83    70.67
+```
+
+```r
+validationplot(pcr_model,val.type = "MSEP") # create a plot depicting the mean squares error for the number of various PCs
+```
+
+&lt;img src="STAT_L10_Advanced_files/figure-html/pcr-1.png" width="504" /&gt;
+
+```r
+validationplot(pcr_model,val.type = "R2") # By writing val.type = "R2" we can plot the R square for various no. of PCs
+```
+
+&lt;img src="STAT_L10_Advanced_files/figure-html/pcr-2.png" width="504" /&gt;
+
+```r
+# If we want to fit pcr for 4 principal components and hence get the predicted values we can write:
+pred = predict(pcr_model, swiss, ncomp = 4)
+pred
+```
+
+```
+## , , 4 comps
+## 
+##    Fertility
+## 1   77.00692
+## 2   84.57642
+## 3   86.46200
+## 4   77.87235
+## 5   67.55227
+## 6   90.65368
+## 7   76.70232
+## 8   79.71493
+## 9   79.36776
+## 10  78.12262
+## 11  80.96439
+## 12  58.76651
+## 13  68.50176
+## 14  67.57980
+## 15  63.19225
+## 16  71.31194
+## 17  72.19757
+## 18  57.45206
+## 19  47.34791
+## 20  64.03831
+## 21  61.14936
+## 22  76.76937
+## 23  60.38211
+## 24  62.46489
+## 25  75.01357
+## 26  75.17387
+## 27  75.80759
+## 28  63.37551
+## 29  63.25594
+## 30  74.30958
+## 31  76.55573
+## 32  77.19808
+## 33  78.36065
+## 34  74.17085
+## 35  82.44688
+## 36  73.07388
+## 37  77.61260
+## 38  70.21427
+## 39  63.29624
+## 40  67.21750
+## 41  67.62308
+## 42  52.63706
+## 43  73.71012
+## 44  69.14455
+## 45  37.26377
+## 46  59.33697
+## 47  59.75220
+```
+]
+
+.pull-right[
+
+
+```r
+library(plsdepot) # We use plsdepot to run PLS...
+pls.model = plsreg1(X[, -1], 
+                    X[, 1], 
+                    comps = 4)
+pls.model$R2
+```
+
+```
+##           t1           t2           t3           t4 
+## 5.387168e-01 2.281873e-02 6.585772e-04 2.293884e-06
+```
+]
+
+???
+
+Here in the RMSEP the root mean square errors are being denoted. 
+While in 'Training: %variance explained' the cumulative % of variance explained by principle components is being depicted. 
+We can see that with 4 PCs more than 95% of variation can be attributed.
+
+---
+## 6. Count Models
+
+In this course we have already covered a few different models for counts.
+- .red[Poisson regression] is the main model for non-negative event count dependent variables.
+- .red[negative binomial regression] is similar, but does not assume distribution of count having variance equal to its mean (as the Poisson does) and can therefore be used for overdispersion.
+- .red[quasi-Poisson regression] is an alternative to negative binomial regression, but whereas the variance of an NB is a quadratic function of the mean, the variance of a quasi-Poisson model is a linear function of the mean. Quasi-Poisson can handle both overdispersion and underdispersion
+
+Any of these models can be made into a two-stage model by combining it with, say, a logistic regression to deal with .red[zero inflation] or .red[zero truncation].
+
+.red[Isotonic regression]	is used to approximate data that can only increase (typically cumulative data).
+
+???
+
+&lt;!-- qs.pos.model &lt;- glm(Days ~ Sex/(Age + Eth*Lrn), data = quine, family = "quasipoisson") --&gt;
+
+---
+## 7. Panel Models
+
+In this course, we have covered .red[fixed effects] approaches for dealing with longitudinal, panel data,
+as well as .red[mixed effects models] that also include random effects (intercepts and slopes).
+With mixed effects models, it's possible to use the data to predict the individual subject effects.
+This permits us to predict time trends at the subject level.
+
+More generally, the random effects can represent clusters rather than subjects.
+Different packages in R, including `lme4` and `nlme` can fit mixed models assuming various correlation structures for repeated measures.
+There are also generalizations of mixed models so that count and other data can be treated.
+
+--
+## 8. Multilevel Models
+
+Random effects are useful for various types of models in addition to models for longitudinal data.
+An example is .red[hierarchical models] that describe observations having a nested structure:
+units at one level are contained within units of another level.
+A classic example is students (L1) in schools (L2) (perhaps in turn nested in communes, cantons, countries, etc).
+Hierarchical models contain terms for the different levels,
+e.g. some predicting student response on a test (e.g. ability, parents' occupation),
+and others predicting overall school response (e.g. financial resources, teaching quality, district characteristics).
+
+???
+
+For further details, see Gelman and Hill (2006), Raudenbush and Bryk (2002), and Snijders and Bosker (1999).
+
+---
+## 9. Event Models
+
+.red[survival analysis] or .red[event history analysis] can be used to estimating the time it takes to reach a certain event (historically machine failure, hence the 'survival'). 
+
+The .red[Kaplan-Meier estimator] can be used to compare time-to-event for multiple groups.
+
+The .red[Weibull] is one example of a parametric form in survival analysis. There are others.
+Only with a parametric form can you predict how long it will take to observe a certain event--but with this comes assumptions.
+
+.red[Cox proportional hazards] is non-parametric but more flexible and so is often used to study the relative effects of different explanatory variables.
+
+---
+## 10. Sequence Models
+
+Sequence analysis is the study of sequences of different states.
+State/categorical sequences are ordered lists of states/categories defined on a time axis.
+Event sequences are ordered lists of time-stamped events.
+
+Sequence analysis represents a more 'holistic' approach than, say, event history analysis.
+Whereas event history analysis focuses on the occurrence of one specific event,
+sequence analysis allows a more general overview of an entire sequence of events/transitions/stages/states.
+While sequence analysis has been largely exploratory and descriptive,
+more explanatory methods have been developed more recently:
+- .red[Discrepancy analysis] seeks to explain how sequence variation (discrepancy) is related to different covariates.
+- .red[Classification and Regression Trees] (CART) can be used to summarise how the successive application of a set of covariates determines different types of sequences.
+- .red[Markov chains] can be used to identify how covariates impact transition probabilities.
+
+???
+
+For more on Markov chains, see Moore and Siegel (2013: 327-351)
+
+---
+## 11. Time-series Models
+
+Time-series models are about dealing with temporal dependencies in your data.
+
+Models for time series data can have many forms and represent different stochastic processes. 
+When modeling variations in the level of a process, three broad classes of practical importance are 
+- .red[autoregressive (AR) models]
+- .red[integrated (I) models]
+- .red[moving average (MA) models]
+
+These three classes depend linearly on previous data points.
+Combinations of these ideas produce .red[autoregressive moving average] (ARMA) and .red[autoregressive integrated moving average] (ARIMA) models. 
+The .red[autoregressive fractionally integrated moving average] (ARFIMA) model generalizes the former three. 
+
+Sometimes the preceding acronyms are prefixed by a "V" for "vector", as in VAR for .red[vector autoregression], indicating an extension to deal with vector-valued data,
+of suffixed by a "X" for "exogenous", where the observed time-series is driven by some "forcing" time-series that may be deterministic or under the experimenter's control.
+
+Among other types of non-linear time series models, there are models to represent the changes of variance over time (heteroskedasticity). 
+These models represent .red[autoregressive conditional heteroskedasticity] (ARCH) and the collection comprises a wide variety of representation (GARCH, TARCH, EGARCH, FIGARCH, CGARCH, etc.). Here changes in variability are related to, or predicted by, recent past values of the observed series.
+
+???
+
+There are also a range of decompositional analyses available.
+
+---
+## 12. Spatial Models
+
+Spatial models are about dealing with spatial dependencies in your data.
+
+.red[Local regression] or local polynomial regression, also known as moving regression, LOESS or LOWESS, 
+is a generalization of moving average and polynomial regression.
+LOESS is very flexible, making it useful for modeling complex processes for which no theoretical models exist.
+However, it makes less efficient use of data than other least squares methods, requiring fairly large, densely sampled data sets.
+Thus, LOESS provides less complex data analysis in exchange for greater experimental costs.
+It also does not produce a regression function that is easiliy represented by a mathematical formula,
+and is thus difficult to generalise out of sample with it.
+
+.red[Regression-kriging] (RK) is a spatial prediction technique that combines a regression of the dependent variable on auxiliary variables (such as parameters derived from digital elevation modelling, remote sensing/imagery, and thematic maps) with kriging of the regression residuals.
+Kriging is a method of interpolation for which the interpolated values are modeled by a Gaussian process governed by prior covariances.
+
+Geospatial analysis uses .red[Geographic Information Systems] (GIS) for a huge variety of applications.
+
+.red[Agent based modelling] is also a very popular way of exploring spatial diffusion/contagion.
+
+More advanced spatial analysis often takes the form of applied network analysis...
+
+---
+## 13. Network Models
+
+Network models are about dealing with (structural) dependencies in your data.
+
+.red[Diffusion models] model contagion or diffusion across a network,
+either simulating or inferring thresholds based on observed data.
+More recent applications combine diffusion with a network selection below.
+
+The .red[exponential random graph model] (ERGM) is an extension of the multinomial logit 
+to network data and is (best) estimated using maximum likelihood estimation.
+It is traditionally used on cross-sectional network data, 
+but there are some extensions for e.g. multilevel or panel data 
+(e.g. MERGMs, LERGMs, STERGMs, BERGMs, etc).
+
+The .red[stochastic actor-oriented model] (SAOM) is a two-part model for network panel data
+that combines a Poisson process for modelling actors' opportunities in continuous time
+with a multinomial logit for modelling the tie choice made by those actors.
+SAOMs can be used to study the coevolution of multiple networks
+or the coevolution of networks and behaviour (selection and influence).
+
+The .red[relational event model] (REM) is an event-history model that concentrates on time
+to relational/tie event (NB: not *tied* event).
+
+The .red[dynamic network actor model] (DyNAM) is a two-part model for network event data
+that is kind of like a cross between a SAOM and a REM.
+
+???
+
+The .red[quadratic assignment procedure] (QAP) is a type of linear regression 
+that controls for structural dependencies present in the data.
+
+---
+## 14. Text Models
+
+Text classification is the process of assigning predefined tags or categories to unstructured text. 
+It's considered one of the most useful Natural Language Processing (NLP) techniques because it's so versatile 
+and can organize, structure and categorize all sorts of text data.
+
+.red[Language detection] is where the language of a document or extract is inferred from its words.
+
+.red[Sentiment analysis] is where the affectivity of a document or extract is inferred from (the composition of) words.
+
+.red[Intent detection] is a classifier where a document or, more commonly, an extract is mapped to an existing set of keywords.
+
+.red[Topic models] are used to identify/infer latent topics embedded in or across a corpus of documents.
+.red[Latent dirichlet allocation] (LDA) is perhaps the most well-known of these,
+and is related to .red[Dirichlet regression], used more generally for modelling compositional data.
+
+---
+## 15. Causal Inference
+
+Correlation is of course not causation.
+But correlation is thought to be an important component of causation.
+
+Some options to improve causal inference and avoid problems of endogeneity include:
+- .red[instrumental variables] 
+- .red[difference-in-difference] designs
+- .red[matching estimators]
+- .red[regression discontinuity]
+
+--
+
+Theoretical explanations of cause-effect relationships often hypothesise a system of (intervening) relationships.
+A single multiple regression model is insufficient for that system, since it can only handle a single response variable.
+
+.red[Path analysis] regresses all proposed relationships in the theoretical explanation.
+Path diagrams summarise the hypothesised system, and then regressions are run to return path coefficients.
+Path analysis is useful when there is a complex system of intervening variables.
+NB: for a path analysis decomposition formula to hold, we must assume that unmeasured variables are uncorrelated with the predictors for each response.
+This is a heroic assumption...
+
+.red[Structural equation models] (SEM) or covariance structure models combine elements of path and factor analysis.
+First there is a measurement model which, like a factor analysis, derives a set of unobserved factors/latent variables from observed variables.
+Second there is a structural equation model that, like a path analysis, specifies regression models for the latent variables.
+
+???
+
+See Gailmard (2014:335-355) on dealing with endogeneity and causal inference.
+
+See Freedman (2005: 75-106) on path analysis and (ibid. 169-200) on structural equations.
+
+See also .red[[structural causal models (SCM)](https://www.r-bloggers.com/an-introduction-to-causal-inference/)].
+
+---
+class: center, middle
+
+# Robustness
+
+.pull-1[.circleoff[![](https://illustoon.com/photo/1595.png)]]
+.pull-1[.circleon[![](https://us.123rf.com/450wm/alexlaplun/alexlaplun1611/alexlaplun161100019/66579996-cute-funny-confused-man-makes-a-choice-from-the-options-on-the-orange-background-make-a-decision-car.jpg?ver=6)]]
+.pull-1[.circleoff[![](https://media.gettyimages.com/photos/field-of-forking-paths-picture-id136140307)]]
+
+---
+## Results
+
+Now, all of this course has just been with an eye to getting results on substantive or theoretical questions we care about.
+
+You might be keen on testing an explanation around whether there is a particular effect,
+or whether a set of effects is jointly a 'good' explanation. 
+
+In any case, let's talk (again) about results and how we should interpret them.
+
+---
+## A Few Notes on p
+
+Recall that `\(p\)` about how surprised we should be to find this result in the sample.
+- If `\(p\)` moderate or large, then unsurprising and data consistent with null, `\(H_0\)`, and could as well be true
+- If `\(p\)` very small, then surprising and data inconsistent with `\(H_0\)` therefore we reject
+
+.pull-left[
+But be careful!
+- `\(p\)`-values not the probability that `\(H_0\)` is true
+  - It is the probability, assuming `\(H_0\)` to be true, of observing a test statistic this far from the null hypothesised value
+  - Further observed statistic diverges from null hypothesised value, less probably such a divergent statistic obtained simply by chance
+- `\(p\)`-values not the probability that Ha is true
+  - Inference relates only to null hypothesis; could be other alternative hypotheses
+  - In practice we provisionally accept the alternative when rejecting the null (but more scholarship always
+warranted!)
+]
+
+.pull-right[
+- `\(p\)`-values not the probability that `\(H_0\)` false
+  - Statistical significance does not necessarily mean that the effect is real
+  - By chance alone about one in 20 significant findings will be spurious (implications for replication crisis...)
+- Non-significance does not mean no effect
+  - Small studies will often report non-significance even when there are important, real effects which a larger study would have detected
+- Significance does not mean important effect
+  - It is the size of the effect that determines the importance, not the presence of statistical significance.
+]
+
+???
+
+Recall also that we almost always use two-tailed tests because more cautious, more rigorous, more robust
+
+Q: Is the `\(p\)`-value just a measure of sample size?
+
+---
+### Type I and Type II Errors
+
+.pull-left[
+![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fwww.simplypsychology.org%2Ftype-1-and-2-errors.jpg)
+
+Relationship between them not straightforward:
+- Type I relates to the null distribution 
+- Type II relates to the “power” of the effect
+
+]
+
+.pull-right[
+![](https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fi.stack.imgur.com%2Fx1GQ1.png)
+
+Clear trade-off between these two errors: 
+if we lower probability of accepting an effect as genuine (i.e. make `\(\alpha\)` smaller), 
+then we increase probability we’ll reject a genuine effect (because so strict)
+
+]
+
+---
+### Error sensitivity
+
+.pull-left[
+Generally, as `\(\alpha\)` decreases, you have a stricter decision rule
+- Type I error (false positive) decreases
+- Type II error (false negative) increases
+
+As `\(\mu\)` increases distance from `\(\mu_0\)`, more distinctive effect
+- Type I error (false positive) decreases
+- Type II error (false negative) decreases
+
+As `\(n\)` increases, more statistical power to identify effects
+- Type I error (false positive) decreases (but potentially trivial)
+- Type II error (false negative) decreases
+]
+
+--
+
+.pull-right[
+
+That means that, all other things equal, `\(\bar{x}\)` `\(sd\)`, 
+the larger `\(n\)` becomes, the larger `\(t\)` becomes, and the smaller `\(p\)` becomes...
+- Because `\(se\)` gets smaller as `\(n\)` denominator increases 
+(in other words, we have more evidence with more data)
+
+Therefore, larger the sample, more likely we are to reject `\(H_0\)`, even if actual effect very small
+
+Therefore, report actual `\(p\)`-value (not just threshold), `\(se\)`, and `\(n\)`
+
+]
+
+---
+## Does multiple significance levels help?
+
+.pull-left[
+![](https://imgs.xkcd.com/comics/p_values.png)
+]
+
+.pull-right[
+Sometimes several significance levels given.
+
+Matthew Hankins found phrases in peer-reviewed journals where
+- (a) authors set 𝛼=0.05
+- (b) p &gt; 0.05
+- (c) published results
+
+Some examples:
+- “weakly significant” (p=0.0557) 
+- “verging on” (p=0.056) 
+- “sufficiently close to” (p=0.07) 
+- “slightly significant” (p=0.09) 
+- “trending towards” (p=0.099) 
+- “well-nigh significant” (p=0.11) 
+- “vaguely significant” (p&gt;0.2)
+]
+
+---
+.pull-left-2[
+
+### Enduring NHST Debate
+
+Since at least 1960 with Rozeboom, William W. 1960. “The Fallacy of the Null-Hypothesis Significance Test.” *Psychological Bulletin* 57 (5): 416–28.
+
+Nickerson, Raymond S. 2000. “Null Hypothesis Significance Testing: a Review of an Old and Continuing Controversy..” *Psychological Methods* 5 (2): 241–301.
+]
+
+.pull-right-1[
+![](https://imgs.xkcd.com/comics/null_hypothesis.png)
+]
+
+--
+
+.pull-down[
+
+.pull-left-1[
+- Logical framework that reduces complexity under uncertainty
+- Don’t have to specify how much of an effect Ha has
+- CI-consistent under frequentist paradigm
+- Tested techniques
+- Accepted convention
+]
+
+.pull-left-2[
+- Forced false dichotomy accentuates publication bias with meta-analytic consequences
+- Only about H0 not Ha (Jim Berger) and H0 almost always false (Andrew Gelman)
+- Stat signif not prac signif (Stephen Ziliak and Deirdra McCloskey)
+- Small p does not mean replicable in practice (William Gosset); 50-75% of significant findings unreplicable (John Iaonnidis)
+- Often misinterpreted (see above)
+]
+
+]
+
+---
+## The problem of multiple comparisons
+
+.pull-left[
+
+Ok, so we might choose any of these models or any way of dealing with missing data.
+
+However, there's a danger there.
+
+Consider a case where you have 20 hypotheses to test, and a significance level of 0.05. What’s the probability of observing at least one significant result just due to chance?
+
+`$$P(≥1 sig) = 1 − P(0 sig) = 1−(1−0.05)20 \approx 0.64$$`
+
+So, with 20 tests being considered, we have a 64% chance of observing at least one significant result, even if all of the tests are actually not significant. 
+
+]
+
+.pull-right[
+![](https://imgs.xkcd.com/comics/significant.png)
+]
+
+
+---
+### p-Hacking and Fishing
+
+Given contemporary pressures to publish, it might be understandable for researchers to look for significant results.
+
+This problem is sometimes called “p-hacking”, "fishing expeditions", or “researcher degrees of freedom” (Simmons, Nelson, and Simonsohn, 2011, Gelman, 2013a).
+
+A dataset can be analyzed in so many different ways (with the choices being not just what statistical test to perform but also decisions on what data to exclude or exclude, what measures to study, what interactions to consider, etc.), that very little information is provided by the statement that a study came up with a p &lt; .05 result. 
+
+The short version is that it’s easy to find a p &lt; .05 comparison even if nothing is going on, if you look hard enough—and good scientists are skilled at looking hard enough and subsequently coming up with good stories (plausible even to themselves, as well as to their colleagues and peer reviewers) to back up any statistically-significant comparisons they happen to come up with.
+
+---
+### Or, a walk through the garden of forking paths
+
+Gelman and Loken (2013) reflect that “fishing” and “p-hacking” (and even “researcher degrees of freedom”) unfortunate:
+1. when such terms are used, a misleading implication that researchers were consciously trying out many different analyses on a single data set
+2. it can lead researchers who know they did not try out many different analyses to mistakenly think they are not so strongly subject to problems of researcher degrees of freedom
+
+Our key point here is that it is possible to have multiple potential comparisons, 
+in the sense of a data analysis whose details are highly contingent on data, 
+without the researcher performing any conscious procedure of fishing or examining multiple p-values.
+
+This is all happening in a context of small effect sizes, small sample sizes, large measurement errors, and high variation (which combine to give low power, hence less reliable results even when they happen to be statistically significant, as discussed by Button et al., 2013). Multiplicity would not be a huge problem in a setting of large real differences, large samples, small measurement errors, and low variation.
+
+???
+
+An example: 
+A researcher is interested in differences between Democrats and Republicans in how they perform in a short mathematics test 
+when it is expressed in two different contexts, either involving health care or the military. 
+
+The research hypothesis is that context matters, and one would expect Democrats to do better in the health-care context and Republicans in the military context. 
+
+Party identification measured on a standard 7-point scale and various demographic information also available. 
+
+At this point there is a huge number of possible comparisons that can be performed—all consistent with the data. 
+- For example, the pattern could be found (with statistical significance) among men and not among women— explicable under the theory that men are more ideological than women. 
+- Or the pattern could be found among women but not among men—explicable under the theory that women are more sensitive to context, compared to men. 
+- Or the pattern could be statistically significant for neither group, but the difference could be significant (still fitting the theory, as described above). 
+- Or the effect might only appear among men who are being asked the questions by female interviewers. 
+- We might see a difference between sexes in the health-care context but not the military context; 
+this would make sense given that health care is currently a highly politically salient issue and the military is not. 
+- There are degrees of freedom in the classification of respondents into Democrats and Republicans from a 7-point scale. 
+- And how are independents and nonpartisans handled? They could be excluded entirely. 
+- Or perhaps the key pattern is between partisans and nonpartisans? And so on. 
+
+-As Humphreys, Sanchez, and Windt (2013) write, 
+a researcher when faced with multiple reasonable measures can reason (perhaps correctly) that 
+the one that produces a significant result is more likely to be the least noisy measure, 
+but then decide (incorrectly) to draw inferences based on that one only.
+
+In this garden of forking paths, whatever route you take seems predetermined, but that’s because the choices are done implicitly. 
+The researchers are not trying multiple tests to see which has the best p-value; 
+rather, they are using their scientific common sense to formulate their hypotheses in reasonable way, given the data they have. 
+The mistake is in thinking that, if the particular path that was chosen yields statistical significance, that this is strong evidence in favor of the hypothesis.
+
+---
+## Replication crisis
+
+There is a growing realization that statistically significant claims in scientific publications are routinely mistaken, and this has raised a growing 'replication crisis' and m(at least partly responsible) istrust in experts. 
+
+[Statscheck the Game](https://sachaepskamp.github.io/StatcheckTheGame/)
+
+There's even an [online support](https://sachaepskamp.shinyapps.io/statcheck/)
+
+---
+## What, then, can be done? 
+
+### Pre-registration
+
+Humphreys, Sanchez, and Windt (2013) and Monogan (2013) recommend preregistration: defining the entire data-collection and data-analysis protocol ahead of time. 
+
+Perhaps in psychology, but more difficult in political science, economics, and sociology:
+- cannot easily gather data on additional wars, or additional financial crises, or additional countries
+- often analyzing public data on elections, the economy, and public opinion that have already been studied by others many times before, and it would be close to meaningless to consider preregistration for data with which we are already so familiar
+- often most important hypotheses could never have been formulated ahead of time; you need to see the data first, e.g. recognising potential non-linearities that suggest interactions
+
+---
+### Monferroni correction
+
+Methods for dealing with multiple testing frequently call for adjusting `\(\alpha\)` in some way, 
+so that the probability of observing at least one significant result due to chance remains below your desired significance level.
+
+The Bonferroni correction sets the significance cut-off at `\(\alpha/n\)` 
+
+For example, in the example above, with 20 tests and `\(\alpha = 0.05\)`, 
+you’d only reject a null hypothesis if the p-value is less than 0.0025.
+
+???
+
+The Bonferroni correction tends to be a bit too conservative. To demonstrate this, let’s calculate the probability of observing at least one significant result when using the correction just described:
+P
+P(at least one significant result) = 1 − P(no significant results) = 1 − (1 − 0.0025)20
+≈ 0.0488
+Here, we’re just a shade under our desired 0.05 level. We benefit here from assuming that all tests are independent of each other. In practical applications, that is often not the case. Depending on the correlation structure of the tests, the Bonferroni correction could be extremely conservative, leading to a high rate of false negatives.
+
+
+---
+### Replication materials
+
+This can help make sure that
+1. the analysis was done in the way described in the paper
+1. another analysis may turn up the same or different results
+
+But still based on the same data, so only goes so far:
+- e.g. doesn't address any issues of measurement error that may plague original study
+
+---
+### Robustness checks
+
+This is perhaps the most common approach in our field(s) (for quantitative work).
+Often, when you get a manuscript back from a journal and it's an R&amp;R,
+one or more reviewers will ask for a grocery list of additional tests they they’d like to see: 
+alternate control variables, different estimators, excluded observations.
+
+Indeed, it is rare for one model to be a completely sufficient test of a hypothesis. 
+There are often various controls that could be included, estimators that could be used, parameters to tweak. 
+If a paper I’m reviewing includes just one or two models with no discussion of alternate specifications, 
+I get suspicious that they’re hiding something.
+
+It may be possible to have a simple, crisp, clearly identified research design that requires no robustness checks. 
+But this would not be the case for much international relations research that relies on admittedly messy data. 
+One solution is to avoid relying on such data, but that limits the questions we can ask. 
+Instead, we admit the limits of any models we run by…including lots of robustness checks.
+
+???
+
+Note some different meanings of robustness:
+- .red[Robust standard errors] is where we make our standard errors are robust to e.g. heterskedasticity.
+- .red[Robust regression] is where we make sure our parameter estimates are robust to e.g. outliers.
+- .red[Robustness checks] is where we make sure our model specification is robust to alternative model specifications.
+
+Unfortunately, another reviewer might complain about the long list of robustness checks already in the manuscript, 
+as it obscures the important findings.
+Readers’ eyes glaze over as they scan the list of alternate specifications. 
+And it takes up precious space in an article that could be devoted to more discussion of the results or the broader implications of a study. 
+
+It gets worse if the article ends up rejected and it is sent on to another journal.
+Now that list of robustness checks–some of which were of questionable value–expands under a new set of reviewers’ comments. 
+And those reviewers irritated by voluminous appendices get even more annoyed by all the tests included with little clear justification 
+(“another reviewer told me to add this” not being an acceptable footnote).
+
+One option may be to move all robustness checks to appendices. 
+These are usually included as separate files in the review process, and can then be made available online after publication. 
+Of course, we all know that a significant number of reviewers fail to notice the appendix, 
+so the more an author relies on the appendix to deal with potential counterarguments, 
+the greater the risk of rejection.
+
+Moreover, just as robustness should serve to see whether a posited relationship is robust to different specification,
+the danger is that an otherwise pretty regular relationship may, just by chance, not be found under some specification.
+To reject a paper on that basis seems an unnecessarily high bar.
+
+---
+### Multilevel modelling
+
+Gelman advocates using multilevel modelling to explore all the possible ways of specifying the data/model
+to identify.
+
+He also advocates, more generally, a Bayesian approach rather than a frequentist one.
+
+---
+### Interpretation
+
+Just because an effect is statistically significant, 
+doesn’t mean it is theoretically or practically important.
+
+Therefore it is well worthwhile to spend time elaborating how we should interpret the practical or clinical significance (importance) of our findings.
+
+This is why I have tried to give you options for practical interpretation, wherever possible:
+- confidence intervals
+- odds ratios
+- Pearson's `\(r\)`
+- Cohen's `\(d\)`
+- etc.
+
+&lt;!-- Criticism is easy, doing research is hard. Flaws can be found in any research design if you look hard enough.  --&gt;
+&lt;!-- Statisticians need not only be scolds. --&gt;
+
+&lt;!-- P-values are a method of protecting researchers from declaring truth based on patterns in noise, and so it is ironic that, by way of data-dependent analyses, p-values are often used to lend credence to noisy claims based on small samples. --&gt;
+&lt;!-- Working scientists are also keenly aware of the risks of data dredging, and they use confidence intervals and p-values as a tool to avoid getting fooled by noise. Unfortunately, a byproduct of all this struggle and care is that, when a statistically significant pattern does show up, it is natural to get excited and believe it. It is the very fact that scientists generally don’t cheat, generally don’t go fishing for statistical significance, that they are inclined to draw strong conclusions when they do encounter a pattern that is strong enough to cross the p &lt; .05 threshold. --&gt;
+
+&lt;!-- The authors wrote, “We showed that upper-body strength in modern adult men in- fluences their willingness to bargain in their own self-interest over income and wealth redistribution. These effects were replicated across cultures and, as expected, found only among males.” Actually, two of their three studies were of college students, and they did not actually measure anybody’s upper-body strength; they just took measure- ments of arm circumference. It’s a longstanding tradition to do research studies using proxy measures on students—but if it’s OK to do so, you should be open about it; instead of writing about “upper-body strength” and “men,” be direct and say “arm circumference” and “male students.” Own your research choices! --&gt;
+
+---
+background-image: url(https://pbs.twimg.com/media/D85MmnMUYAAAEGk?format=jpg&amp;name=medium)
+background-size: contain
+
+---
+## Choosing the correct regression model 
+
+As much a science as it is an art. Statistical methods can help point you in the right direction but ultimately you’ll need to incorporate other considerations.
+
+### Theory
+
+Research what others have done and incorporate those findings into constructing your model. Before beginning the regression analysis, develop an idea of what the important variables are along with their relationships, coefficient signs, and effect magnitudes. Building on the results of others makes it easier both to collect the correct data and to specify the best regression model without the need for data mining.
+
+Theoretical considerations should not be discarded based solely on statistical measures. After you fit your model, determine whether it aligns with theory and possibly make adjustments. For example, based on theory, you might include a predictor in the model even if its p-value is not significant. If any of the coefficient signs contradict theory, investigate and either change your model or explain the inconsistency.
+
+### Complexity
+
+You might think that complex problems require complex models, but many studies show that simpler models generally produce more precise predictions. Given several models with similar explanatory ability, the simplest is most likely to be the best choice. Start simple, and only make the model more complex as needed. The more complex you make your model, the more likely it is that you are tailoring the model to your dataset specifically, and generalizability suffers.
+
+Verify that added complexity actually produces narrower prediction intervals. Check the predicted R-squared and don’t mindlessly chase a high regular R-squared!
+
+### Residual Plots
+
+As you evaluate models, check the residual plots because they can help you avoid inadequate models and help you adjust your model for better results. For example, the bias in underspecified models can show up as patterns in the residuals, such as the need to model curvature. The simplest model that produces random residuals is a good candidate for being a relatively precise and unbiased model.
+
+In the end, no single measure can tell you which model is the best. Statistical methods don't understand the underlying process or subject-area. Your knowledge is a crucial part of the process!
+
+---
+## Statisticsal Modelling
+Why is this necessary?
+- knowing what methods are out there can help you decide whether and how you can answer the research question you have
+- perhaps more importantly, knowing what methods are out there can inspire you to consider a research question you hadn't yet considered
+
+In some cases, your model choice will be dictated by the type and/or distribution of the dependent variable,
+or, less commonly, the independent variables.
+For example, continuous unbounded DVs may be treated with linear regression,
+binary DVs might be treated with logistic regression,
+or discrete, non-negative DVs could be modelled with a Poisson regression.
+If the relationship is more difficult, perhaps because there is multicollinearity, a lack of theory, or outliers,
+you might want to use a more robust or regularised form of regression.
+
+More importantly, you will make your choice based on the research question that you have.
+You will see that most of the above models are adapted for particular questions and have particular illustrative cases.
+However, *being familiar with more methods allows you to see more potential research questions as potentially answerable*.
+For example, how can we think of different ways to specify the `swiss` dataset to ask slightly different questions?
+Maybe some of them are more interesting than if we just stuck to the original data given.
+
+The final consideration is the state of the literature to which you are speaking.
+There is an argument to be made for sticking with whatever models are conventional in your field.
+After all, you cannot fight all battles all at once with reviewers.
+Try to manage the degrees of innovation in each paper/chapter.
+However, in some cases your point is that the literature have missed something
+or come to the wrong conclusions, and this can be supported by some small methodological innovation.
+
+
+--
+c## The ABCs of stats
+
+Attend to the details
+- Trends and patterns are important, but so are outliers,
+missing data points, and inconsistencies
+
+Be conservative, cautious and careful
+- Always a possibility you are wrong, don’t blind yourself to biases, measurement error etc by an agenda
+
+Contextualise
+- Place your analysis into the bigger picture, look behind and around the data to inform your interpretation
+
+---
+lass: left, middle
+
+.blockquote[It is easy to lie with statistics, but easier without them.
+
+~ Frederick Mosteller]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="libs/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>`"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
