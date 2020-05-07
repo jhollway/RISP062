@@ -1,24 +1,15 @@
-unnamed-chunk-1	
-unnamed-chunk-2	
+booklogos	
+rlogos	
 simulatedDataCode	
 simulatedData	
 lotsOfModelsCode	
 lotsOfModels	models
-unnamed-chunk-3	sim1_mod
-unnamed-chunk-4	
-unnamed-chunk-5	
-unnamed-chunk-6	
-unnamed-chunk-7	
-unnamed-chunk-8	iris
-unnamed-chunk-9	
-unnamed-chunk-10	
-unnamed-chunk-11	
-unnamed-chunk-12	
 twoModels	candidates	dists	obs	pred	squares
-setup	old
-unnamed-chunk-13	
-unnamed-chunk-14	
 bestModels	measure_distance	model1	models	sim1_dist
+lm	sim1_mod
 linearRegression	sim1_mod
 regressionResults	
+forestplot	sim1	sim2_model
 residuals	
+forestplotstd	
+plotBestModels	

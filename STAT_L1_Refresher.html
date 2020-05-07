@@ -411,7 +411,14 @@ Let’s use a model to capture that pattern and make it explicit...
 ]
 
 .pull-left[
-![](STAT_L1_Refresher_files/figure-html/simulatedData-1.png)&lt;!-- --&gt;
+
+```r
+library(modelr)
+library(ggplot2)
+ggplot(sim1, aes(x, y)) + geom_point()
+```
+
+&lt;img src="STAT_L1_Refresher_files/figure-html/simulatedData-1.png" width="504" /&gt;
 ]
 
 ---
@@ -423,6 +430,7 @@ by randomly generating a few and overlaying them on the data.
 
 
 ```r
+seed(123)
 models &lt;- tibble(a1 = runif(250, -20, 40), 
                  a2 = runif(250, -5, 5))
 
@@ -441,7 +449,16 @@ so that we can work out which ones are good, bad, and ugly.
 ]
 
 .pull-left[
-![](STAT_L1_Refresher_files/figure-html/lotsOfModels-1.png)&lt;!-- --&gt;
+
+```r
+models &lt;- tibble(a1 = runif(250, -20, 40), a2 = runif(250, -5, 5))
+
+ggplot(sim1, aes(x, y)) + 
+  geom_abline(aes(intercept = a1, slope = a2), data = models, alpha = 1/4) +
+  geom_point()
+```
+
+&lt;img src="STAT_L1_Refresher_files/figure-html/lotsOfModels-1.png" width="504" /&gt;
 ]
 
 ---
@@ -461,7 +478,7 @@ RMSE has lots of appealing mathematical properties, which we’re not going to t
 
 .pull-left[
 
-![](STAT_L1_Refresher_files/figure-html/twoModels-1.png)&lt;!-- --&gt;
+&lt;img src="STAT_L1_Refresher_files/figure-html/twoModels-1.png" width="504" /&gt;
 
 ]
 
@@ -476,16 +493,44 @@ Then we just highlight the candidate model that comes closest to (or, least far 
 Let's overlay the 10 best models from our random selection on to the data.
 
 I’ve coloured the models by -dist: this is an easy way to make sure that the best models (i.e. the ones with the smallest distance) get the brighest colours.
+
+
+```r
+model1 &lt;- function(a, data) {
+  a[1] + data$x * a[2]
+}
+measure_distance &lt;- function(mod, data) {
+  diff &lt;- data$y - model1(mod, data)
+  sqrt(mean(diff ^ 2))
+}
+sim1_dist &lt;- function(a1, a2) {
+  measure_distance(c(a1, a2), sim1)
+}
+models &lt;- models %&gt;% 
+  mutate(dist = purrr::map2_dbl(a1, a2, sim1_dist))
+```
+
 ]
 
 .pull-left[
-![](STAT_L1_Refresher_files/figure-html/bestModels-1.png)&lt;!-- --&gt;
+
+```r
+ggplot(sim1, aes(x, y)) + 
+  geom_point(size = 2, colour = "grey30") + 
+  geom_abline(
+    aes(intercept = a1, slope = a2, colour = -dist), 
+    data = filter(models, rank(dist) &lt;= 10)
+  )
+```
+
+&lt;img src="STAT_L1_Refresher_files/figure-html/plotBestModels-1.png" width="504" /&gt;
 ]
 
 ---
-## The best model
 
 .pull-left[
+## The best model
+
 However, since these belong to the family of *linear models* we can exploit some connections between geometry, calculus, and linear algebra to quickly identify the single best solution. So instead of trying lots of random models, R has a tool specifically designed for fitting linear models called `lm()`:
 
 
@@ -505,7 +550,18 @@ $$ y = a + b_1 x $$
 ]
 
 .pull-left[
-![](STAT_L1_Refresher_files/figure-html/linearRegression-1.png)&lt;!-- --&gt;
+
+```r
+sim1_mod &lt;- lm(y ~ x, data = sim1)
+# coef(sim1_mod)
+
+ggplot(sim1, aes(x, y)) + 
+  geom_point(size = 2, colour = "grey30") + 
+  geom_abline(intercept = sim1_mod$coefficients[1], 
+              slope = sim1_mod$coefficients[2])
+```
+
+&lt;img src="STAT_L1_Refresher_files/figure-html/linearRegression-1.png" width="504" /&gt;
 ]
 
 ???
@@ -550,9 +606,10 @@ $$ (a + b_11) - (a + b_10) = b_1 $$
 We talk about this being a 'one unit change', but you can also give it a substantive interpretation...
 
 ---
-## Simple linear regression
 
 .pull-left[
+## Simple linear regression
+
 But how sure should we be that we couldn't have just gotten this particular slope by chance,
 and that actually it doesn't tell us much beyond this particular sample?
 
@@ -607,19 +664,14 @@ lm(y ~ x, sim1) %&gt;% tab_model()
 &lt;/table&gt;
 
 ```r
-# Alternatives
-
-# library(stargazer)
 # sim1_mod &lt;- lm(y ~ x, sim1)
-# stargazer(sim1_mod, type = "text")
+# stargazer::stargazer(sim1_mod, type = "text")
 
-# library(finalfit)
-# finalfit(sim1, “y”, “x”)
+# finalfit::finalfit(sim1, “y”, “x”)
 
-# library(modelsummary)
 # models &lt;- list()
 # models[['OLS 1']] &lt;- lm(y ~ x, sim1)
-# msummary(models)
+# stargazer::msummary(models)
 ```
 ]
 
@@ -644,6 +696,35 @@ $$ (a + b_1 (x_1 + 1) + b_2 x_2) -  (a + b_1 x_1 + b_2 x_2) = b_1$$
 The effect of each independent variable is the slope *controlling for* or *adjusting for* the effects of (all) other variables.
 
 Thus, the best way of thinking about regression with more than one independent variable is to imagine a separate regression line for age at each value of religiosity, and vice versa.
+
+---
+### Forest plots
+
+.pull-left[
+
+```r
+sim1$z &lt;- sim2$y[1:30]
+sim2_model &lt;- lm(y ~ x + z, sim1)
+plot_model(sim2_model, vline.color = "red", sort.est = TRUE, show.values = TRUE, value.offset = .3)
+```
+
+&lt;img src="STAT_L1_Refresher_files/figure-html/forestplot-1.png" width="504" /&gt;
+]
+
+.pull-right[
+And for standardised coefficients...
+
+
+```r
+plot_model(sim2_model, vline.color = "red", sort.est = TRUE, show.values = TRUE, value.offset = .3, type= "std")
+```
+
+&lt;img src="STAT_L1_Refresher_files/figure-html/forestplotstd-1.png" width="504" /&gt;
+]
+
+???
+
+See [here](https://strengejacke.github.io/sjPlot/articles/plot_model_estimates.html) for more on forest plots.
 
 ---
 ## Residuals
@@ -687,7 +768,12 @@ But how wrong they are and how they are wrong can tell us a lot about whether we
 The main way to explore this is by examining the *residuals*: the remaining deviation between model predictions and the actual observations
 (the _e_ in our model equation).
 
-![](STAT_L1_Refresher_files/figure-html/residuals-1.png)&lt;!-- --&gt;![](STAT_L1_Refresher_files/figure-html/residuals-2.png)&lt;!-- --&gt;![](STAT_L1_Refresher_files/figure-html/residuals-3.png)&lt;!-- --&gt;![](STAT_L1_Refresher_files/figure-html/residuals-4.png)&lt;!-- --&gt;
+
+```r
+plot(sim1_mod)
+```
+
+&lt;img src="STAT_L1_Refresher_files/figure-html/residuals-1.png" width="504" /&gt;&lt;img src="STAT_L1_Refresher_files/figure-html/residuals-2.png" width="504" /&gt;&lt;img src="STAT_L1_Refresher_files/figure-html/residuals-3.png" width="504" /&gt;&lt;img src="STAT_L1_Refresher_files/figure-html/residuals-4.png" width="504" /&gt;
 
 ---
 ## Some final points on data
