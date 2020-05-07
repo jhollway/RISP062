@@ -634,13 +634,14 @@ For example, consider the prediction equation of _k=2_ explanatory variables:
 
 $$ E(Y) = a + b_1 x_1 + b_2 x_2 $$
 
-_b1, b2, ..., bk_ are partial regression coefficients. That is, there is a linear relationship between _E(Y)_ and _x1_ with the slope _b1_, __controlling for other predictors in the model__.
+_b1, b2, ..., bk_ are partial regression coefficients. 
+That is, there is a linear relationship between _E(Y)_ and _x1_ with the slope _b1_, __controlling for other predictors in the model__.
 
 If x1 goes up 1 unit with x2 held constant, the change in E(Y) is:
 
 $$ (a + b_1 (x_1 + 1) + b_2 x_2) -  (a + b_1 x_1 + b_2 x_2) = b_1$$
 
-The effect of each independent variable is the slope controlling for the effects of (all) other variables.
+The effect of each independent variable is the slope *controlling for* or *adjusting for* the effects of (all) other variables.
 
 Thus, the best way of thinking about regression with more than one independent variable is to imagine a separate regression line for age at each value of religiosity, and vice versa.
 
@@ -776,6 +777,32 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
 // adds .remark-code-has-line-highlighted class to <pre> parent elements
 // of code chunks containing highlighted lines with class .remark-code-line-highlighted
 (function(d) {
@@ -793,17 +820,6 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
-
-<script>
-(function() {
-  var links = document.getElementsByTagName('a');
-  for (var i = 0; i < links.length; i++) {
-    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
-      links[i].target = '_blank';
-    }
-  }
-})();
-</script>
 
 <script>
 slideshow._releaseMath = function(el) {
