@@ -1012,9 +1012,18 @@ While sequence analysis has been largely exploratory and descriptive,
 more explanatory methods have been developed more recently:
 - .red[Discrepancy analysis] seeks to explain how sequence variation (discrepancy) is related to different covariates.
 - .red[Classification and Regression Trees] (CART) can be used to summarise how the successive application of a set of covariates determines different types of sequences.
+  - classification trees are for categorical dependent variables
+  - regression trees and for continuous dependent variables
 - .red[Markov chains] can be used to identify how covariates impact transition probabilities.
 
 ???
+
+The CART algorithm is structured as a sequence of questions, the answers to which determine what the next question, if any should be.  The result of these questions is a tree like structure where the ends are terminal nodes at which point there are no more questions.
+
+The main elements of CART (and any decision tree algorithm) are:
+Rules for splitting data at a node based on the value of one variable;
+Stopping rules for deciding when a branch is terminal and can be split no more; and
+Finally, a prediction for the target variable in each terminal node.
 
 For more on Markov chains, see Moore and Siegel (2013: 327-351)
 
@@ -1352,7 +1361,7 @@ The short version is that it’s easy to find a p &lt; .05 comparison even if no
 ---
 ### Or, a walk through the garden of forking paths
 
-Gelman and Loken (2013) reflect that “fishing” and “p-hacking” (and even “researcher degrees of freedom”) unfortunate:
+[Gelman and Loken](https://www.americanscientist.org/article/the-statistical-crisis-in-science) (2013) reflect that “fishing” and “p-hacking” (and even “researcher degrees of freedom”) unfortunate:
 1. when such terms are used, a misleading implication that researchers were consciously trying out many different analyses on a single data set
 2. it can lead researchers who know they did not try out many different analyses to mistakenly think they are not so strongly subject to problems of researcher degrees of freedom
 
@@ -1415,7 +1424,7 @@ Perhaps in psychology, but more difficult in political science, economics, and s
 - often most important hypotheses could never have been formulated ahead of time; you need to see the data first, e.g. recognising potential non-linearities that suggest interactions
 
 ---
-### MBnferroni correction
+### Bonferroni correction
 
 Methods for dealing with multiple testing frequently call for adjusting `\(\alpha\)` in some way, 
 so that the probability of observing at least one significant result due to chance remains below your desired significance level.
