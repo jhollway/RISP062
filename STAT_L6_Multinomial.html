@@ -310,6 +310,8 @@ Multinomial logit should only be used in cases where outcome categories
 
 IIA is closely related to the notion of transitive (or acylic) preferences.
 
+Roughly, the IIA assumption means that adding or deleting alternative outcome categories does not affect the odds among the remaining outcomes.
+
 ---
 #### Diagnosing Violations of the IIA Assumption
 
@@ -512,6 +514,13 @@ Unlike binary logit, we constrain the probabilities to sum to unity, gaining eff
 Unlike ordinal logit, does not constrain the \\(\beta\\)s to be constant across categories.
 Any multinomial model can be reestimated with a different reference category.
 
+???
+
+Since multinomial regression uses a maximum likelihood estimation method, 
+it requires a large sample size. 
+It also uses multiple equations. 
+This implies that it requires an even larger sample size than ordinal or binary logistic regression.
+
 ---
 ## From probability to likelihood, again
 
@@ -564,6 +573,21 @@ mnl2 &lt;- multinom(vote ~ female + persfinance + natlecon + dem + rep, vote92)
 *mnl3 &lt;- multinom(relevel(vote, ref = "Bush") ~ female +
                    persfinance + natlecon + dem + rep, vote92)
 ```
+
+???
+
+Complete or quasi-complete separation: 
+Complete separation means that the outcome variable separate a predictor variable completely, 
+leading to perfect prediction by the predictor variable.
+Perfect prediction means that only one value of a predictor variable is associated with only one value of the response variable. 
+You can usually tell from the output of the regression coefficients that something is wrong. 
+You can then do a two-way tabulation of the outcome variable with the problematic variable to confirm this 
+and then rerun the model without the problematic variable.
+
+You should check for empty or small cells 
+by doing a cross-tabulation between categorical predictors and the outcome variable. 
+If a cell has very few cases (a small cell), 
+the model may become unstable or it might not even run at all.
 
 ---
 class: center, middle
@@ -637,6 +661,11 @@ lrtest(mnl1,mnl2)
 ]
 
 ???
+
+Unlike logistic regression where there are many statistics for performing model diagnostics, 
+it is not as straightforward to do diagnostics with multinomial logistic regression models. 
+For the purpose of detecting outliers or influential data points, 
+one can run separate logit models and use the diagnostics tools on each model.
 
 And what would happen if you did a likelihood ratio test on model 2 and 3?
 
@@ -715,6 +744,10 @@ confusionMatrix(data=pred, vote92$vote)
 
 .small[
 
+```r
+library(texreg)
+htmlreg(list(mnl1, mnl2, mnl3), doctype = F, single.row = T)
+```
 ]
 
 
@@ -867,6 +900,10 @@ sjPlot::plot_model(mnl2, type = "pred",
 We can use the basic probability statement of the MNL model to generate predictions for the probability of each category, a la binary logit/probit.
 
 
+```r
+head(predict(mnl2, vote92))
+```
+
 ```
 ## [1] Bush    Bush    Clinton Bush    Clinton Clinton
 ## Levels: Perot Clinton Bush
@@ -905,7 +942,7 @@ gg3logit(field3logit(mnl2, 'natlecon')) +
 &lt;img src="STAT_L6_Multinomial_files/figure-html/ternary1-1.png" width="504" /&gt;
 
 ```
-## Error in validDetails.text(x): invalid 'rot' value
+## Error in validDetails.segments(x): invalid 'arrow' argument
 ```
 ]
 
@@ -925,7 +962,7 @@ gg3logit(natl + pers + female + dem + rep) +
 &lt;img src="STAT_L6_Multinomial_files/figure-html/ternary2-1.png" width="504" /&gt;
 
 ```
-## Error in validDetails.text(x): invalid 'rot' value
+## Error in validDetails.segments(x): invalid 'arrow' argument
 ```
 ]
 
@@ -936,7 +973,8 @@ I haven't seen them used in published work much.
 
 The idea, as Ward and Ahlquist explain, 
 is to display the combination of probabilities simultaneously.
-I couldn't replicate their plot, however.
+Their plot is done with the `vcd::ternaryplot()` function,
+but this just visualizes compositional, 3-dimensional data in an equilateral triangle.
 
 What I found for you is the `plot3logit` package.
 This represents the vector field of changing probabilities
@@ -996,6 +1034,7 @@ class: center, middle
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="libs/remark-latest.min.js"></script>
+<script src="macros.js"></script>
 <script>var slideshow = remark.create({
 "ratio": "16:9",
 "highlightStyle": "github",
@@ -1042,6 +1081,32 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
 // adds .remark-code-has-line-highlighted class to <pre> parent elements
 // of code chunks containing highlighted lines with class .remark-code-line-highlighted
 (function(d) {
@@ -1059,17 +1124,6 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
-
-<script>
-(function() {
-  var links = document.getElementsByTagName('a');
-  for (var i = 0; i < links.length; i++) {
-    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
-      links[i].target = '_blank';
-    }
-  }
-})();
-</script>
 
 <script>
 slideshow._releaseMath = function(el) {
