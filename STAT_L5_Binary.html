@@ -320,6 +320,13 @@ The standard logistic has the following characteristics:
 ]
 
 .pull-right[
+
+```r
+ggplot(data.frame(x = c(-4, 4)), aes(x = x)) +
+stat_function(fun = dlogis, colour = "red") +
+stat_function(fun = dnorm, colour = "blue")
+```
+
 &lt;img src="STAT_L5_Binary_files/figure-html/pdfcompare-1.png" width="504" /&gt;
 ]
 
@@ -345,6 +352,13 @@ As an example, consider some values for _u_:
 ]
 
 .pull-right[
+
+```r
+ggplot(data.frame(x = c(-4, 4)), aes(x = x)) +
+stat_function(fun = plogis, colour = "red") +
+stat_function(fun = pnorm, colour = "blue")
+```
+
 &lt;img src="STAT_L5_Binary_files/figure-html/cdfcompare-1.png" width="504" /&gt;
 
 Notice the sigmoidal curve and the thick tails!
@@ -493,6 +507,14 @@ We can estimate this model using (e.g.) the `glm()` function in R.
 
 .pull-right[
 
+
+```r
+fullmodel &lt;- glm(War ~ VotedBush + Republican, 
+                 data=iraqVote, 
+                 family=binomial(link="logit"))
+tab_model(fullmodel, transform = NULL)
+```
+
 &lt;table style="border-collapse:collapse; border:none;"&gt;
 &lt;tr&gt;
 &lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
@@ -517,7 +539,7 @@ We can estimate this model using (e.g.) the `glm()` function in R.
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.012&lt;/strong&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Republican []&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Republican [Republican]&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;3.02&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.30&amp;nbsp;&amp;ndash;&amp;nbsp;5.95&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.005&lt;/strong&gt;&lt;/td&gt;
@@ -563,6 +585,14 @@ but we have a few options to help us get the most out of this...
 ]
 
 .pull-right[
+
+```r
+fullmodel &lt;- glm(War ~ VotedBush + Republican, 
+                 data=iraqVote, 
+                 family=binomial(link="logit"))
+tab_model(fullmodel, transform = NULL)
+```
+
 &lt;table style="border-collapse:collapse; border:none;"&gt;
 &lt;tr&gt;
 &lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
@@ -587,7 +617,7 @@ but we have a few options to help us get the most out of this...
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.012&lt;/strong&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Republican []&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Republican [Republican]&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;3.02&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.30&amp;nbsp;&amp;ndash;&amp;nbsp;5.95&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.005&lt;/strong&gt;&lt;/td&gt;
@@ -633,7 +663,7 @@ but we have a few options to help us get the most out of this...
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.012&lt;/strong&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Republican []&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Republican [Republican]&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;3.02&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.30&amp;nbsp;&amp;ndash;&amp;nbsp;5.95&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.005&lt;/strong&gt;&lt;/td&gt;
@@ -686,6 +716,13 @@ Much more intuitive than log-odds!
 Would you prefer to bet on a horse winning at the track based on log-odds of -1.95 or an odds ratio of 7 to 1?
 ]
 
+???
+
+For more on probability and odds see [this](https://stats.seandolinar.com/statistics-probability-vs-odds/).
+
+---
+background-image: url(https://media.giphy.com/media/tALnlXYyyDJFS/giphy.gif)
+background-size: contain
 
 ---
 .pull-left[
@@ -708,6 +745,12 @@ Quick Guide:
 ]
 
 .pull-right[
+
+```r
+ # sjPlot reports OR by default
+ tab_model(fullmodel)
+```
+
 &lt;table style="border-collapse:collapse; border:none;"&gt;
 &lt;tr&gt;
 &lt;th style="border-top: double; text-align:center; font-style:normal; font-weight:bold; padding:0.2cm;  text-align:left; "&gt;&amp;nbsp;&lt;/th&gt;
@@ -732,7 +775,7 @@ Quick Guide:
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.012&lt;/strong&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Republican []&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Republican [Republican]&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;20.47&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;3.69&amp;nbsp;&amp;ndash;&amp;nbsp;384.20&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.005&lt;/strong&gt;&lt;/td&gt;
@@ -822,9 +865,18 @@ either in-sample, out-of-sample, or totally-made-up,
 to `predict()` and see what probability of a 1 would be predicted by the model:
 
 
+```r
+predict(fullmodel, type="response")[1:4]
+```
+
 ```
 ##         1         2         3         4 
 ## 0.9850607 0.9850607 0.9968734 0.9968734
+```
+
+```r
+(test &lt;- data.frame(Republican = as.factor(c("Democrat","Democrat","Republican","Republican")),
+                   VotedBush = seq(20,80, by = 20)))
 ```
 
 ```
@@ -833,6 +885,10 @@ to `predict()` and see what probability of a 1 would be predicted by the model:
 ## 2   Democrat        40
 ## 3 Republican        60
 ## 4 Republican        80
+```
+
+```r
+predict(fullmodel, newdata=test, type="response")
 ```
 
 ```
@@ -857,8 +913,19 @@ However, some argue that marginal effects for categorical independent variables 
 ]
 
 .pull-right[
-&lt;img src="STAT_L5_Binary_files/figure-html/margins-1.png" width="504" /&gt;
+
+```r
+plot_model(fullmodel, type = "pred", 
+     terms = c("VotedBush","Republican"),
+     colors = c("blue","red"))
+```
+
+&lt;img src="STAT_L5_Binary_files/figure-html/plotmargins-1.png" width="504" /&gt;
 ]
+
+???
+
+See [here](https://strengejacke.github.io/sjPlot/articles/plot_marginal_effects.html) for more on `sjPlot`'s `plot_model()`.
 
 ---
 ### Average Marginal Effects
@@ -866,6 +933,11 @@ However, some argue that marginal effects for categorical independent variables 
 One can also calculate AMEs (average marginal effects), 
 which are the differences in values associated with a unit change in the specified covariate.
 
+
+```r
+library(margins)
+summary(margins(fullmodel))
+```
 
 ```
 ##                factor    AME     SE      z      p  lower  upper
@@ -932,6 +1004,15 @@ Most notable is McFadden’s \\(R^2\\):
 - ranges from 0 to just under 1, with values closer to zero indicating that the model has no predictive power.
 
 
+```r
+library(pscl)
+pR2(fullmodel)  # look for 'McFadden'
+```
+
+```
+## fitting null model for pseudo-r2
+```
+
 ```
 ##         llh     llhNull          G2    McFadden        r2ML        r2CU 
 ## -35.9421472 -53.9276341  35.9709740   0.3335115   0.3021211   0.4578199
@@ -951,6 +1032,13 @@ There is some discussion of pseudo-\\(R^2\\) [here](https://statisticalhorizons.
 ### Akaike’s information criterion (AIC)
 
 Better to report the log-likelihood and use AIC and BIC to compare models (as discussed last week).
+
+
+```r
+partyonly &lt;- glm(War ~ Republican, data=iraqVote, 
+                 family=binomial(link="logit"))
+tab_model(partyonly, fullmodel, show.loglik = T, show.aic = T, show.r2 = F)
+```
 
 &lt;table style="border-collapse:collapse; border:none;"&gt;
 &lt;tr&gt;
@@ -977,7 +1065,7 @@ Better to report the log-likelihood and use AIC and BIC to compare models (as di
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;0.017&lt;/strong&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Republican []&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Republican [Republican]&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;36.41&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;7.06&amp;nbsp;&amp;ndash;&amp;nbsp;669.38&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
@@ -1037,6 +1125,10 @@ It would provide evidence against the reduced model in favor of the current mode
 
 .pull-right[
 
+```r
+anova(partyonly, fullmodel, test ="Chisq")
+```
+
 ```
 ## Analysis of Deviance Table
 ## 
@@ -1047,6 +1139,11 @@ It would provide evidence against the reduced model in favor of the current mode
 ## 2        97     71.884  1    7.616 0.005785 **
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+```r
+library(lmtest)
+lrtest(partyonly, fullmodel)
 ```
 
 ```
@@ -1093,6 +1190,18 @@ The metric ranges from 0.50 to 1.00, and some good rules of thumb for interpreta
 
 .pull-right[
 
+
+```r
+library(plotROC)
+test &lt;- data.frame(resp = c(iraqVote$War), 
+                    PartyOnly = predict(partyonly, iraqVote, type="response"),
+                    FullModel = predict(fullmodel, iraqVote, type="response"))
+test &lt;- melt_roc(test, "resp", c("PartyOnly","FullModel"))
+out &lt;- ggplot(test, aes(d = D, m = M, colour = name)) +
+   geom_roc(n.cuts = 0) + style_roc(theme = theme_grey)
+out + annotate("text", x = .75, y = .25, label = paste(paste(unique(test$name), "AUC =", round(calc_auc(out)$AUC, 2)), collapse = "\n"))
+```
+
 &lt;img src="STAT_L5_Binary_files/figure-html/roc-1.png" width="504" /&gt;
 
 By these criteria, our full voting model predicts well,
@@ -1108,6 +1217,10 @@ There are a range of variations on this theme.
 I may add some notes about some of the more common ones if I get time.
 
 ---
+background-image: url(https://i2.wp.com/modelplot.github.io/img/cartoonrocplot.jpg?w=456&amp;ssl=1)
+background-size: contain
+
+---
 ## Wald Test
 
 We learned last week that we can use the Wald test to evaluate the statistical significance of each coefficient in the model.
@@ -1117,11 +1230,20 @@ Idea is to test the hypothesis that the coefficient of an feature in the model i
 If test fails to reject null hypothesis, removing the variable from the model should not substantially harm the fit of that model.
 
 
+```r
+library(survey)
+regTermTest(fullmodel, "VotedBush")
+```
+
 ```
 ## Wald test for VotedBush
 ##  in glm(formula = War ~ VotedBush + Republican, family = binomial(link = "logit"), 
 ##     data = iraqVote)
 ## F =  6.308672  on  1  and  97  df: p= 0.013666
+```
+
+```r
+regTermTest(fullmodel, "Republican")
 ```
 
 ```
@@ -1167,6 +1289,7 @@ class: center, middle
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="libs/remark-latest.min.js"></script>
+<script src="macros.js"></script>
 <script>var slideshow = remark.create({
 "ratio": "16:9",
 "highlightStyle": "github",
@@ -1213,6 +1336,32 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
     deleted = true;
   });
 })();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
 // adds .remark-code-has-line-highlighted class to <pre> parent elements
 // of code chunks containing highlighted lines with class .remark-code-line-highlighted
 (function(d) {
@@ -1230,17 +1379,6 @@ if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   }
   preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
 })(document);</script>
-
-<script>
-(function() {
-  var links = document.getElementsByTagName('a');
-  for (var i = 0; i < links.length; i++) {
-    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
-      links[i].target = '_blank';
-    }
-  }
-})();
-</script>
 
 <script>
 slideshow._releaseMath = function(el) {
