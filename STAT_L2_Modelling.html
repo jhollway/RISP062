@@ -1247,12 +1247,20 @@ Multicollinearity even more of a problem under iterative estimation techniques b
 ---
 ## Model fit
 
+.pull-left-1[
+
+![](https://i.pinimg.com/originals/c3/42/4b/c3424b53196516a7e9a7436786aae4de.gif)
+]
+
+
+.pull-right-2[
 - We've talked about when a model is the 'best', but when is it 'good'?
 
 - For linear regression, we normally use a measure called \\(R^2\\)
   - measures proportion of variation in Y that is explained by the fitted model
   - varies between 0 and 1, with 1 representing 'perfect' explanation
   - increases monotonically with each additional feature
+]
   
 - However, sometimes \\(R^2\\) not the most useful measure of model ‘performance’
   - High \\(R^2\\) values don’t automatically make your model a “good” model
@@ -1261,9 +1269,9 @@ Multicollinearity even more of a problem under iterative estimation techniques b
   - Or whether it makes sense to favour a slightly more complex model over a more parsimonious one
 
 ---
-### Overfitting
 
 .pull-left[
+### Overfitting
 
 Overfitting is "analysis that corresponds too closely to a particular set of data and may therefore fail to fit additional data or predict future observations reliably".
 
@@ -1276,6 +1284,8 @@ To lessen the chance of, or amount of, overfitting, one can:
 ]
 
 .pull-right[
+
+![](https://i.gifer.com/g3IK.gif)
 
 ![](https://upload.wikimedia.org/wikipedia/commons/6/68/Overfitted_Data.png)
 
@@ -1521,6 +1531,10 @@ Often coupled with (mistaken) belief that _only_ statistically significant featu
 - __a lack of statistical significance does not mean definitely no effect; it just means we cannot reject the hypothesis that there is no effect__
 - sometimes just an ambiguous relationship, particular if nonlinear/endogeneity/multicollinearity
 - moreover, can lose valuable predictive information from deleting marginally significant variables
+
+???
+
+For more on (machine-learning style) model selection, see [this link](http://r-statistics.co/Model-Selection-in-R.html).
 
 ---
 

@@ -729,6 +729,10 @@ basically allowing coefficients to be zero for some
 
 ???
 
+Maximum a priori (MAP) estimation with Gaussian priors is often referred to as “ridge regression”; with Laplace priors MAP estimation is known as the “lasso”. 
+MAP estimation with Gaussian, Laplace or Cauchy priors is known as parameter shrinkage. 
+Gaussian and Laplace are forms of regularized regression, with the Gaussian version being regularized with the L2 norm (Euclidean distance, called the Frobenius norm for matrices of parameters) and the Laplace version being regularized with the L1 norm (taxicab distance or Manhattan metric); other Minkowski metrics may be used for shrinkage.
+
 See [here](https://uc-r.github.io/regularized_regression) for more.
 
 ---
@@ -1405,11 +1409,19 @@ The mistake is in thinking that, if the particular path that was chosen yields s
 ---
 ## Replication crisis
 
+.pull-left[
 There is a growing realization that statistically significant claims in scientific publications are routinely mistaken, and this has raised a growing 'replication crisis' and m(at least partly responsible) istrust in experts. 
 
 [Statscheck the Game](https://sachaepskamp.github.io/StatcheckTheGame/)
 
 There's even an [online support](https://sachaepskamp.shinyapps.io/statcheck/)
+]
+
+.pull-right[
+
+![](https://i.gifer.com/50zL.gif)
+
+]
 
 ---
 ## What, then, can be done? 
