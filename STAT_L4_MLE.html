@@ -745,6 +745,8 @@ mle.fit &lt;- optim(
 if(mle.fit$convergence != 0) print("WARNING: Convergence Problems; Try again!")
 ```
 
+&lt;!-- https://www.r-bloggers.com/how-to-build-a-logistic-regression-model-from-scratch-in-r/ --&gt;
+
 ---
 ## Establishing uncertainty
 
@@ -1006,6 +1008,43 @@ That is, rather than consider the data as random and the parameters as fixed, ML
 What parameter values are most likely to have generated the data?
 
 It is thus quite similar to a Bayesian framework.
+
+---
+## Generalized Linear Models
+
+So what is MLE good for then?
+
+--
+
+MLE is most often used as a flexible estimation technique for .red[Generalized Linear Models] (GLMs).
+
+Whereas .red[General Linear Models] (I know, I know) require that the errors follow the normal distribution 
+(also known as the bell curve or Gaussian Distribution),
+.red[Generalized Linear Models] allows the specification of models where errors follow different distributions.
+
+GLMs are one of the most useful modern statistical tools,
+because they can be applied to many different types of data:
+e.g. binary, ordinal, categorical, count, and waiting time data.
+
+GLMs use different link functions to 
+denote a different relationship between the linear model and the response variable (e.g. inverse, logit, log, etc). 
+For example for the poisson regression, 
+the link function is the "log".
+
+The link function is not the same thing as the conditional distribution of the response.
+In R, we often use the `glm()` function for GLMs.
+There one specifies the conditional distribution, e.g. `binomial`, as well as sometimes the link function (there are defaults/canonical link functions), e.g. `link = logit`.
+
+
+```r
+?family # for more
+```
+
+???
+
+For general linear models, the link function is just a simple identity function, `\(f(z)=z\)`.
+
+See [here](https://www.r-bloggers.com/generalized-linear-models-understanding-the-link-function/).
 
 ---
 class: center, middle
