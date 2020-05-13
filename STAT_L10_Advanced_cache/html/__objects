@@ -20,3 +20,5 @@ pbox
 rpartcheck	actuals	predicteds	reli_pred
 quantreg2	model2	model3
 quantregplot	model3
+unnamed-chunk-44	catha	fertexpl
+ibreakdown	catha	fertexpl

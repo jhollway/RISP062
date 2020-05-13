@@ -20,3 +20,5 @@ pbox	T	library	pbox	suisse
 rpartcheck	!=	$	anova_mod	apply	as.factor	class_mod	colnames	is.na	mean	predict	regr.eval	suisse	swiss	which.max
 quantreg2	~	coef	plot	rq	seq	swiss
 quantregplot	~	plot	rq	seq	swiss
+unnamed-chunk-44	~	$	break_down	explain	library	lm	plot	swiss
+ibreakdown	~	$	break_down	explain	library	lm	plot	swiss

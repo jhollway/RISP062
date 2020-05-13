@@ -1541,6 +1541,40 @@ This is why I have tried to give you options for practical interpretation, where
 
 &lt;!-- The authors wrote, “We showed that upper-body strength in modern adult men in- fluences their willingness to bargain in their own self-interest over income and wealth redistribution. These effects were replicated across cultures and, as expected, found only among males.” Actually, two of their three studies were of college students, and they did not actually measure anybody’s upper-body strength; they just took measure- ments of arm circumference. It’s a longstanding tradition to do research studies using proxy measures on students—but if it’s OK to do so, you should be open about it; instead of writing about “upper-body strength” and “men,” be direct and say “arm circumference” and “male students.” Own your research choices! --&gt;
 
+???
+
+[Breakdowns](https://flowingdata.com/2018/11/05/demographic-effects-on-voting-intention/) can also be a helpful way of summarising and interpreting models.
+
+Take a look at [`DALEX`, `iBreakDown` and `ingredients`](https://github.com/ModelOriented/DrWhy) for more ideas on how to facilitate interpretation.
+
+
+```r
+catha &lt;- lm(Fertility ~ Catholic + Education + Infant.Mortality + Agriculture, swiss)
+library(DALEX)
+library(iBreakDown)
+library(ingredients)
+fertexpl &lt;- explain(catha, swiss[,-1], y = swiss$Fertility, new_observation = swiss[1,])
+```
+
+```
+## Preparation of a new explainer is initiated
+##   -&gt; model label       :  lm  ( [33m default [39m )
+##   -&gt; data              :  47  rows  5  cols 
+##   -&gt; target variable   :  47  values 
+##   -&gt; model_info        :  package stats , ver. 4.0.0 , task regression ( [33m default [39m ) 
+##   -&gt; predict function  :  yhat.lm  will be used ( [33m default [39m )
+##   -&gt; predicted values  :  numerical, min =  34.65212 , mean =  70.14255 , max =  89.75906  
+##   -&gt; residual function :  difference between y and yhat ( [33m default [39m )
+##   -&gt; residuals         :  numerical, min =  -14.67648 , mean =  -1.511808e-14 , max =  16.14219  
+##  [32m A new explainer has been created! [39m
+```
+
+```r
+plot(break_down(fertexpl, swiss[1,]))
+```
+
+&lt;img src="STAT_L10_Advanced_files/figure-html/ibreakdown-1.png" width="504" /&gt;
+
 ---
 background-image: url(https://pbs.twimg.com/media/D85MmnMUYAAAEGk?format=jpg&amp;name=medium)
 background-size: contain
