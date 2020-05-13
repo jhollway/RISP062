@@ -1177,6 +1177,33 @@ Fullmodel fits the data significantly better!
 The likelihood ratio test can be performed in R using the lrtest() function from the lmtest package or using the anova() function in base.
 
 ---
+.pull-left-1[
+
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Precisionrecall.svg/350px-Precisionrecall.svg.png)
+
+]
+
+## Classification evaluation
+
+Sensitivity and specificity are used together as measures of accuracy.
+I.e. sensitivity quantifies the avoidance of false negatives and specificity does the same for false positives. 
+For any test, there is usually a trade-off between the measures – for instance, in airport security.
+
+Precision and recall are used together as measures of relevance.
+I.e. precision is "how useful the model results are", and recall is "how complete the results are".
+
+.pull-center[
+
+ | True condition positive | True condition negative
+--------|---------|---------
+Predicted condition positive | True positive (TP) | False positive (Type I error) | Precision `\(= \frac{TP}{TP + FP}\)`
+Predicted condition negative | False negative (Type II error) | True negative (TN) | NPV `\(= \frac{TN}{TN + FN}\)`
+ | Sensitivity/Recall `\(= \frac{TP}{TP + FN}\)` | Specificity `\(= \frac{TN}{TN + FP}\)`
+
+]
+
+
+---
 
 .pull-left[
 
@@ -1190,11 +1217,11 @@ The ROC is usually visualised as a trade-off between
 rate of correct predictions versus rate of incorrect predictions.
 But we can also summarise the area under the ROC curve (AUROC or AUC) as a measure. 
 The metric ranges from 0.50 to 1.00, and some good rules of thumb for interpretation are:
-- Area under ROC = 0.90-1.00 ! Excellent (A)
-- Area under ROC = 0.80-0.90 ! Good (B)
-- Area under ROC = 0.70-0.80 ! Fair (C) 
-- Area under ROC = 0.60-0.70 ! Poor (D)
-- Area under ROC = 0.50-0.60 ! Total Failure (F)
+- Area under ROC = 0.90-1.00 = Excellent (A)
+- Area under ROC = 0.80-0.90 = Good (B)
+- Area under ROC = 0.70-0.80 = Fair (C) 
+- Area under ROC = 0.60-0.70 = Poor (D)
+- Area under ROC = 0.50-0.60 = Total Failure (F)
 
 ]
 
@@ -1220,11 +1247,32 @@ but a model including only party predicts fairly well.
 
 ???
 
-Bear in mind that ROC curves can examine both target-x-predictor pairings and target-x-model performance. An example of both are presented below.
+Another option for plotting ROC curves is the [`MLeval` package](https://www.r-bloggers.com/how-to-easily-make-a-roc-curve-in-r/).
 
-There are a range of variations on this theme.
+ROC curves were invented during WWII to help radar operators decide whether the signal they were getting indicated the presence of an enemy aircraft or was just noise. 
+The AUC has a [nice probabilistic meaning](https://www.r-bloggers.com/probabilistic-interpretation-of-auc/).
+You can learn more about [the history and the tradeoffs](https://www.r-bloggers.com/roc-curves/) involved with ROC-AUCs.
 
-I may add some notes about some of the more common ones if I get time.
+Receiver Operating Characteristics Curve traces the percentage of true positives accurately predicted by a given logit model as the prediction probability cutoff is lowered from 1 to 0. 
+For a good model, as the cutoff is lowered, it should mark more of actual 1’s as positives and lesser of actual 0’s as 1’s. 
+So for a good model, the curve should rise steeply, indicating that the TPR (Y-Axis) increases faster than the FPR (X-Axis) as the cutoff score decreases. 
+Greater the area under the ROC curve, better the predictive ability of the model.
+Bear in mind that ROC curves can examine both target-x-predictor pairings and target-x-model performance.
+
+Precision recall (PR) curves are useful for model evaluation when there is an extreme imbalance in the data and the analyst is interested particuarly in one class. 
+A good example is credit card fraud, where the instances of fraud are extremely few compared with non fraud.
+PR curves are sensitive to which class is defined as positive, unlike the ROC curve which is a more balanced method.
+PR curves are sensitive to class distribution, so if the ratio of positives to negatives changes across different analyses, then the PR curve cannot be used to compare performance between them. This is because the chance line varies between datasets with different class distributions.
+PR curves, because they use precision, instead of specificity (like ROC) can pick up false positives in the predicted positive fraction. This is very helpful when negatives &gt;&gt; positives. 
+In these cases, the ROC is pretty insensitive and can be misleading, whereas PR curves reign supreme.
+The area under the PR curve does not have a probabilistic interpretation like ROC.
+
+---
+
+
+```r
+library(MLeval)
+```
 
 ---
 background-image: url(https://i2.wp.com/modelplot.github.io/img/cartoonrocplot.jpg?w=456&amp;ssl=1)
