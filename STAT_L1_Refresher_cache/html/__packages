@@ -11,3 +11,5 @@ stringr
 forcats
 sjPlot
 modelr
+Matrix
+xaringanExtra

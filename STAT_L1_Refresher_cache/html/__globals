@@ -13,3 +13,5 @@ forestplot	~	$	$<-	lm	plot_model	sim2
 residuals	plot	sim1_mod
 forestplotstd	plot_model	sim2_model
 plotBestModels	<=	a1	a2	aes	dist	filter	geom_abline	geom_point	ggplot	models	rank	sim1	x	y
+panel-chunk	aes	geom_point	ggplot	library	sim1	x	y
+setup	::	$	c	library	options	theme_minimal	theme_set

@@ -5,6 +5,14 @@
     <meta charset="utf-8" />
     <meta name="author" content="James Hollway" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/clipboard/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
     <link rel="stylesheet" href="https://cdn.githubraw.com/jhollway/iheidmyninja/7b9e9101/iheid-xaringan-style.css" type="text/css" />
   </head>
   <body>
@@ -112,8 +120,8 @@ Primary goals are to:
 --
 
 Basically I want to help with two more general problems researchers have:
+1. recognise what data and models you would need to answer the questions that you have
 1. recognise what questions you could answer with available data
-1. recognise what data you would need to answer the questions that you have
 
 This course is about developing this knowledge.
 
@@ -132,28 +140,28 @@ class: left, middle
 
 .full-width[.content-box-blue[2: Modelling]]
 
-.full-width[.content-box-blue[3: Assumptions]]
+.full-width[.content-box-yellow[3: no class]]
 
-.full-width[.content-box-purple[4: MLE]]
+.full-width[.content-box-blue[4: Assumptions]]
 
-.full-width[.content-box-blue[5: Binary]]
+.full-width[.content-box-purple[5: MLE]]
 
-.full-width[.content-box-yellow[6: no class]]
+.full-width[.content-box-blue[6: Models for Binary Outcomes]]
 
-.full-width[.content-box-blue[7: Multinomial]]
+.full-width[.content-box-blue[7: Models for Multinomial Outcomes]]
 ]
 .pull-left[
-.full-width[.content-box-blue[8: Count]]
+.full-width[.content-box-blue[8: Models for Longitudinal Outcomes]]
 
-.full-width[.content-box-blue[9: Mixed]]
+.full-width[.content-box-blue[9: Models for Text Outcomes]]
 
-.full-width[.content-box-blue[10: Duration]]
+.full-width[.content-box-blue[10: Models for Network Outcomes]]
 
 .full-width[.content-box-purple[11: Advanced]]
 
 .full-width[.content-box-orange[12: Consultancies]]
 
-.full-width[.content-box-red[13: Projects]]
+.full-width[.content-box-orange[13: Consultancies]]
 
 .full-width[.content-box-red[14: Projects]]
 ]
@@ -164,9 +172,9 @@ class: left, middle
 .pull-left[
 **Lectures**, James Hollway
 
-Room: P3-506
+Room: Zoom
 
-Tuesdays, 4.15-6pm
+Tuesdays, 16:15-18:00
 
 1. Mix of conceptual and practical 
 
@@ -178,7 +186,7 @@ Tuesdays, 4.15-6pm
 
 Room: S8
 
-Wednesdays, 12.15-2pm
+Wednesdays, 16:15-18:00
 
 1. Deepening comprehension
 
@@ -188,21 +196,23 @@ Wednesdays, 12.15-2pm
 ---
 ## Course evaluation
 
-**15% Discussant** 
-- Discuss a contemporary paper and defend author/s’ choices
-- 10% your discussion, 5% questions asked other weeks
-
 **30% Exercises** 
-- Submit 6/8 weekly exercises, 20 points each
+- Submit 6/8 weekly exercises by noon following week, worth 20 points each
+- Download and fill in the RMarkdown template, e.g. "E1_Surname.Rmd"; ensure replicability
 
-**45% Project**
-- At the end of Easter, submit a data report describing the data you are interested in investigating
-- At the end of semester, present (first) analyses using one of the methods discussed during the seminar
-- Also submit replication materials (data and script)
+**15% Reviews** 
+- Submit a short review of a statistical publication of your choice in your field
+- Check publication with us by 16th March; needs to use a method covered in class
+- Due one week after session that uses method in the paper; guidelines and grading rubric shared on Moodle
 
-**10% Participation**
-- To reward those who put the extra effort in to understand/help others understand
-- Will be based off of interventions on Moodle on conceptual or practical matters
+**40% Project Report**
+- Submit an RMarkdown report analysing data of your choice with a method discussed during the seminar
+- Check with us by 16th April with an (ungraded) data report describing the data you are interested in investigating
+- Due final week; will be shared online and includes grade for commenting on each others' projects
+
+**15% Participation**
+- Submit answers _and_ questions on Moodle on conceptual or pratical matters
+- Nonlinear grading scheme rewards all those who put the extra effort in to understand/help others understand
 
 ---
 ##  Books
@@ -310,9 +320,13 @@ and talk a bit about statistical **modelling**.
 
 --
 
-The goal of a model is to provide a *simple low-dimensional summary* of a dataset.
+The goal of a model is to provide a *simple, low-dimensional summary* of historical data
+that might help us understand: 
+- what basically happened here?
 
-That is, answer the question: "what basically seems to be happening here?"
+--
+
+With a reasonable 'model' of the data, we can explore all sorts of potential applications...
 
 ---
 ## Why model?
@@ -390,18 +404,11 @@ $$ E(Y) =  \alpha + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_k x_k  $$
 ---
 ## Some totally made-up data
 
-Before we start using models on real, interesting datasets, let's explore the basics of how models work.
+.pull-left[Before we start using models on real, interesting datasets, let's explore the basics of how models work.
 
-.pull-left[Lets use the simulated dataset `sim1`, included with the `modelr` package. 
+Let's use the simulated dataset `sim1`, included with the `{modelr}` package. 
 
-Let's plot its two continuous variables, *x* and *y*, to see how they’re related.
-
-
-```r
-library(modelr)
-library(ggplot2)
-ggplot(sim1, aes(x, y)) + geom_point()
-```
+Let's plot its two continuous variables, *x* and *y*, to see how they’re related...
 
 You can see a strong (linear) pattern in the data: the more *x* the same amount more/less *y* and vice versa.
 
@@ -410,15 +417,25 @@ What do you think this data could be??
 Let’s use a model to capture that pattern and make it explicit...
 ]
 
-.pull-left[
+.pull-right[
+
+.panelset[
+.panel[.panel-name[R Code]
+
 
 ```r
 library(modelr)
 library(ggplot2)
 ggplot(sim1, aes(x, y)) + geom_point()
 ```
+]
 
-&lt;img src="STAT_L1_Refresher_files/figure-html/simulatedData-1.png" width="504" /&gt;
+.panel[.panel-name[Plot]
+
+![](/statsII/STAT_L1_Refresher_files/figure-html/simulatedData-1.png)
+]
+]
+
 ]
 
 ---
@@ -448,7 +465,11 @@ We need a way to measure the distance/closeness between the data and the model
 so that we can work out which ones are good, bad, and ugly.
 ]
 
-.pull-left[
+.pull-right[
+
+.panelset[
+.panel[.panel-name[R Code]
+
 
 ```r
 models &lt;- tibble(a1 = runif(250, -20, 40), a2 = runif(250, -5, 5))
@@ -457,8 +478,14 @@ ggplot(sim1, aes(x, y)) +
   geom_abline(aes(intercept = a1, slope = a2), data = models, alpha = 1/4) +
   geom_point()
 ```
+]
 
-&lt;img src="STAT_L1_Refresher_files/figure-html/lotsOfModels-1.png" width="504" /&gt;
+.panel[.panel-name[Plot]
+
+![](/statsII/STAT_L1_Refresher_files/figure-html/lotsOfModels-1.png)
+]
+]
+
 ]
 
 ---
@@ -476,9 +503,38 @@ $$ RMSE = \sqrt{\frac{1}{n} \sum\limits_{i=1}^{n} (Y_i - \hat{Y}_i)^2}   $$
 RMSE has lots of appealing mathematical properties, which we’re not going to talk about here...
 ]
 
-.pull-left[
+.pull-right[
 
-&lt;img src="STAT_L1_Refresher_files/figure-html/twoModels-1.png" width="504" /&gt;
+.panelset[
+.panel[.panel-name[R Code]
+
+
+```r
+library(dplyr)
+candidates &lt;- models %&gt;% filter(a1 &gt; 0) %&gt;% filter(a2 &gt; 0) %&gt;% filter(a1 &lt; 15) %&gt;% slice(1:2)
+obs &lt;- sim1 %&gt;% filter(x == 5) %&gt;% slice(3)
+pred &lt;- candidates[,1] + candidates[,2]*5
+dists &lt;- (pred$a1 - obs$y)
+squares &lt;- data.frame(x1 = pmin(5, 5+dists), x2 = pmax(5, 5+dists), 
+                  y1 = pmin(obs$y, obs$y+dists), y2 = pmax(obs$y, obs$y+dists))
+
+ggplot(sim1, aes(x, y)) + geom_point() +
+  scale_x_continuous(limits = c(-5, 30)) +
+  scale_y_continuous(limits = c(-5, 30)) +
+  geom_abline(data = candidates, aes(intercept = a1, slope = a2), color = c("blue", "red"),
+              alpha = 1/4, show.legend = F) +
+  geom_rect(data=sim1[1,], aes(xmin=squares[1,1], xmax=squares[1,2],
+                ymin=squares[1,3], ymax=squares[1,4]), fill="blue", alpha=0.2) +
+  geom_rect(data=sim1[2,], aes(xmin=squares[2,1], xmax=squares[2,2],
+                ymin=squares[2,3], ymax=squares[2,4]), fill="red", alpha=0.2)
+```
+]
+
+.panel[.panel-name[Plot]
+
+![](/statsII/STAT_L1_Refresher_files/figure-html/twoModels-1.png)
+]
+]
 
 ]
 
@@ -826,7 +882,7 @@ What questions do you have for me?
 "highlightStyle": "github",
 "highlightLines": true,
 "countIncrementalSlides": false,
-"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>`"
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>`"
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
