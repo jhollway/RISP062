@@ -5,13 +5,13 @@ simulatedData
 lotsOfModelsCode	
 lotsOfModels	models
 twoModels	candidates	dists	obs	pred	squares
-bestModels	measure_distance	model1	models	sim1_dist
+bestModels	
 lm	sim1_mod
-linearRegression	sim1_mod
+linearRegression	alpha_est	beta_est	sim1_mod
 regressionResults	
 forestplot	sim1	sim2_model
 residuals	
 forestplotstd	
-plotBestModels	
+plotBestModels	measure_distance	model1	models	sim1_dist
 panel-chunk	
 setup	old	.STAT_L1_Refresher_cache/html/setup_0bf6bd1725de47378e8f3c512d5b75af_meta

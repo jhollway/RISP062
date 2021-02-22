@@ -539,9 +539,9 @@ ggplot(sim1, aes(x, y)) + geom_point() +
 ]
 
 ---
+.pull-left[
 ## The better models
 
-.pull-left[
 We could iterate over all the 250 (random) models we created and calculate the RMSE for each one.
 
 Then we just highlight the candidate model that comes closest to (or, least far from) all the points.
@@ -549,6 +549,15 @@ Then we just highlight the candidate model that comes closest to (or, least far 
 Let's overlay the 10 best models from our random selection on to the data.
 
 I’ve coloured the models by -dist: this is an easy way to make sure that the best models (i.e. the ones with the smallest distance) get the brighest colours.
+
+
+
+]
+
+.pull-right[
+
+.panelset[
+.panel[.panel-name[R Code]
 
 
 ```r
@@ -563,24 +572,27 @@ sim1_dist &lt;- function(a1, a2) {
   measure_distance(c(a1, a2), sim1)
 }
 models &lt;- models %&gt;% 
-  mutate(dist = purrr::map2_dbl(a1, a2, sim1_dist))
-```
+  mutate(dist = purrr::map2_dbl(a1, a2, 
+                                sim1_dist))
 
-]
-
-.pull-left[
-
-```r
 ggplot(sim1, aes(x, y)) + 
   geom_point(size = 2, colour = "grey30") + 
   geom_abline(
-    aes(intercept = a1, slope = a2, colour = -dist), 
+    aes(intercept = a1, slope = a2, 
+        colour = -dist), 
     data = filter(models, rank(dist) &lt;= 10)
   )
 ```
-
-&lt;img src="STAT_L1_Refresher_files/figure-html/plotBestModels-1.png" width="504" /&gt;
 ]
+
+.panel[.panel-name[Plot]
+
+![](STAT_L1_Refresher_files/figure-html/plotBestModels-1.png)
+]
+]
+
+]
+
 
 ---
 
@@ -605,19 +617,30 @@ coef(sim1_mod)
 $$ y = a + b_1 x $$
 ]
 
-.pull-left[
+.pull-right[
+
+.panelset[
+.panel[.panel-name[R Code]
+
 
 ```r
 sim1_mod &lt;- lm(y ~ x, data = sim1)
-# coef(sim1_mod)
+alpha_est &lt;- sim1_mod$coefficients[1]
+beta_est &lt;- sim1_mod$coefficients[2]
 
 ggplot(sim1, aes(x, y)) + 
   geom_point(size = 2, colour = "grey30") + 
-  geom_abline(intercept = sim1_mod$coefficients[1], 
-              slope = sim1_mod$coefficients[2])
+  geom_abline(intercept = alpha_est, 
+              slope = beta_est)
 ```
+]
 
-&lt;img src="STAT_L1_Refresher_files/figure-html/linearRegression-1.png" width="504" /&gt;
+.panel[.panel-name[Plot]
+
+![](STAT_L1_Refresher_files/figure-html/linearRegression-1.png)
+]
+]
+
 ]
 
 ???
@@ -758,14 +781,16 @@ The effect of each independent variable is the slope *controlling for* or *adjus
 Thus, the best way of thinking about regression with more than one independent variable is to imagine a separate regression line for age at each value of religiosity, and vice versa.
 
 ---
+.pull-left[
 ### Forest plots
 
-.pull-left[
 
 ```r
 sim1$z &lt;- sim2$y[1:30]
 sim2_model &lt;- lm(y ~ x + z, sim1)
-plot_model(sim2_model, vline.color = "red", sort.est = TRUE, show.values = TRUE, value.offset = .3)
+plot_model(sim2_model, vline.color = "red", 
+           sort.est = TRUE, show.values = T, 
+           value.offset = .3)
 ```
 
 &lt;img src="STAT_L1_Refresher_files/figure-html/forestplot-1.png" width="504" /&gt;
@@ -776,7 +801,11 @@ And for standardised coefficients...
 
 
 ```r
-plot_model(sim2_model, vline.color = "red", sort.est = TRUE, show.values = TRUE, value.offset = .3, type= "std")
+plot_model(sim2_model, vline.color = "red", 
+           sort.est = TRUE, 
+           show.values = TRUE, 
+           value.offset = .3, 
+           type= "std")
 ```
 
 &lt;img src="STAT_L1_Refresher_files/figure-html/forestplotstd-1.png" width="504" /&gt;
@@ -819,11 +848,9 @@ The goal of a model is not to uncover truth, but to discover a simple approximat
 ---
 ## Residuals
 
-The other thing to note here is that what we're really doing is using models to partition data into _patterns_ and _residuals_.
-
+What we're really doing is using models to partition data into _patterns_ and _residuals_.
 We’re trying to predict Y, but we’re never going to be spot on. 
-
-But how wrong they are and how they are wrong can tell us a lot about whether we can improve our model or whether we are using the right family of models.
+_How wrong they are_ and _how they are wrong_ can tell us a lot about whether we can improve our model or whether we are using the right family of models.
 
 The main way to explore this is by examining the *residuals*: the remaining deviation between model predictions and the actual observations
 (the _e_ in our model equation).

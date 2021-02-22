@@ -5,13 +5,13 @@ simulatedData	aes	geom_point	ggplot	library	sim1	x	y
 lotsOfModelsCode	a1	a2	aes	geom_abline	geom_point	ggplot	runif	seed	sim1	tibble	x	y
 lotsOfModels	a1	a2	aes	geom_abline	geom_point	ggplot	runif	sim1	tibble	x	y
 twoModels	%>%	<	==	>	$	a1	a2	aes	c	data.frame	F	filter	geom_abline	geom_point	geom_rect	ggplot	library	models	pmax	pmin	scale_x_continuous	scale_y_continuous	sim1	slice	x	y
-bestModels	::	%>%	^	$	a1	a2	c	mean	mutate	sim1	sqrt
+bestModels	
 lm	~	coef	lm	sim1
 linearRegression	~	$	aes	geom_abline	geom_point	ggplot	lm	sim1	x	y
 regressionResults	%>%	~	library	lm	sim1	tab_model
-forestplot	~	$	$<-	lm	plot_model	sim2
+forestplot	~	$	$<-	lm	plot_model	sim2	T
 residuals	plot	sim1_mod
 forestplotstd	plot_model	sim2_model
-plotBestModels	<=	a1	a2	aes	dist	filter	geom_abline	geom_point	ggplot	models	rank	sim1	x	y
+plotBestModels	::	%>%	^	<=	$	a1	a2	aes	c	dist	filter	geom_abline	geom_point	ggplot	mean	mutate	rank	sim1	sqrt	x	y
 panel-chunk	aes	geom_point	ggplot	library	sim1	x	y
 setup	::	$	c	library	options	theme_minimal	theme_set
