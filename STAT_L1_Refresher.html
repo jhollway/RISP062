@@ -207,11 +207,11 @@ Wednesdays, 16:15-18:00
 
 **40% Project Report**
 - Submit an RMarkdown report analysing data of your choice with a method discussed during the seminar
-- Check with us by 16th April with an (ungraded) data report describing the data you are interested in investigating
+- Check with us by 16th April with an (ungraded) data report describing the data you are interested in
 - Due final week; will be shared online and includes grade for commenting on each others' projects
 
 **15% Participation**
-- Submit answers _and_ questions on Moodle on conceptual or pratical matters
+- Submit answers _and_ questions about conceptual or practical matters on Moodle
 - Nonlinear grading scheme rewards all those who put the extra effort in to understand/help others understand
 
 ---
@@ -230,7 +230,7 @@ All additional required and recommended readings are provided in electronic form
 ---
 ## Software
 
-The software used in the class is `\(\mathcal{R}\)`. It is free. And very powerful.
+In this class, we will use `\(\mathcal{R}\)`. It is **free**. **Flexible**. And **facilitates** more modern research.
 
 &lt;!-- ![:scale 20%](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2F1%2F1b%2FR_logo.svg%2F1200px-R_logo.svg.png&amp;f=1&amp;nofb=1) --&gt;
 
@@ -240,9 +240,40 @@ The software used in the class is `\(\mathcal{R}\)`. It is free. And very powerf
 
 ]
 
-There are many highly recommended resources for learning `\(\mathcal{R}\)` which I will share with you on Moodle.
+There are many highly recommended resources for learning `\(\mathcal{R}\)` which I will share with you on Moodle,
+and Juliette will make sure you have the basic understanding to get started during the lab sessions.
 
 In the meantime, please download and install the most recent versions of both `\(\mathcal{R}\)` (the statistical software) and RStudio (a front-end which makes using R much easier).
+RStudio makes it easier not only to manage what `\(\mathcal{R}\)` is doing,
+but also to run Python (e.g. for webscraping) and C++ (for faster programming),
+as well as writing assignments (like in this course), presentations, 
+even apps that help you communicate your research more widely.
+The assignments in this course will be in Rmarkdown.
+
+???
+
+Basically, GUI statistical software (e.g. Excel, SPSS) [were a mistake for modern research](https://www.r-bloggers.com/2020/11/graphical-user-interfaces-were-a-mistake-but-you-can-still-make-things-right/?utm_source=feedburner&amp;utm_medium=feed&amp;utm_campaign=Feed%3A+RBloggers+%28R+bloggers%29).
+
+---
+## Since you are here...
+
+...you might also be interested in...
+
+.center[
+
+&lt;img src="https://raw.githubusercontent.com/jhollway/iheiddown/main/inst/iheiddown.png" height="250" /&gt;
+
+]
+
+--
+
+- for writing IHEID-style consistent dissertations (and syllabi and presentations..)
+  - less prone to corruption, crashing, or inconsistency than Word
+  - easier to write (and read) than `\(\LaTeX\)`, but nearly as flexible and nearly as small files
+  - automatic figure, table, and cross-referencing; includes dedications, tables of contents, bibliography
+  - write separate sections (with comments) and compile in chapters/papers (for supervisors) or as a whole (for submission),
+  with automatic versioning
+  - much, much more!
 
 ---
 ## Suggested approach
@@ -262,11 +293,11 @@ Learning statistics is all about:
 
 --
 
-In this sense, learning statistics is very much like learning a language.
+In this sense, learning statistics is _very_ much like learning a language.
 
 Some are going to have a different familiarity or affinity with the material, have a stronger vocabulary or 'pronunication', etc.
 
-That's fine -- you do you! -- but statistics is still an extraordinarily useful toolbelt (more later) and so it's worth leaning into it and getting out what you can. This is your chance.
+That's fine -- you do you! -- but statistics is still an extraordinarily useful toolbelt for understanding the world (and people) around you and so it's worth leaning into it and getting out what you can. This is your chance.
 
 So read, listen, do exercises, ask questions, play with ideas, get things wrong, ask for advice, etc...
 
@@ -326,7 +357,7 @@ that might help us understand:
 
 --
 
-With a reasonable 'model' of the data, we can explore all sorts of potential applications...
+With a reasonable 'model' of the data, of what basically appeared to happen here, we can explore all sorts of potential applications...
 
 ---
 ## Why model?
@@ -368,7 +399,7 @@ Note this does not obviate the need for judgment. But by revealing tradeoffs, un
 
 The term “model” can sometimes be confusing, because it can mean different things:
 
-1. a **theoretical model** captures how we think concepts relate to one another such that it _can_ be written as an equation, e.g.
+1. a **theoretical model** captures how we think concepts relate to one another such that it _can_ (but need not) be written as an equation, e.g.
 $$y = \alpha + \beta_1 x_1 - \beta_2 x_2 $$
 
 1. a **family of models** express a precise but generic pattern like a straight line or quadratic curve as an equation, e.g.
@@ -379,6 +410,8 @@ $$y = \alpha + \beta_1 x_1 - \beta_2 x_2 $$
 
 Note a fitted model is just the closest model from a family of models.
 It implies that you have the “best” model (according to some criteria); it doesn’t imply that you have a “good” model and it certainly doesn’t imply that the model is “true”.
+
+So this is sometimes why talk about 'model choice' is plagued by misunderstandings...
 
 ---
 ## Form and notation for linear models
@@ -511,22 +544,34 @@ RMSE has lots of appealing mathematical properties, which we’re not going to t
 
 ```r
 library(dplyr)
-candidates &lt;- models %&gt;% filter(a1 &gt; 0) %&gt;% filter(a2 &gt; 0) %&gt;% filter(a1 &lt; 15) %&gt;% slice(1:2)
+candidates &lt;- models %&gt;% filter(a1 &gt; 0) %&gt;% 
+  filter(a2 &gt; 0) %&gt;% filter(a1 &lt; 15) %&gt;% 
+  slice(1:2)
 obs &lt;- sim1 %&gt;% filter(x == 5) %&gt;% slice(3)
 pred &lt;- candidates[,1] + candidates[,2]*5
 dists &lt;- (pred$a1 - obs$y)
-squares &lt;- data.frame(x1 = pmin(5, 5+dists), x2 = pmax(5, 5+dists), 
-                  y1 = pmin(obs$y, obs$y+dists), y2 = pmax(obs$y, obs$y+dists))
+squares &lt;- data.frame(x1 = pmin(5, 5+dists), 
+                      x2 = pmax(5, 5+dists), 
+                  y1 = pmin(obs$y, 
+                            obs$y+dists), 
+                  y2 = pmax(obs$y, 
+                            obs$y+dists))
 
 ggplot(sim1, aes(x, y)) + geom_point() +
   scale_x_continuous(limits = c(-5, 30)) +
   scale_y_continuous(limits = c(-5, 30)) +
-  geom_abline(data = candidates, aes(intercept = a1, slope = a2), color = c("blue", "red"),
+  geom_abline(data = candidates, 
+              aes(intercept = a1, slope = a2), 
+              color = c("blue", "red"),
               alpha = 1/4, show.legend = F) +
-  geom_rect(data=sim1[1,], aes(xmin=squares[1,1], xmax=squares[1,2],
-                ymin=squares[1,3], ymax=squares[1,4]), fill="blue", alpha=0.2) +
-  geom_rect(data=sim1[2,], aes(xmin=squares[2,1], xmax=squares[2,2],
-                ymin=squares[2,3], ymax=squares[2,4]), fill="red", alpha=0.2)
+  geom_rect(data=sim1[1,], 
+            aes(xmin=squares[1,1], xmax=squares[1,2],
+                ymin=squares[1,3], ymax=squares[1,4]), 
+            fill="blue", alpha=0.2) +
+  geom_rect(data=sim1[2,], 
+            aes(xmin=squares[2,1], xmax=squares[2,2],
+                ymin=squares[2,3], ymax=squares[2,4]), 
+            fill="red", alpha=0.2)
 ```
 ]
 
@@ -548,7 +593,7 @@ Then we just highlight the candidate model that comes closest to (or, least far 
 
 Let's overlay the 10 best models from our random selection on to the data.
 
-I’ve coloured the models by -dist: this is an easy way to make sure that the best models (i.e. the ones with the smallest distance) get the brighest colours.
+I’ve coloured the models by `-dist`: this is an easy way to make sure that the best models (i.e. the ones with the smallest distance) get the brighest colours.
 
 
 
@@ -599,7 +644,10 @@ ggplot(sim1, aes(x, y)) +
 .pull-left[
 ## The best model
 
-However, since these belong to the family of *linear models* we can exploit some connections between geometry, calculus, and linear algebra to quickly identify the single best solution. So instead of trying lots of random models, R has a tool specifically designed for fitting linear models called `lm()`:
+However, since these belong to the family of *linear models*, 
+we can exploit some connections between geometry, calculus, and linear algebra to quickly identify the single best solution. 
+So instead of trying lots of random models "brute force", 
+R has a tool specifically designed for fitting linear models called `lm()`:
 
 
 ```r
@@ -689,18 +737,26 @@ We talk about this being a 'one unit change', but you can also give it a substan
 .pull-left[
 ## Simple linear regression
 
-But how sure should we be that we couldn't have just gotten this particular slope by chance,
-and that actually it doesn't tell us much beyond this particular sample?
+With statistics, and _incomplete data more generally_ (especially observational data),
+we _always_ need to be skeptical and ask:
+_couldn't we just have gotten this particular model (i.e. slope) by chance?_
 
-That's a trickier thing, but we can say something about how likely we are to get a slope
-this steep or greater if actually there isn't any relationship in the population...
+If it's just by chance, 
+then our model wouldn't actually tell us very much beyond this particular sample,
+which kind of undermines its utility for us.
 
-Let's run the simple linear regression again, but this time give a bit more output
+While it is tricky to evaluate how likely we could've gotten this result by chance from just one "sample", 
+we can say something about how likely we are to get a slope
+this steep or greater if actually there isn't any relationship in the population
+based on how large and varied the sample is...
 
+Let's run the simple linear regression again, but this time give a bit more output...
 What can we say about our 'hypothesis' that _y_ is significantly related to _x_?
 ]
 
-.pull-left[
+--
+
+.pull-right[
 
 ```r
 # Recommended
@@ -752,11 +808,15 @@ lm(y ~ x, sim1) %&gt;% tab_model()
 # models[['OLS 1']] &lt;- lm(y ~ x, sim1)
 # stargazer::msummary(models)
 ```
+
+
 ]
 
 ???
 
 For another approach to understanding OLS through simulation, see [this link](http://yukiyanai.github.io/teaching/rm1/contents/R/linear-regression-1.html).
+
+Or, [this](https://enchufa2.shinyapps.io/ls-springs/) is also a fun app...
 
 ---
 ## Extra features
@@ -769,10 +829,10 @@ For example, consider the prediction equation of _k=2_ explanatory variables:
 
 $$ E(Y) = a + b_1 x_1 + b_2 x_2 $$
 
-_b1, b2, ..., bk_ are partial regression coefficients. 
-That is, there is a linear relationship between _E(Y)_ and _x1_ with the slope _b1_, __controlling for other predictors in the model__.
+`\(b_1, b_2, ..., b_k\)` are partial regression coefficients. 
+That is, there is a linear relationship between `\(E(Y)\)` and `\(x_1\)` with the slope `\(b_1\)`, __controlling for other predictors in the model__.
 
-If x1 goes up 1 unit with x2 held constant, the change in E(Y) is:
+If `\(x_1\)` goes up 1 unit with `\(x_2\)` held constant, the change in `\(E(Y)\)` is:
 
 $$ (a + b_1 (x_1 + 1) + b_2 x_2) -  (a + b_1 x_1 + b_2 x_2) = b_1$$
 
@@ -782,7 +842,8 @@ Thus, the best way of thinking about regression with more than one independent v
 
 ---
 .pull-left[
-### Forest plots
+One trend, at least in presentations,
+is to present results as "forest" plots (rather than tables):
 
 
 ```r
@@ -797,7 +858,7 @@ plot_model(sim2_model, vline.color = "red",
 ]
 
 .pull-right[
-And for standardised coefficients...
+`{sjPlot}`, which is what we are using here, also makes it easy to standardise coefficients...
 
 
 ```r
@@ -818,7 +879,7 @@ See [here](https://strengejacke.github.io/sjPlot/articles/plot_model_estimates.h
 ---
 ## Residuals
 
-The other thing to note here is that what we're really doing is using models to partition data into _patterns_ and _residuals_.
+Another way to think about all this is that what we're really doing is using models to partition data into _patterns_ and _residuals_.
 
 We’re trying to predict Y, but we’re never going to be spot on. Remember...
 
@@ -839,9 +900,16 @@ class: left, middle
 
 It’s worth reading the fuller context of the quote:
 
-Now it would be very remarkable if any system existing in the real world could be exactly represented by any simple model. However, cunningly chosen parsimonious models often do provide remarkably useful approximations. For example, the law PV = RT relating pressure P, volume V and temperature T of an “ideal” gas via a constant R is not exactly true for any real gas, but it frequently provides a useful approximation and furthermore its structure is informative since it springs from a physical view of the behavior of gas molecules. --&gt;
+Now it would be very remarkable if any system existing in the real world could be exactly represented by any simple model. 
+However, cunningly chosen parsimonious models often do provide remarkably useful approximations. 
+For example, the law PV = RT relating pressure P, volume V and temperature T of an “ideal” gas 
+via a constant R is not exactly true for any real gas, 
+but it frequently provides a useful approximation and furthermore its structure is informative 
+since it springs from a physical view of the behavior of gas molecules.
 
-For such a model there is no need to ask the question “Is the model true?”. If “truth” is to be the “whole truth” the answer must be “No”. The only question of interest is “Is the model illuminating and useful?”.
+For such a model there is no need to ask the question “Is the model true?”. 
+If “truth” is to be the “whole truth” the answer must be “No”. 
+The only question of interest is “Is the model illuminating and useful?”.
 
 The goal of a model is not to uncover truth, but to discover a simple approximation that is still useful.
 
@@ -890,6 +958,10 @@ but to conclude today I want to highlight three extra conditions concerning the 
 1. Variance: `var()`
   - There must be some variance in the features
   - What is the opposite of a variable?
+
+---
+background-image: url(https://imgs.xkcd.com/comics/statistics.png)
+background-size: contain
 
 ---
 class: center, middle
