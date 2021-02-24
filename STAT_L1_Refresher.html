@@ -819,6 +819,30 @@ For another approach to understanding OLS through simulation, see [this link](ht
 Or, [this](https://enchufa2.shinyapps.io/ls-springs/) is also a fun app...
 
 ---
+## Significant notes
+
+- `\(p\)`-values are not the probability that `\(H_0\)` is true
+  - it is the probability, _assuming `\(H_0\)` to be true_, of observing a test statistic this far from the null hypothesised value
+  - the further the observed statistic diverges from null hypothesised value, less probable such a divergent statistic obtained simply by chance
+- `\(p\)`-values are not the probability that `\(H_a\)` is true
+  - inference relates _only to the null hypothesis_; there could be other alternative hypotheses
+  - in practice, we provisionally accept the alternative when rejecting the null (but more scholarship always warranted!)
+- `\(p\)`-values are not the probability that `\(H_0\)` is false
+  - statistical significance does not necessarily mean that the effect is real
+  - by chance alone, about 1-in-20 significant findings will be spurious (implications for replication crisis...)
+- non-significance does not mean no effect
+  - small studies will often report non-significance even when there are important, real effects which a larger study would have detected
+- significance does not mean important effect
+  - it is the size of the effect that determines the importance, not the presence of statistical significance
+
+---
+## An example
+
+&gt; “The results **do not provide clear support** for the lack-of control hypothesis. Self-reported feelings of low and high control are positively associated with conspiracy belief in observational data (model 1; p&lt;.05 and p&lt;.01, respectively). **We are reluctant to engage in post hoc speculation about this unexpected result, but it does not clearly support our hypothesis.** Moreover, our experimental treatment effect estimate for our low-control manipulation is null relative to both the high-control condition (the preregistered hypothesis test) as well as the baseline condition (a RQ) in both the combined (table 2) and individual item results (table B7). Finally, **we find no evidence** that the association with self-reported feelings of control in model 1 of table 2 or the effect of the control treatments in model 2 are moderated by anti-Western or anti-Jewish attitudes (results available on request). **Our expectations are thus not supported.**”
+
+.pull-right[Nyhan, Brendan, and Thomas Zeitzoff. 2018. "Conspiracy and Misperception Belief in the Middle East and North Africa." _The Journal of Politics_ 80(4): 1400-1404.]
+
+---
 ## Extra features
 
 The linear model is extensible to an arbitrary number of explanatory/independent variables/features.
