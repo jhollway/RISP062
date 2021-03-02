@@ -5,6 +5,14 @@
     <meta charset="utf-8" />
     <meta name="author" content="James Hollway" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/clipboard/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
     <link href="libs/table1/table1_defaults.css" rel="stylesheet" />
     <script src="libs/htmlwidgets/htmlwidgets.js"></script>
     <script src="libs/viz/viz.js"></script>
@@ -138,19 +146,39 @@ table1::table1(~. , swiss)
 
 .pull-right[
 
-Switzerland, in 1888, was entering a period known as the demographic transition; i.e., its fertility was beginning to fall from the high level typical of underdeveloped countries.
+In 1888, Switzerland was entering a period known as the demographic transition; 
+i.e., its fertility was beginning to fall from the high level typical of underdeveloped countries.
 
-The data collected are for 47 French-speaking “provinces” at about 1888.
+The data collected are for 47 French-speaking “provinces” circa 1888.
 
-- Fertility: Ig, ‘common standardized fertility measure’
-- Agriculture: % of males involved in agriculture as occupation
-- Examination: % draftees receiving highest mark on army examination
-- Education: % education beyond primary school for draftees.
-- Catholic: % ‘catholic’ (as opposed to ‘protestant’).
-- Infant.Mortality: live births who live less than 1 year.
+- **Fertility**: Ig, ‘common standardized fertility measure’
+- **Agriculture**: % of males involved in agriculture as occupation
+- **Examination**: % draftees receiving highest mark on army examination
+- **Education**: % education beyond primary school for draftees.
+- **Catholic**: % ‘catholic’ (as opposed to ‘protestant’).
+- **Infant.Mortality**: live births who live less than 1 year.
 
 All variables but ‘Fertility’ give proportions of the population.
 
+]
+
+???
+
+There really are _heaps_ of R packages for creating data summary tables.
+
+Swetha shared [this link](https://thatdatatho.com/easily-create-descriptive-summary-statistic-tables-r-studio/)
+which reviews `{amisc}`, `{arsenal}`, `{compareGroups}`, `{furniture}`, `{htmltable}`, `{qwraps2}`, `{table1}`, `{tableone}`, and `{tangram}`, 
+but there are (even) more out there now since 2018, 
+for example [`{gtsummary}`](https://github.com/ddsjoberg/gtsummary)
+
+---
+## Assumption breakdown structure
+
+.large[
+1. Defining
+1. Diagnosing
+1. So what?
+1. Dealing
 ]
 
 ---
