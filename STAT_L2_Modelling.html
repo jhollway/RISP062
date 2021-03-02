@@ -1193,19 +1193,19 @@ class: center, middle
 ---
 ## Defining multicollinearity
 
-Multicollinearity means that independent variables we are interested in are closely related.
-This contravenes the assumption that 
+Multicollinearity means that independent variables we are interested in are closely related _with each other_.
+This contravenes the assumption that:
 
 &gt; No independent variable is a perfect linear function of other explanatory variables
 
-i.e. that all features are linearly independent/ we cannot predict one feature from another.
-- E.g. X1 = 2 + 3 * X2 violates the assumption
+i.e. that all features are linearly _independent_, i.e. we cannot predict one feature from another.
+- e.g. `\(x_1 = 2 + 3 * x_2\)` violates the assumption
 
-Say we are interested in EU elections and ask respondents also whether they like common foreign policy and common defence policy (e.g. ordinal scale).
+Say we are interested in EU elections and ask respondents whether they are in favour of a common foreign policy and common defence policy (e.g. ordinal scale).
 - these are likely to be (positively) correlated
 - this makes it difficult to work out what happens when foreign policy goes up and defence stays the same
 
-Unfortunately, this is a common problem in social science, because our concepts/variables often overlap.
+Unfortunately, this is a common problem in social science because our concepts/variables _often_ overlap...
 
 ---
 ## Diagnosing multicollinearity
@@ -1283,12 +1283,25 @@ tab_model(lin_reg, show.obs = FALSE)
 ]
 
 ---
+.pull-left[
 ### 2. High correlations between IVs
 
-.pull-left[
-Obviously if variables are highly correlated, then there is multicollinearity
+Obviously if variables are highly correlated, then there is multicollinearity.
 
-A nice, visual way to check is using a _correlogram_
+A nice, visual way to check is using a _correlogram_.
+There are a bunch of correlogram packages available in R.
+Here's one I like for its flexibility:
+
+Watch out for "dummy variable trap":
+- unless you exclude a reference category, 
+there will be perfect correlation between dummy variables and the constant
+
+Note this only explores pairwise correlations among explanatory variables...
+]
+
+.pull-right[
+.panelset[
+.panel[.panel-name[R Code]
 
 
 ```r
@@ -1296,15 +1309,12 @@ library(ggcorrplot)
 ggcorrplot(cor(swiss[, -1]), type = "lower", 
            p.mat = cor_pmat(swiss[, -1]))
 ```
-
-Watch out in particular for "dummy variable trap":
-- unless you exclude a reference category, there will be perfect correlation between the dummy variables and the constant
 ]
 
-.pull-right[
-
-&lt;img src="STAT_L2_Modelling_files/figure-html/corrplot-1.png" width="504" /&gt;
-
+.panel[.panel-name[Plot]
+![](STAT_L2_Modelling_files/figure-html/corrplot-1.png)
+]
+]
 ]
 
 ---
@@ -1312,18 +1322,19 @@ Watch out in particular for "dummy variable trap":
 
 .pull-left[
 
-A variable's VIF is calculated as 
+A VIF measures how much other explanatory variables explain a variable's own variance, calculated as: 
 
 $$ VIF = 1 / (1-R^2) $$
 
-where \\(R^2\\) is for the model regressing X on all other predictors.
+where \\(R^2\\) is for the model regressing `\(X\)` on all other predictors.
 
-This is proportional to how much larger X's SE would be if it were uncorrelated with all other features.
+This is proportional to how much larger `\(X\)`'s `\(SE\)` would be if it were uncorrelated with all other features.
 
-Practically, highly correlated variables each have high VIFs
+Practically, 
   - lower VIFs are better
   - if no features correlated, then all VIFs = 1
-  - a high VIF means the information in that variable is already provided by other variables in the model and is thus redundant
+  - higher VIFs mean the information in those variables already provided by other variables and thus redundant
+  - highly correlated variables each have high VIFs
   
 ]
 
@@ -1364,6 +1375,8 @@ plot(check_collinearity(lin_reg))
 ---
 ## So what if there's multicollinearity?
 
+.pull-left[
+
 _Perfect correlation_ (+1 or -1) is a show stopper...
 - any statistical software will simply break because it cannot find any way to distinguish these variables.
 - suggests variables are different forms of the same variable
@@ -1371,9 +1384,16 @@ _Perfect correlation_ (+1 or -1) is a show stopper...
   - e.g. temperature in Fahrenheit and temperature in Celsius (+1)
 - you must remove one of the variables from the model or _you shall not pass!_
 
+]
+
+.pull-right[
+![](https://media.giphy.com/media/OdyGA2spBFRCg/giphy.gif)
+]
+
 _Imperfect but strong correlations_ in OLS models can be fit, but:
-- estimates less efficient/precise (but still unbiased)
-- SEs will be high and it will be difficult to discern statistically significant results
+- while it won't reduce a model's overall predictive power, 
+SEs will be high and it will be difficult to discern statistically significant results
+- while estimates still unbiased, less efficient/precise
 - estimates will be highly sensitive to particular sets of data
 - makes it more difficult to interpret regression coefficients since variables (kind of) move together
 
@@ -1386,15 +1406,16 @@ Multicollinearity even more of a problem under iterative estimation techniques b
 
 1. Just exclude one of the highly correlated independent variables
   - say the one with the highest VIF
-  – makes sense when the causal relationships are quite clear
+  - makes sense when the causal relationships are quite clear
   - may need to do this several times, be wary of OVB though!
 1. Make a scale/factor out of highly correlated independent variables
   - use principal component analysis (PCA) to reduce features to a smaller set of uncorrelated components
-  – makes sense when there is an underlying/latent variable that we haven’t measured
+  - makes sense when there is an underlying/latent variable that we haven’t measured
   - requires additional expertise and can make interpreting effects of individual IVs difficult
 1. Get more data/variables
-  - basically, multicollinearity just means there’s not enough independent variation to separately identify marginal effects
-  - more data might mean more variation to identify effects? Sometimes easier said than done...
+  - basically, multicollinearity just means not enough independent variation to separately identify marginal effects
+  - if you think variables _ought_ to vary independently, then maybe more data might introduce more independent variation with which to identify effects
+  - sometimes easier said than done...
 1. Do nothing
   - report \\(R^2\\) and \\(F\\) statistics and explain joint significance of the IVs in the model which accounts for the lack of individual significance
 
@@ -1408,18 +1429,18 @@ Multicollinearity even more of a problem under iterative estimation techniques b
 
 
 .pull-right-2[
-- We've talked about when a model is the 'best', but when is it 'good'?
+- We've talked about when a model is the ‘best’, but when is it ‘good’?
 
 - For linear regression, we normally use a measure called \\(R^2\\)
-  - measures proportion of variation in Y that is explained by the fitted model
+  - measures proportion of variation in `\(Y\)` that is explained by the fitted model
   - varies between 0 and 1, with 1 representing 'perfect' explanation
   - increases monotonically with each additional feature
 ]
   
 - However, sometimes \\(R^2\\) not the most useful measure of model ‘performance’
   - High \\(R^2\\) values don’t automatically make your model a “good” model
-  - Many social science models have low R2 values
-  - We still might be interested in whether there is a relationship between X and Y though
+  - Many social science models have low \\(R^2\\) values
+  - We still might be interested in whether there is a relationship between `\(X\)` and `\(Y\)` though
   - Or whether it makes sense to favour a slightly more complex model over a more parsimonious one
 
 ---
@@ -1427,13 +1448,14 @@ Multicollinearity even more of a problem under iterative estimation techniques b
 .pull-left[
 ### Overfitting
 
-Overfitting is "analysis that corresponds too closely to a particular set of data and may therefore fail to fit additional data or predict future observations reliably".
+Overfitting is “analysis that corresponds too closely to a particular set of data and may therefore fail to fit additional data or predict future observations reliably”.
 
 *Curve-fitting* can lead to *false precision*.
 
-To lessen the chance of, or amount of, overfitting, one can:
-- explicitly penalize overly complex models
-- test model's ability to generalize by evaluating its performance on a set of data not used for training the model, approximating the unseen data a model might encounter
+To lessen the chance of, or amount of, overfitting, one can use:
+- adjusted model selection methods to avoid unhelpfully inflating model complexity
+- .red[regularization] to explicitly penalize overly complex models
+- .red[cross-validation] to test model's ability to generalize by evaluating its performance on a set of data not used for training the model, approximating the unseen data a model might encounter
 
 ]
 
@@ -1493,7 +1515,7 @@ For model selection, we use adjusted \\(R^2\\), Akaike's information criterion (
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.14&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.67&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;0.67&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.006&lt;/strong&gt;&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.18&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;strong&gt;0.002&lt;/strong&gt;&lt;/td&gt;
@@ -1521,11 +1543,11 @@ For model selection, we use adjusted \\(R^2\\), Akaike's information criterion (
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.43&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;0.43&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;0.108&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;-0.76&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;&amp;#45;0.76&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;-0.98&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;&amp;#45;0.98&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;&lt;strong&gt;&amp;lt;0.001&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -1534,7 +1556,7 @@ For model selection, we use adjusted \\(R^2\\), Akaike's information criterion (
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.01&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;0.01&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;0.119&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;&lt;/td&gt;
@@ -1564,7 +1586,7 @@ For model selection, we use adjusted \\(R^2\\), Akaike's information criterion (
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col7"&gt;&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col8"&gt;&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  col9"&gt;&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;-0.15&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  0"&gt;&amp;#45;0.15&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  1"&gt;&lt;strong&gt;0.029&lt;/strong&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -1588,7 +1610,7 @@ For model selection, we use adjusted \\(R^2\\), Akaike's information criterion (
 
 ???
 
-Adjusted R2 is based off of the R2 value, but introduces a penalization for additional terms. 
+Adjusted `\(R^2\)` is based off of the `\(R^2\)` value, but introduces a penalization for additional terms. 
 Higher is better.
 
 AIC (and AICc) and BIC are similar, but based on the concept of the information criterion.
@@ -1597,9 +1619,11 @@ Lower is better.
 ---
 ## Model selection
 
+I have some data, how should I analyze it? 
+
 ### Kitchen-sink
 
-I have some data, how should I analyze it? One way of analyzing data is to throw in *every* possible variable and see which were statistically significant
+One way of analyzing data is to throw in *every* possible variable and see which were statistically significant
 
 --
 
@@ -1618,11 +1642,17 @@ This is a nonsensical way to proceed, of course.
 ---
 ### Bathwater
 
+.pull-left[
+![](https://4kwallpaper.wiki/wp-content/uploads/2019/09/304552.jpg)
+]
+
+.pull-right[
 - Generally begin with previous empirical model (or models) based on a theory (or theories)
-  - literature review important for making sure competing/alternative explanations not responsible: don't throw baby out with bathwater!
+  - literature review crucial for making sure competing/alternative explanations not responsible and for making sensible decisions that readers can recognise and understand: don't throw baby out with bathwater!
   - basically your baseline from previous work
 - Then introduce any additional variables or interactions according to your tweak/transformed/totally new theory
   - e.g. previous work suggests that father’s height predicts their son’s height. We think fathers that worked as miners also have shorter sons, so we include this
+]
 
 ---
 
@@ -1632,22 +1662,22 @@ This is a nonsensical way to proceed, of course.
 
 We can test whether increases are statistically significant using something called a *F-test*
   - This is based on a distribution called the F-distribution.
-    - F can take only nonnegative values.
+    - `\(F\)` can take only nonnegative values.
     - Distribution is skewed right.
-    - Mean is approximately equal to 1 (closer to 1 for large n).
-  - Exact shape depends on two df values:
-    - df1 = k (number of explanatory variables in model)
-    - df2 = n – (k + 1) (sample size – no. model parameters)
-  - This test tells us whether we can reject the null hypothesis that the increase in model fit is zero
+    - Mean is approximately equal to 1 (closer to 1 for large `\(n\)`).
+  - Exact shape depends on two `\(df\)` values:
+    - `\(df_1 = k\)` (number of explanatory variables in model)
+    - `\(df_2 = n – (k + 1)\)` (sample size – no. model parameters)
+  - Test tells us whether we can reject `\(H_0\)` that the increase in model fit is 0
 
 ]
 
 .pull-right[
 We are testing the collective influence of all explanatory variables in a model on Y:
-  - H0 : \\(b_1 = b_2 = ... = b_k = 0\\)
-    - (i.e., y is independent of all explanatory variables)
-  - HA: At least one \\(b ≠ 0\\)
-    - (i.e. at least one explanatory variable has an effect on y, controlling for the others in the model)
+  - `\(H_0\)` : \\(b_1 = b_2 = ... = b_k = 0\\)
+    - (i.e., `\(y\)` is independent of all explanatory variables)
+  - `\(H_A\)`: At least one \\(b ≠ 0\\)
+    - (i.e. at least one explanatory variable has an effect on `\(y\)`, controlling for the others in the model)
 
 
 ```r
@@ -1668,17 +1698,18 @@ anova(cathm, catha)
 
 ]
 
-
 ---
 ### Stepwise model selection
 
-A popular method for searching for a model rather than testing a particular hypothesis
-involves fitting several models and using information about them to make decisions about which features should be in the theoretical model 
-- Forward stepwise model selection starts with a minimal model and adds features
-- Backward stepwise model selection starts with a maximal model and removes features
+A popular, usually more exploratory method for searching for an overall fitted model 
+rather than testing a particular hypothesis
+involves fitting several models and using information about them 
+to make decisions about which features should be in the theoretical model 
+- **Forward stepwise model selection** starts with a minimal model (just the established state of the art or just your variable(s) of interest) and adds features as alternative explanations or controls
+- **Backward stepwise model selection** starts with a maximal model (all the credible effects you could include) and removes features
 
 However, be careful with semi-automated model selection:
-commonly used, commonly abused.
+_commonly used, commonly abused_.
 
 Often coupled with (mistaken) belief that _only_ statistically significant features should be retained and presented.
 - goes against principle of hypothesis testing
@@ -1689,6 +1720,8 @@ Often coupled with (mistaken) belief that _only_ statistically significant featu
 ???
 
 For more on (machine-learning style) model selection, see [this link](http://r-statistics.co/Model-Selection-in-R.html).
+
+There are, of course, [other variable selection approaches](http://r-statistics.co/Variable-Selection-and-Importance-With-R.html).
 
 ---
 
@@ -1751,9 +1784,9 @@ For more on `olsrr`'s stepwise functions, see [this link](https://olsrr.rsquared
 ### KISS
 
 Basically:
+- if significant and expected sign, cool keep it
 - if insignificant but main feature of the theory or an alternative explanation, keep it as a control
 - if insignificant and only weak theoretical grounds for inclusion, drop it (though keep as robustness check)
-- if significant and expected sign, cool keep it
 - if significant and unexpected sign, review data, review interactions with other variables, review statistical power, review theory...
 
 Generally, KEEP IT SIMPLE STUPID (KISS)
@@ -1792,7 +1825,7 @@ class: center, middle
 "highlightStyle": "github",
 "highlightLines": true,
 "countIncrementalSlides": false,
-"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>`"
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>`"
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
