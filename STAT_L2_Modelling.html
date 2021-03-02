@@ -198,15 +198,17 @@ Recall that ordinary least squares (OLS) regression is a *linear* regression mod
 
 In statistics, the functional form (defining characteristic) of a regression model is *linear* when:
 - all terms in the model are either the constant or an independent variable multiplied by a parameter
-- the coefficients \\(\beta\\)s and the error term \\(\varepsilon\\) are only added together 
+- the coefficients \\(\beta\\)s and the error term \\(\varepsilon\\) are only added (or subtracted) together 
 
 This makes \\(Y\\) a linear function of \\(X\\) and \\(\varepsilon\\), or “linear in its parameters”, thus allowing relatively straightforward estimation of the parameters.
 
-Obvs linear regression is therefore not appropriate when the relationship between variables is *nonlinear*.
-
 &gt; The regression model is linear in parameters 
 
-Note that we are _not_ saying that the dependent variable must be linear. It is the relationship between dependent variable on the one hand and independent variables and error term on the other hand that must be linear.
+Note that we are _not_ saying that the dependent variable must be linear. 
+It is the relationship between dependent variable on the one hand 
+and independent variables and error term on the other hand that must be linear.
+
+Obvs linear regression is not appropriate when the relationship between variables is *nonlinear*...
 
 &lt;!-- Related: The Difference Between Linear and Nonlinear Regression and How to Specify a Regression Model --&gt;
 
@@ -221,21 +223,24 @@ To detect nonlinearity, I'm going to create a quick function that will show us w
 library(ggplot2); library(gridExtra)
 
 plotpreds &lt;- function(model, data){
-p1 &lt;- ggplot(model, aes(.fitted, .resid)) + 
+
+df_plt &lt;- data.frame("fitted" = fitted(model), 
+                  "observed" = data$Fertility)
+
+p1 &lt;- ggplot(df_plt, 
+             aes(x=fitted, y=observed)) + 
+  geom_point() + stat_smooth(method="loess") + 
+  geom_abline(intercept = 1, col="red") + 
+  xlab("Predicted") + ylab("Observed") + 
+  ggtitle("Observed vs. Predicted Values")
+
+p2 &lt;- ggplot(model, 
+             aes(.fitted, .resid)) + 
   geom_point() + 
   stat_smooth(method="loess") + 
   geom_hline(yintercept=0, col="red") + 
   xlab("Predicted") + ylab("Residuals") + 
   ggtitle("Residuals vs. Predicted Values")
-
-df_plt &lt;- data.frame("fitted" = fitted(model), 
-                  "observed" = data$Fertility)
-
-p2 &lt;- ggplot(df_plt, aes(x=fitted, y=observed)) + 
-  geom_point() + stat_smooth(method="loess") + 
-  geom_abline(intercept = 1, col="red") + 
-  xlab("Predicted") + ylab("Observed") + 
-  ggtitle("Observed vs. Predicted Values")
 
 grid.arrange(p1, p2, ncol=2)
 }
@@ -259,19 +264,20 @@ A 'bowed' pattern indicates the model makes systematic errors, over- or underpre
 ---
 ## So what if there's nonlinearity?
 
-If there is a pattern to observations (i.e., not just due to inherent variation), but the pattern is *not linear*,
-then using linear regression to describe relationships that are curvilinear can lead to:
-- underestimating true association (i.e. biased estimates of the parameters)
-- serious prediction errors, especially out-of-sample (data not used in fitting/training the model)
+If there is a pattern to observations (i.e., not just due to inherent variation), 
+but the pattern is *not linear* (i.e. _nonlinear_ or _curvilinear_), 
+then using linear regression can lead to:
+- underestimating 'true' association (i.e. biased estimates of the parameters)
+- serious prediction errors, especially .red[out-of-sample] (data not used in fitting/training the model)
 
-The model expects catholicism to increase fertility, but while that might be generally true,
+The model expects Catholicism to increase fertility, but while that might be generally true,
 it seems that there are some communes that are not very catholic but nonetheless moderately fertile:
 Grandson, Paysd'enhaut, and Oron.
 
-It means that for different values of catholicism, the slope of the line is different:
-while catholicism is generally associated with fertility, 
-at first a drop in catholicism can lead to higher fertility,
-and then an increase in catholicism leads to higher fertility.
+It means that for different values of Catholicism, the slope of the line is different:
+while Catholicism is generally associated with fertility, 
+at first a drop in Catholicism can lead to higher fertility,
+and then an increase in Catholicism leads to higher fertility.
 
 This suggests that this relationship is _nonlinear_.
 
@@ -294,16 +300,20 @@ Fortunately, not that difficult to deal with non-linear relationships, even with
 
 .pull-left[
 
-The most commonly used way to take account of non-linearity is to use polynomial regression, such as a quadratic model:
+The most commonly used way to take account of non-linearity is to use .red[polynomial regression], such as a quadratic model:
 
 `$$Y =\alpha + \beta _{1}X_{1} + \beta _{2}X_{1}^{2} + \varepsilon$$`
 
 Note while \\(X^2\\) is raised to the power of 2, model still _linear in its parameters_.
 
+You can probably increase the fit by adding further polynomials, e.g. `\(x^3\)`,
+but the trade-offs to such complexity are rarely worth it in political science...
+
 
 ```r
 cath2 &lt;- lm(Fertility ~ Catholic + 
-                I(Catholic^2), swiss)
+                I(Catholic^2),
+            swiss)
 ```
 
 ]
@@ -340,8 +350,8 @@ cath2 &lt;- lm(Fertility ~ Catholic +
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.67&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.13&amp;nbsp;&amp;ndash;&amp;nbsp;-0.20&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;0.67&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;1.13&amp;nbsp;&amp;ndash;&amp;nbsp;-0.20&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.006&lt;/strong&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -361,14 +371,49 @@ cath2 &lt;- lm(Fertility ~ Catholic +
 
 .pull-right[
 
-Terms that rely on same underlying variable _must_ be interpreted together.
-- \\(\beta_2\\) is interpreted as showing the marginal effect of one unit change in x with the level of x itself.
+When interpreting model results, _always_ remember that terms that rely on same underlying variable _must_ be interpreted together.
+- \\(\beta_2\\) is interpreted as showing the marginal effect of one unit change in `\(x\)` with the level of `\(x\)` itself.
 - Depending on the value of \\(\beta_2\\) the function will be convex (if \\(\beta_2 &gt; 0\\)) or concave (if \\(\beta_2 &lt; 0\\)).
-- What if both parameters have the same direction? Positive or negative?
+- What if both parameters related to `\(x\)` have the same direction? Positive or negative?
 
-Since \\(\beta_1 &lt; 0 \\) and \\(\beta_2 &gt; 0 \\), the marginal effect of x on y starts negative and then goes up, becoming positive for large values of x.
+Since \\(\beta_1 &lt; 0 \\) and \\(\beta_2 &gt; 0 \\), the marginal effect of `\(x\)` on `\(y\)` starts negative and then goes up, becoming positive for large values of `\(x\)`.
 
 ]
+
+---
+#### Examples of quadratic interpretations
+
+.panelset[
+.panel[.panel-name[R Code]
+
+
+```r
+sq_intrp &lt;- tibble(x = 0:10, x2 = (0:10)^2) %&gt;%
+  mutate(y_1 = 0.2 + -0.2*x + 2*x2,
+         y_2 = 200 + -20*x + 1*x2,
+         y_3 = 80 + -20*x + 2*x2,
+         y_4 = 100 + .2*x + -1*x2,
+         y_5 = -20 + 20*x + -1*x2,
+         y_6 = -20 + 20*x + -2*x2)
+
+library(gridExtra)
+g1 &lt;- ggplot(sq_intrp, aes(x = x, y = y_1)) + geom_line()
+g2 &lt;- ggplot(sq_intrp, aes(x = x, y = y_2)) + geom_line()
+g3 &lt;- ggplot(sq_intrp, aes(x = x, y = y_3)) + geom_line()
+g4 &lt;- ggplot(sq_intrp, aes(x = x, y = y_4)) + geom_line()
+g5 &lt;- ggplot(sq_intrp, aes(x = x, y = y_5)) + geom_line()
+g6 &lt;- ggplot(sq_intrp, aes(x = x, y = y_6)) + geom_line()
+grid.arrange(g1,g2,g3,g4,g5,g6, ncol = 3)
+```
+
+]
+
+.panel[.panel-name[Plot]
+
+![](STAT_L2_Modelling_files/figure-html/sqintrp-1.png)
+]
+]
+
 
 ---
 ### 2. Logged terms
@@ -379,9 +424,9 @@ Another option is to take the log of an independent variable:
 
 `$$Y =\alpha + \beta _{1}log(X_{1}) + \varepsilon$$`
 
-If log-scale, then \\(2-1 = 4-2 = 8-4 = ...\\)
+If log-scale, then \\(2=1, 4=2, 8=4, ...\\)
 - this bunches up high values relative to low values
-- can convert nonlinear X,Y relationship close to linear log(X), Y relationship
+- can convert nonlinear `\(X,Y\)` relationship close to linear `\(\log(X), Y\)` relationship
 - especially useful when relationship looks like an exponential function
 
 Again, note that the model still _linear in its parameters_.
@@ -406,7 +451,8 @@ In this case, just seems to have shifted the 'bow'.
 
 .pull-left[
 
-The effect is significant, but certainly not as well-fitting as the quadratic model (we'll come back to fit later).
+The effect is statistically significant, 
+but certainly not as well-fitting as the quadratic model (we'll come back to fit later).
 
 &lt;table style="border-collapse:collapse; border:none;"&gt;
 &lt;tr&gt;
@@ -442,15 +488,15 @@ The effect is significant, but certainly not as well-fitting as the quadratic mo
 
 .pull-right[
 
-Careful with interpretation though (log(X) ≠ X):
-- if \\(Y = \alpha + \beta_1 log(X), \beta_1\\) interpreted as change in Y for 1 percentage in X
-- if \\(log(Y) = \alpha + \beta_1 log(X), \beta_1\\) interpreted as percentage change in Y for 1 percentage in X
+Careful with interpretation though `\((\log(X) \neq X)\)`:
+- if \\(Y = \alpha + \beta_1 log(X), \beta_1\\) interpreted as change in `\(Y\)` for 1 percentage in `\(X\)`
+- if \\(log(Y) = \alpha + \beta_1 log(X), \beta_1\\) interpreted as percentage change in `\(Y\)` for 1 percentage in `\(X\)`
 
-Be very careful extrapolating from these models, as they can easily go beyond bounds of plausibility...
+Be _very careful extrapolating_ from these models, as they can easily go beyond bounds of plausibility...
 
-Note that log(0) and e.g. log(-1) undefined.
-- if just a few 0s, add 1 to all scores (log(1) = 0)
-- if negative, maybe rescale variable but careful with interpretation
+Note that `\(\log(0)\)` and e.g. `\(\log(-1)\)` undefined.
+- if just a few 0s, add 1 to all scores `\((\log(1) = 0)\)`
+- if negative, maybe rescale variable but _careful with interpretation_
 
 ]
 
