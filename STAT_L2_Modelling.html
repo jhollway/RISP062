@@ -745,7 +745,7 @@ I'm going to talk about two sets of assumptions here:
 &gt; All independent variables are uncorrelated with the error term
   
   - remember that the error term is supposed to represent unpredictable random error
-  - if an indepedendent variable is correlated with the error term, then we could use that to predict errors
+  - if an independent variable is correlated with the error term, then we could use that to predict errors
   - there are three types of this kind of endogeneity...
 
 --
@@ -753,25 +753,26 @@ I'm going to talk about two sets of assumptions here:
 &gt; Observations of the error term are uncorrelated with each other
   
   - if one observation is correlated with another observation, say an observation is more positive than expected and this systematically increases the probability that the following observation is also positive
-  - this problem known generally as autocorrelation
+  - this problem known generally as .red[autocorrelation]
 
 ---
 ## When is the exogeneity assumption violated?
 
-The features and residuals are uncorrelated
+When features and residuals are correlated somehow...
 
 1. **measurement error** -&gt; *attenuation bias*
-  - X causes Y, but we cannot observe X and Z (which we observe) is influence by X but also by Y
+  - `\(X\)` causes `\(Y\)` but we cannot observe `\(X\)`, 
+  and `\(Z\)` (which we observe) is influenced by `\(X\)` but also by `\(Y\)`
   - does higher income both decrease child mortality and fertility rates?
 1. **instantaneous/reverse causation** -&gt; *simultaneity bias*
-  - X influences Y, but Y reinforces X too
+  - `\(X\)` influences `\(Y\)`, but `\(Y\)` reinforces `\(X\)` too
   - does child mortality lead to higher fertility rates, vice versa, or both?
 1. **omitted variables** -&gt; *selection bias*
-  - Z causes both X and Y fairly contemporaneously
+  - `\(Z\)` causes both `\(X\)` and `\(Y\)` fairly contemporaneously
   - does education both decrease child mortality and lower fertility rates?
 
-Actually selection bias is *the* problem in observational research that undermines causal inference.
-Measurement error and instantaneous causation can be posed as problems of omitted variables.
+Actually selection/omitted variable bias is *the* problem in observational research that undermines causal inference.
+Measurement error and instantaneous causation can be both posed as problems of omitted variables.
 
 ---
 ## The OVB Triangle
@@ -783,9 +784,13 @@ Omitted variable bias (OVB) is one of the most common and vexing problems in ord
 
 OVB occurs when a variable that is correlated with both the dependent and one or more included independent variables is omitted from a regression equation. 
 
-An “OVB Triangle” exists when there exists a third variable that is 
+An “OVB Triangle” exists when there exists a third variable that is: 
 - not currently in the model, and is 
-- correlated with both the independent and dependent variable
+- correlated with _both_ the independent and dependent variable
+
+OVs usually because:
+- data simply not available
+- effect of explanatory variable on response variable unknown
 ]
 
 .pull-left[
@@ -794,7 +799,7 @@ An “OVB Triangle” exists when there exists a third variable that is
 ]
 
 ---
-## Diagnosing ommitted variable bias
+## Diagnosing omitted variable bias
 
 .pull-left[
 
@@ -824,9 +829,16 @@ plotpreds(cath2, swiss)
 ### 2. Ramsey RESET test
 
 The RESET test is a popular diagnostic for correctness of the specification of a linear model.
-Basically, it sees whether nonlinear combinations of the explanatory variables have any power in explaining the response variable.
+Basically, it sees whether additional variables might have significant influence
+by testing whether an alternative model taking powers of the fitted response or regressor variables, 
+e.g. `\((x_1, x_1^2, x_1^3)\)`, fits better than the current fitted model.
 
-If they do (established using an F-test, see below), then the model is misspecified in the sense that there might be some missing variable (e.g. an OV) or a polynomial or other nonlinear functional form would be a better fit.
+If the F-test (see below) shows a significant improvement,
+this suggests the model is misspecified in the sense that there might be some missing variable (e.g. an OV), 
+or a polynomial or other nonlinear functional form would be a better fit.
+
+.panelset[
+.panel[.panel-name[Fitted Response Variable]
 
 
 ```r
@@ -841,16 +853,29 @@ resettest(cath2, type = "fitted")
 ## data:  cath2
 ## RESET = 2.3524, df1 = 2, df2 = 42, p-value = 0.1076
 ```
+]
+
+.panel[.panel-name[Regressor Variables]
 
 ```r
-# resettest(cath2, type = "regressor")
+resettest(cath2, type = "regressor")
 ```
+
+```
+## 
+## 	RESET test
+## 
+## data:  cath2
+## RESET = 4.2654, df1 = 4, df2 = 40, p-value = 0.00573
+```
+
+]]
 
 ---
 ### 3. Testing correlations between IVs and residuals
 
-Or we could check the Pearson correlation between each feature and the residuals.
-Then report the p-value for testing the lack of correlation between the two considered series.
+Lastly, we can check the Pearson correlation between each feature and the residuals,
+and report the `\(p\)`-value for testing the lack of correlation between the two considered series.
 
 
 ```r
@@ -884,30 +909,41 @@ cor.test(swiss$Education, cath2$residuals)
 We can reject the null hypothesis (that there is a lack of correlation) for several pairs,
 and cannot reject the null hypothesis for a couple of others. Which ones?
 
-Low p-values suggest we can reject the null hypothesis that the true correlation is 0.
+Low p-values suggest we can reject the null hypothesis that the "true" correlation is 0.
 
 This provides some evidence of potential OVB.
 
-If adding in variables that could be correlated with both catholicism and the residuals changes the coefficient for catholicism by more than about 3-5%, then this is indicative of OVB.
+Additionally, we sometimes say that if adding in variables that could be correlated with both catholicism and the residuals changes the coefficient for catholicism by more than about 3-5%, then this is indicative of OVB.
 
-A reasonable supposition would be that we are still missing a key variable.
+A reasonable supposition would be that we are still missing at least one key variable.
 
 ---
 ## So what if there's omitted variable bias?
 
-Violating this assumption biases the coefficient estimate. 
+Violating this assumption _biases the coefficient estimate_.
 
-To understand why, remember the error term always explains some of variability in the dependent variable. 
+--
 
-But when an independent variable correlates with the error term, OLS incorrectly attributes some of the variance that the error term actually explains to the independent variable instead.
+Remember the error term always explains some of variability in the dependent variable. 
+When an independent variable correlates with the error term, 
+OLS incorrectly attributes some of the variance that the error term actually explains to the independent variable instead.
+The amount of "extra" distance between `\(Y\)` and \\(\hat{Y}\\) created by leaving out the omitted variable will be correlated with any included variables the OV is correlated with.
+In other words, if there are omitted variables, `\(E[\varepsilon_i|x_i] \neq 0\)` which biases your estimates, 
+no matter how many observations (this is called .red[inconsistent]).
 
-The amount of "extra" distance between Y and \\(\hat{Y}\\) created by leaving out the omitted variable will also be correlated with any included variables the OV is correlated with.
+--
 
-In other words, if there are omitted variables, `\(E[\varepsilon_i|x_i] \neq 0\)` which biases your estimates, no matter how many observations (this is called inconsistent).
+The bias is in predictable ways _if you knew all the correlations_ also with features beyond the model, 
+though you typically don't...
 
-Therefore, whatever point estimates we find, we can't even tell if they are positive or negative, significant or insignificant, because we do not know the size of the bias and no way to estimate the size of the bias.
 
-Fortunately, the amount of OVB depends on how large those correlations are – if any one of them is relatively small, then very little bias will be generated.
+|    &amp;nbsp;     | cor(X, Z) &gt; 0 | cor(X, Z) &lt; 0 |
+|:-------------:|:-------------:|:-------------:|
+| cor(Z, Y) &gt; 0 |    Bias +     |    Bias -     |
+| cor(Z, Y) &lt; 0 |    Bias -     |    Bias +     |
+
+This leaves us in a pretty uncertain position because there could be a serious problem (bias) with our inference
+and we wouldn't necessarily know about it or in which direction it goes.
 
 ???
 
@@ -917,13 +953,15 @@ However, the error term is also defined as the difference between the actual obs
 ## Dealing with endogeneity
 
 ### 1. Instrumental variables (IV)
-  - An instrumental variable is strongly correlated with the explanatory variable that has problems with endogeneity (a _strong first stage_) and is not itself correlated with the error term (the _exclusion restriction_), conditional on all other covariates.
+  - An instrumental variable is strongly correlated with the explanatory variable that has problems with endogeneity (a _strong first stage_) 
+  and is not itself correlated with the error term (the _exclusion restriction_), 
+  conditional on all other covariates.
   - E.g. Acemoglu, Johnson and Robinson (2001): good institutions =&gt; economic development, _but_ economic development =&gt; good institutions?
     Try instrumental variable: 
       - strong first stage: settler mortality rates (exogenous: disease environments) =&gt; colonization strategies =&gt; modern institutions =&gt; economic development
       - exclusion restriction: settler mortality rates ≠&gt; economic development
       - e.g. high African mortality deterred all except those interested in imposing predatory institutions, whereas low North American mortality attracted droves of migrants that demanded institutions of equal rights. Institutions persisted in both cases, but only the latter resulted in long-run economic growth.
-  - Creativity required to identify appropriate instrumental variables, and sometimes impossible.
+  - Creativity required to identify appropriate instrumental variables, and sometimes impossible...
   
 ---
 
@@ -954,11 +992,11 @@ they are correlated with themselves.
 
 Imagine our predictor of the weather is the season. 
 We don’t predict that it will be sunny in winter.
-_But_ if it is sunny on 24 Feb (so we have a large residual), 
-it’s likely to be sunny on 25 Feb (and again we have a large residual). 
+_But_ if it is sunny on 2 March (so we have a large residual), 
+it’s likely to be sunny on 2 March (and again we have a large residual). 
 When one residual is high, next one also likely to be high.
 
-Serial/autocorrelation common in panel data (observations of same entity over time e.g. country-year designs, actor-month, etc.), but also spatial and structural (i.e. network) data.
+Serial/autocorrelation common in panel data (observations of same entity over time e.g. country-year designs, actor-month, etc.), but also spatial and structural (i.e. network) data...
 
 ---
 
@@ -968,9 +1006,9 @@ Serial/autocorrelation common in panel data (observations of same entity over ti
 
 The easiest way to visually diagnose autocorrelation is using an autocorrelation function (ACF) plot.
 
-The ACF plot shows us how correlated observations or residuals are with those at different lags.
+The ACF plot shows us how correlated observations or residuals are with those at different lags (steps away).
 - if not time-series data, then row number is used
-- x-axis corresponds to the lags of the residual, increasing in steps of 1
+- `\(x\)`-axis corresponds to the lags of the residual, increasing in steps of 1
 - leftmost line shows correlation of residual with itself (Lag0), therefore always =1
 
 If values are significantly correlated with lagged values, then there is autocorrelation.
@@ -1105,10 +1143,10 @@ Moderate autocorrelation reduces the precision of OLS estimates.
 
 Extreme autocorrelation can also signal a badly misspecified model:
 - e.g. violation of linearity assumption (underlying exponential growth model will present autocorrelation)
-- or bias due to omitted variables
-That is, there could be a violation of the linearity assumption (an underlying exponential growth model will present autocorrelation) or due to bias that is explainable by omitted variables (interaction terms or dummy variables for identifiable conditions).
+- or bias due to omitted variables (interaction terms or dummy variables for identifiable conditions).
 
-Possible in both time-series models -- current value depends on previous (historic) values -- and non-time-series models -- current value depends on spatially or structurally adjacent values.
+Possible in both time-series models (current value depends on previous (historic) values) 
+and non-time-series models (current value depends on spatially or structurally adjacent values).
 
 ---
 ## Dealing with autocorrelation
@@ -1133,9 +1171,9 @@ In DW &gt; 3, some variables possibly overdifferenced:
 .pull-right[
 
 Mixed models:
-- Fixed effects (FE) controls for entity-specific time-invariant characteristics we cannot observe or quantify (ex: culture, religion, gender, race)
+- .red[Fixed effects] (FE) controls for entity-specific time-invariant characteristics we cannot observe or quantify (ex: culture, religion, gender, race)
   - good for studying changes within an entity over time.
-- Random effects (RE) used when we suspect variation between entities is random and is an important determinant of our DV; can include entity specific time-invariant characteristics
+- .red[Random effects] (RE) used when we suspect variation between entities is random and is an important determinant of our DV; can include entity specific time-invariant characteristics
   - good for studying changes across entities over time.
   
 Autocorrelation can be treated as a _nuisance_ or a _feature_.
