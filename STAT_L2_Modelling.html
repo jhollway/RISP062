@@ -501,41 +501,42 @@ Note that `\(\log(0)\)` and e.g. `\(\log(-1)\)` undefined.
 ]
 
 ---
-### 3. Interaction terms
-
 .pull-left[
+
+### 3. Interaction terms
 
 Interaction terms _can_ also help with nonlinearity:
 
 `$$Y =\alpha + \beta _{1}X_{1} + \beta _{2}X_{2} + \beta _{3}X_{1}X_{2} + \varepsilon$$`
 
-Any combination of binary and continuous variables.
+Express the effect of a _combination_ of binary and continuous variables.
 
 Though involve multiplications, _terms_ still additive.
 
-\\(&gt;1\\) interaction possible, but difficult to interpret.
-
-
-```r
-cathi &lt;- lm(Fertility ~ Catholic * Education, 
-            swiss)
-```
-
 Note though that this only helps if main effects of both variables are linear.
 
-Mismodelling main effect may introduce spurious interactions
+\\(&gt;1\\) interaction possible, but difficult to interpret.
+
+Mismodelling main effect may introduce spurious interactions...
 
 ]
 
 .pull-right[
+
+
+```r
+cathi &lt;- lm(Fertility ~ Catholic * Education, 
+            data = swiss)
+plotpreds(cathi, swiss)
+```
 
 &lt;img src="STAT_L2_Modelling_files/figure-html/interaction-1.png" width="504" /&gt;
 
 Remember, always interpret effects with the same underlying variables together:
 - marginal effect of \\(x_1\\) is \\(b_1 + b_3 x_2\\)
 - marginal effect of \\(x_2\\) is \\(b_2 + b_3 x_1\\)
-- if \\(\beta_1\\) significant, then \\(x_1\\) effect on Y when \\(x_2 = 0\\)
-- if \\(\beta_1\\) not significant, then no \\(x_1\\) effect on Y when \\(x_2 = 0\\)
+- if \\(\beta_1\\) significant, then \\(x_1\\) effect on `\(Y\)` when \\(x_2 = 0\\)
+- if \\(\beta_1\\) not significant, then no \\(x_1\\) effect on `\(Y\)` when \\(x_2 = 0\\)
 
 ]
 
@@ -574,14 +575,14 @@ For nonlinear relationships, consider multivariable fractional polynomials inter
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Education&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.43&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.95&amp;nbsp;&amp;ndash;&amp;nbsp;0.10&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;0.43&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;0.95&amp;nbsp;&amp;ndash;&amp;nbsp;0.10&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.108&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic * Education&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.01&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.02&amp;nbsp;&amp;ndash;&amp;nbsp;0.00&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;0.01&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;0.02&amp;nbsp;&amp;ndash;&amp;nbsp;0.00&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.119&lt;/td&gt;
 &lt;/tr&gt;
 
@@ -593,13 +594,14 @@ so could ignore/drop interaction or test whether linear combination of effects t
 ]
 
 .pull-right-2[
-.tiny[
 
+.panelset[
+.panel[.panel-name[xCatholic]
 
 ```r
 library(multcomp)
 summary(glht(cathi, 
-          linfct = c("Catholic + Catholic:Education = 0")))
+        linfct = c("Catholic + Catholic:Education = 0")))
 ```
 
 ```
@@ -615,7 +617,14 @@ summary(glht(cathi,
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## (Adjusted p values reported -- single-step method)
 ```
+]
 
+.panel[.panel-name[xEducation]
+
+```r
+summary(glht(cathi, 
+        linfct = c("Education + Catholic:Education = 0")))
+```
 
 ```
 ## 
@@ -630,6 +639,7 @@ summary(glht(cathi,
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## (Adjusted p values reported -- single-step method)
 ```
+]
 
 ]
 ]
@@ -637,18 +647,14 @@ summary(glht(cathi,
 ???
 
 ...if we were to interpret, would mean that with every extra unit of education,
-expect to see less fertility by catholicism.
+expect to see less fertility by Catholicism.
 
-Important to test whether the marginal effect x1 on y at different values of x2 is significant.
+Important to test whether the marginal effect `\(x_1\)` on `\(y\)` at different values of `\(x_2\)` is significant.
 
-If b1 &gt; 0 (i.e. positive), bint &lt; 0 (i.e. negative), and both are p&lt;0.05, then it might be that once x2 &gt; 0, b1 becomes insignificant.
+If `\(b_1 &gt; 0\)` (i.e. positive), `\(b_{int} &lt; 0\)` (i.e. negative), and both are `\(p&lt;0.05\)`, 
+then it might be that once `\(x_2 &gt; 0\)`, `\(b_1\)` becomes insignificant.
 
-Solution: Set x2 to its mean and test if b1 + bint(x2) ≠ 0.
-
----
-class: center
-
-&lt;img src="STAT_L2_Modelling_files/figure-html/interPlot-1.png" width="720" /&gt;
+Solution: Set `\(x_2\)` to its mean and test if `\(b_1 + b_{int}(x_2) ≠ 0\)`.
 
 ---
 #### DIY
@@ -668,10 +674,45 @@ plot_model(cathi, type = "int") # plots minmax by default
 
 This model shows how Catholicism affects provinces with low education differently than those that are highly educated.
 
-For those provinces with low education (in red), increasing Catholicism (vs Protestantism) leads to increased fertility.
+For those provinces with .red[low education], increasing Catholicism (vs Protestantism) leads to increased fertility.
 
-But for those provinces with high eduation (in blue), increasing Catholicism (vs Protestantism) leads to _decreased_ fertility.
+But for those provinces with .blue[high education], increasing Catholicism (vs Protestantism) leads to _decreased_ fertility.
 
+(But why are the confidence intervals for the blue so wide?)
+
+]
+
+---
+class: center
+
+.panelset[
+.panel[.panel-name[R Code]
+
+```r
+new_d &lt;- expand.grid(Catholic=c(min(swiss$Catholic),
+                                mean(swiss$Catholic),
+                                max(swiss$Catholic)),
+                     Education=c(min(swiss$Education),
+                                mean(swiss$Education),
+                                max(swiss$Education)))
+new_d$Fertility &lt;- predict(cathi,new_d)
+
+ggplot(swiss, aes(x=Catholic,y=Fertility,color=Education))+
+ geom_point()+
+ geom_line(data=new_d,aes(group=Education)) +
+ scale_color_continuous(low="green",high="blue") +
+ geom_text(aes(x=50,y=85,label="Slope: (0.18 - 0.01 * 1) * Catholic"),
+           color="green",angle=8,family="Arial") +
+ geom_text(aes(x=50,y=65,label="Slope: (0.18 - 0.01 * 11) * Catholic"),
+           color="brown",angle=3,family="Arial") +
+ geom_text(aes(x=50,y=25,label="Slope: (0.18 - 0.01 * 53) * Catholic"),
+           color="blue",angle=-11,family="Arial")
+```
+]
+
+.panel[.panel-name[Plot]
+![](STAT_L2_Modelling_files/figure-html/interplot-1.png)
+]
 ]
 
 ---
@@ -679,13 +720,14 @@ But for those provinces with high eduation (in blue), increasing Catholicism (vs
 
 - Nonlinearity is a serious but relatively easily remediable issue for most linear models.
 
-- Most common solution is to include a squared term as this is especially good at accounting for the relationship when the slope goes up and down.
+- Most common solution is to include a squared term as this is flexible, does not usually require any further transformations, and is usually pretty interpretable.
 
-- Where the curvilinear relationship is particularly pronounced and behaves in an exponential-like manner, include a log of the X variable.
+- Where the curvilinear relationship is particularly pronounced and behaves in an exponential-like manner, include a log of the `\(X\)` variable, though be careful of zeros/negative values and with interpretation.
 
-- Interactions can help, but only if main effects are linear.
+- Interactions can help, and can lead to interesting insights, but only if main effects are linear,
+and need to watch out for potentially spurious 'discoveries'.
 
-- There are also more sophisticated methods for deadling with nonlinearity, some of which are beyond this course...
+- There are also more sophisticated methods for dealing with nonlinearity, some of which are beyond this course...
 
 ---
 class: center, middle
