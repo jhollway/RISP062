@@ -808,17 +808,17 @@ class: center, middle
 ---
 ## Defining outliers
 
-This is not really an assumption, but outliers can lead to violations of other aforementioned assumptions and so are worth checking for.
+This is not really an assumption per se, but outliers can lead to violations of other aforementioned assumptions and so are worth checking for.
 
-One downside of the linear model is that it is sensitive to unusual values because the distance incorporates a squared term.
+One major downside of OLS is that the incorporation of a squared term makes it sensitive to unusual values.
 Outlying observations can therefore sometimes radically change our regression equation.
 
-Sometimes we want to remove these outliers so that we can concentrate on the main model,
-especially if they may be measurement errors,
-but othertimes we want to explicitly look at these outliers.
+--
 
-They can help us think about other independent variables that may be important,
-or perhaps we're interested in investigating the exceptions that don't fit our predictions further (say in a case study as part of a mixed methods research design).
+Ultimately, investigator's best judgment required to decide:
+- whether there are any outliers
+- whether it is _necessary_ to treat them
+- how to treat them
 
 ---
 
@@ -828,13 +828,12 @@ or perhaps we're interested in investigating the exceptions that don't fit our p
 
 ### 1. z-score
 
-The `outliers` package provides useful functions to systematically extract outliers:
+The `{outliers}` package provides some useful functions:
 
 .small[
 
 
 ```r
-library(outliers)
 mean(swiss$Fertility)
 ```
 
@@ -843,7 +842,7 @@ mean(swiss$Fertility)
 ```
 
 ```r
-outlier(swiss$Fertility) # most exceptional
+outliers::outlier(swiss$Fertility) # most exceptional
 ```
 
 ```
@@ -851,7 +850,7 @@ outlier(swiss$Fertility) # most exceptional
 ```
 
 ```r
-outlier(swiss$Fertility, opposite = TRUE) # most typical
+outliers::outlier(swiss$Fertility, opposite = TRUE) # most exceptional on the other side
 ```
 
 ```
@@ -864,6 +863,9 @@ outlier(swiss$Fertility, opposite = TRUE) # most typical
 
 .pull-right-2[
 
+.panelset[
+.panel[
+.panel-name[Scores]
 
 ```r
 # z-scores =&gt; (x-mean)/sd
@@ -871,11 +873,15 @@ scores(swiss$Fertility)
 ```
 
 ```
-##  [1]  0.80513053  1.03728474  1.78978457  1.25342831  0.54095506  0.47691252  1.09332196  1.78177925  0.98124752  1.02127410  1.35749743 -0.48372556 -0.25957667
-## [14] -0.09947033 -0.67585318 -0.14750223  0.12467856 -1.15617222 -1.26824666 -0.40367239 -0.37165112 -0.41167770 -1.08412436 -1.02008182  0.18872110  0.32481149
-## [27]  0.14869451 -0.77191698 -0.94803397 -0.37965643  0.42888062 -0.06744906  0.57297633  0.02861475  0.74108800 -0.41167770  1.76576862  0.73308268  0.02060943
-## [40] -0.35564048  0.20473173 -0.45970961  0.59699228 -0.20353945 -2.81327291 -2.03675713 -2.18885816
+##  [1]  0.80513053  1.03728474  1.78978457  1.25342831  0.54095506  0.47691252  1.09332196  1.78177925  0.98124752  1.02127410  1.35749743
+## [12] -0.48372556 -0.25957667 -0.09947033 -0.67585318 -0.14750223  0.12467856 -1.15617222 -1.26824666 -0.40367239 -0.37165112 -0.41167770
+## [23] -1.08412436 -1.02008182  0.18872110  0.32481149  0.14869451 -0.77191698 -0.94803397 -0.37965643  0.42888062 -0.06744906  0.57297633
+## [34]  0.02861475  0.74108800 -0.41167770  1.76576862  0.73308268  0.02060943 -0.35564048  0.20473173 -0.45970961  0.59699228 -0.20353945
+## [45] -2.81327291 -2.03675713 -2.18885816
 ```
+]
+.panel[
+.panel-name[Logical]
 
 ```r
 # observations that lie beyond a given percentile based on a given score
@@ -883,10 +889,13 @@ scores(swiss$Fertility, type="t", prob = 0.95)
 ```
 
 ```
-##  [1] FALSE FALSE  TRUE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
-## [28] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE
+##  [1] FALSE FALSE  TRUE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE
+## [24] FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE
+## [47]  TRUE
 ```
-
+]
+.panel[
+.panel-name[Standardised]
 Or we can standardize the residuals (divide by s.d. expected from normal sampling variability) to find out whether they're big.
 
 
@@ -901,17 +910,19 @@ car::outlierTest(cath)
 
 Apparently V. de Geneve is an outlier! Who would've thought!
 
+(If there isn't an outlier, `car::outlierTest()` returns the most extreme observation based on the given model)
+
+What's wrong with using _z_-scores to establish whether outliers are present?
+
 ]
-
-???
-
-If there isn't an outlier, the `outlierTest()` from `car` package gives the most extreme observation based on the given model
+]
+]
 
 ---
 ### 2. Box plot
 
-Another visual way to proceed is by using boxplots.
-For a given continuous variable, outliers are those observations that lie outside \\(1.5 IQR\\), where IQR, the ‘Inter Quartile Range’ is the difference between 75th and 25th quartiles. Points outside the whiskers in the box plot signal outliers.
+A visual way to proceed is by using boxplots.
+For a given continuous variable, outliers are those observations that lie outside \\(1.5 IQR\\), where IQR, the ‘Inter Quartile Range’ is the difference between 75th and 25th percentiles. Points outside the whiskers in the box plot signal outliers.
 
 .pull-left[
 
@@ -940,22 +951,22 @@ ggplot(swiss, aes(Catholic, Fertility)) +
 ]
 
 ---
-### 3. Cook's distance
-
 .pull-left-2[
 
-Declaring an outlier based on a just one feature could lead to unrealistic inferences. 
-Better to collectively consider the features that matter.
+### 3. Cook's distance
 
-Cook’s distance is a measure of how deleting an observation impacts the regression model,
+Declaring an outlier based on a just one variable could lead to unrealistic inferences.
+After all, they might not be outliers “under the model” as a whole.
+
+.red[Cook’s distance] is a measure of how much deleting an observation impacts the regression model,
 and thus reflects the influence exerted by each observation on the predicted outcome.
 
 It is computed with respect to a given regression model and therefore impacted only by the features included in the model.
 
-The lowest value that Cook's D can assume is zero, and the higher the Cook's D is, the more influential the point.
+The lowest value that Cook's D can assume is 0, and the higher the Cook's D is, the more influential the point.
 It makes sense to investigate points with high Cook’s distances.
 
-The conventional cutoff is 4/n (used in `lindia` by default).
+The conventional cutoff is `\(\frac{4}{n}\)` (used in `{lindia}` by default).
 ]
 
 .pull-right-1[
@@ -968,59 +979,81 @@ gg_cooksd(cath)
 
 &lt;img src="STAT_L3_Assumptions_files/figure-html/cooks-1.png" width="504" /&gt;
 
+```r
+# 45 and 47 are V. de Geneve and Rue Gauche
+```
+
 ]
 
 ???
 
-Observation 45 and 47 are V. de Geneve and Rive Gauche respectively.
-
-Mathematically, cook’s distance Di for observation i is calculated as:
+Mathematically, cook’s distance `\(D_i\)` for observation `\(i\)` is calculated as:
 
 $$  D_i = \frac{\sum^n_j (\hat{y}_j - \hat{y}_i)^2}{s^2p}   $$
 
-where, Ŷ j is the value of jth fitted response when all the observations are included.
-Ŷ j(i) is the value of jth fitted response, where the fit does not include observation i.
-s2 is the mean squared error.
-p is the number of coefficients in the regression model.
+where `\(\hat{y}_j\)` is the value of `\(j\)`th fitted response when all the observations are included.
+`\(\hat{y}_i\)` is the fitted response value obtained when excluding the observation `\(i\)`.
+`\(s^2\)` is the mean squared error.
+`\(p\)` is the number of coefficients in the regression model.
 
 ---
-.pull-left-2[
+.pull-left[
 
 ### 4. Leverage
 
-A related measure is _leverage_. 
-A high-leverage observation is a point at extreme values of the variables, where the lack of nearby observations makes the fitted regression model pass close to that particular point.
+Sometimes those observations with the biggest residuals do not make the most difference to the regression line.
+Sometimes observations with smaller residuals but that are more extreme/far from the mean may have more .red[leverage].
+
+A high-leverage observation is a point at extreme values of the variables, 
+where the lack of nearby observations makes the fitted regression model pass close to that particular point.
 
 Best way to think of this is with simple linear regression.
 We’d shift the line most when points are far away from the mean (just like a lever is most effective when you push the end rather than the middle).
 
-Sometimes those observations with the biggest residuals do not have the most leverage.
-Changes in observations far from the mean make more difference to the regression line.
-
-We can get at this in two ways:
-- a leverage by residuals plot
-- a diagnostic called dfbeta tells us the effect of removing the observation on each parameter estimate
-  - a dfbeta more than 1 for a parameter means the observation has a big residual and a lot of leverage.
 
 ]
 
-.pull-right-1[
+.pull-right[
+We can get at this in two ways...
+
+.panelset[
+.panel[
+.panel-name[Lev x Resids]
 
 ```r
-gg_resleverage(cath)
+ols_plot_resid_lev(cath2)
 ```
 
 &lt;img src="STAT_L3_Assumptions_files/figure-html/leverage-1.png" width="504" /&gt;
 
+In 'cath2', we have 4 outliers but only 2 with leverage.
+
+]
+.panel[
+.panel-name[dfbeta]
+
 ```r
-ols_plot_dfbetas(cath)
+ols_plot_dfbetas(cath2)
 ```
 
-&lt;img src="STAT_L3_Assumptions_files/figure-html/leverage-2.png" width="504" /&gt;
+&lt;img src="STAT_L3_Assumptions_files/figure-html/dfbeta-1.png" width="504" /&gt;
+
+Larger .red[dfbeta] for a parameter means observation has big residual and lots of leverage on that parameter estimate.
 ]
 
----
-#### Distance vs. Leverage
+]
+
+]
+
+???
+
+Options include: 
+
+- Outlier without influence. Although its _Y_ value is unusual given its _X_ value, it has little influence on the regression line because it is in the middle of the _X_ range
+- High leverage because it has a high value of _X_. However, because its value of _Y_ puts it in line with the general pattern of the data it has no influence.
+- Combination of discrepancy (unusual _Y_ value) and leverage (unusual _X_ value) results in strong influence. When this case is deleted both the slope and intercept change dramatically.
+
+For more on measures of influence, see [here](https://olsrr.rsquaredacademy.com/articles/influence_measures.html).
 
 
 ```r
@@ -1081,10 +1114,6 @@ influence.measures(cath)
 ## Rive Gauche  -0.17761 -0.178715 -0.46477 0.755 9.27e-02 0.0250   *
 ```
 
-- Figure (a): Outlier without influence. Although its Y value is unusual given its X value, it has little influence on the regression line because it is in the middle of the X range
-- Figure (b) High leverage because it has a high value of X. However, because its value of Y puts it in line with the general pattern of the data it has no influence.
-- Figure (c): Combination of discrepancy (unusual Y value) and leverage (unusual X value) results in strong influence. When this case is deleted both the slope and intercept change dramatically.
-
 ---
 
 .pull-left[
@@ -1106,7 +1135,8 @@ Six methods from other R packages are included.
 
 ```r
 s1 &lt;- O3prep(swiss, 
-             method=c("HDo", "PCS", "BAC", "adjOut", "DDC", "MCD"), 
+             method=c("HDo", "PCS", "BAC", 
+                      "adjOut", "DDC", "MCD"), 
              tolHDo=0.05, tolPCS=0.05, tolBAC=0.05, toladj=0.05, tolDDC=0.05, tolMCD=0.05)
 O3plotM(s1)$gO3
 ```
@@ -1188,39 +1218,23 @@ tab_model(cathm, catho, dv.labels = c("Fertility With Outliers","Fertility Witho
 
 &lt;/table&gt;
 
-While there are no changes in significance or sign, if we include outliers our estimation of the (negative) effect of education would have been exaggerated. Outliers in data can drastically bias/change the fit estimates and predictions.
+While no changes in significance or sign, including outliers exaggerates our estimation of the (negative) effect of education. 
+Outliers in data can drastically bias/change the fit estimates and predictions.
+
+???
+
+It is often a good idea to run everything without the outlier(s) and see if the ‘interesting’ relationships change much.
+In other words, check the robustness of your results to how outliers are treated.
 
 ---
 ## Dealing with outliers
 
-The investigator's best judgement is required to decide:
-- whether there are any outliers
-- whether it is necessary to treat them
-- how to treat them
-
---
-
-First, you may find outliers but decide for theoretical or methodological reasons _not_ to do anything about them.
-
-For example, while they might be high distance or even high leverage observations, perhaps you might expect such outliers to happen sometimes within the data-generating process and so you want to retain them in the training data.
-
-Maybe you recognise that the outliers are the story and you just want to [highlight them visually](https://flowingdata.com/2018/03/07/visualizing-outliers/).
-
---
-
-Or perhaps you decide that the problem is not the data but the model.
-
-Outliers can be particularly informative observations for other predictors you may want to include in your model.
-
---
-
-A good idea is to run everything without the outlier(s) and see if the ‘interesting’ relationships change much.
-
-If you decide that these outliers could lead to problematic inference, you have a few options about how to treat them, either by modifying (correcting?) the data points or by lessening their impact on the parameter estimates.
-
----
 ### Treating the data
 
+If outliers represent measurement errors or otherwise lead to problematic influence, 
+we can try to "correct" the data.
+
+.pull-left[
 #### 1. Deleting
 
 The first option is to delete the outliers.
@@ -1232,6 +1246,9 @@ It’s a real observation after all and may have important information on other 
 We could replace outliers with the mean / median / mode.
 This reduces any leverage that observation has on that parameter estimate without removing the observation entirely.
 
+]
+
+.pull-right[
 #### 3. Capping
 
 Or we could 'cap' outliers by replacing values that lie below the \\(1.5 IQR\\) limits with the value of 5th percentile and those that lie above the upper limit with the value of 95th percentile.
@@ -1239,14 +1256,18 @@ This keeps some influence, but mitigates it.
 
 #### 4. Prediction
 
-Or outliers could be replaced with missing values (NA) and then predicted by considering them as a response variable. This tries to make the treated values consistent with expectations raised by the other observations.
+Or outliers could be replaced with missing values (`NA`) and then predicted by considering them as a response variable. This tries to make the treated values consistent with expectations raised by the other observations.
+
+]
 
 ---
 ### Treating the model
 
+&lt;!-- Or we can 'treat' outliers by instead lessening their impact on the model itself. --&gt;
+
 #### 5. ‘Robust’ regression
 
-One oft used option is ‘robust regression’, which downweighs the influence high leverage observations.
+One oft used option is .red[robust regression], which reduces the influence of high leverage observations.
 
 
 ```r
@@ -1349,31 +1370,28 @@ Use robust standard errors when heteroskedasticity; use robust regression when h
 Robust regression is done by iterated re-weighted least squares (IRLS).
 
 As the absolute residual goes down, the weight goes up. 
-In other words, cases with a large residuals tend to be down-weighted.
+In other words, cases with large residuals tend to be down-weighted.
 
-Basically, if there seems to be a big difference between OLS and robust regression, trust robust regression more.
+Basically, if there seems to be a big difference between OLS and robust regression, 
+trust robust regression more.
 
-Note robust regression does not address issues of heterogeneity of variance. This problem can be addressed by using functions in the `sandwich` package after the `lm` function.
+Note robust regression does _not_ address issues of heterogeneity of variance. 
+This problem can be addressed by using functions in the `sandwich` package after the `lm` function.
 
 ---
 
 #### 6. ‘Resistant’ regression
 
-Lastly, another way to make linear models more robust to outliers is to use a different distance measure.
+Another way to make linear models less sensitive to outliers 
+(and more robust to non-normality) is to use a different distance measure
+than RMSE.
+.red[Resistant regression] uses .red[mean-absolute distance] (MAD or MAE) instead.
+Note that whereas robust regression dampens outlier influence,
+resistant regression effectively trims them out.
 
-OLS uses root-mean-squared distance or error (RMSD or RMSE), but we could use mean-absolute distance (MAD or MAE) instead, which is less sensitive to outliers (because they're not squared) and more robust to non-normality.
-
-Note whereas robust regression dampens outlier influence, 
-resistant regression use estimates that trim outliers out.
-
-
-```r
-library(L1pack)
-cathq &lt;- lad(Fertility ~ Catholic, swiss)
-```
-
-.pull-left[
-
+.panelset[
+.panel[
+.panel-name[OLS]
 
 ```
 ## 
@@ -1398,8 +1416,14 @@ cathq &lt;- lad(Fertility ~ Catholic, swiss)
 
 ]
 
-.pull-right[
+.panel[
+.panel-name[LAD]
 
+```r
+library(L1pack)
+cathq &lt;- lad(Fertility ~ Catholic, swiss)
+summary(cathq)
+```
 
 ```
 ## Call:
@@ -1420,6 +1444,7 @@ cathq &lt;- lad(Fertility ~ Catholic, swiss)
 ```
 
 ]
+]
 
 ???
 
@@ -1434,7 +1459,42 @@ The reason for this is that unlike OLS (which has an analytical solution derived
 See also least trimmed squares using `ltsReg()` in the `robustbase` package
 
 ---
-# OLS Assumptions
+
+### Non-treatment
+
+Lastly, you may decide for theoretical or methodological reasons _not_ to do anything about the outlier(s).
+
+--
+
+#### 7. Outliers happen
+
+While there might be high distance or even high leverage observations,
+you might expect such outliers to happen sometimes with the .red[data-generating process] (DGP)
+under study.
+This seems particularly common in many IR phenomena.
+If you make your "training data" too clean, inference won't be very useful for out-of-sample.
+So you want to retain these outliers in the training data,
+because _sometimes uncertainty is genuine_.
+
+--
+
+#### 8. Outliers are informative
+
+Or perhaps it is not the data or the model that needs tweaking,
+but the model specification.
+Outliers can be particularly informative observations about explanatory variables
+not currently included in the model that you may want to include.
+
+--
+
+#### 9. Outliers are the story
+
+Finally, perhaps the model is not the story; the outliers are.
+Perhaps the statistical model is just a first step in a larger mixed methods research design
+used to identify and justify particular cases for further study.
+Outliers highlight which cases are departures under the model (not just extreme).
+There are [many options for highlighting outliers visually](https://flowingdata.com/2018/03/07/visualizing-outliers/).
+
 
 .pull-left[
 **Data**
