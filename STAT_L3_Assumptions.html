@@ -1495,6 +1495,8 @@ used to identify and justify particular cases for further study.
 Outliers highlight which cases are departures under the model (not just extreme).
 There are [many options for highlighting outliers visually](https://flowingdata.com/2018/03/07/visualizing-outliers/).
 
+---
+# Overview
 
 .pull-left[
 **Data**
@@ -1516,65 +1518,101 @@ There are [many options for highlighting outliers visually](https://flowingdata.
 --
 
 .pull-right[
+NB: Homoskedasticity + No Autocorrelation = .red[Spherical Errors]
+]
 
-NB: When errors homoskedastic and no autocorrelation, statisticians call them _spherical errors_.
+---
+## OLS Assumptions
 
-The _Gauss-Markov Theorem_ states OLS is the
-  - &lt;span style="color:blue"&gt;B&lt;/span&gt;est (minimizes variance)
-  - &lt;span style="color:blue"&gt;L&lt;/span&gt;inear
-  - &lt;span style="color:blue"&gt;U&lt;/span&gt;nbiased (e(B) = B)
-  - &lt;span style="color:blue"&gt;E&lt;/span&gt;stimator
+So, what assumptions are _required_ for linear regression?
 
-of population parameters _if_ errors uncorrelated with equal variance and a mean of zero.
+--
+
+Hmm, "linear regression" ill-defined: mean OLS?
+
+--
+
+Still ill-posed question:
+assumptions required _for what_?
+
+- interested in estimating model coefficients?
+- interested in estimating valid standard errors for those coefficients?
+- only interested in unbiased variance estimators, or are consistent estimators sufficient?
+- if unbiased estimators only, only those with minimum variance?
 
 ]
 
 ---
-## Why you should care
+.pull-left-2[
+## Gauss-Markov Theorem
 
-.pull-left[
-
-The _Gauss-Markov Theorem_ states OLS is the
-  - &lt;span style="color:blue"&gt;B&lt;/span&gt;est (minimizes variance)
+The _Gauss-Markov Theorem_ states OLS (a linear estimator) is the
+  - &lt;span style="color:blue"&gt;B&lt;/span&gt;est
   - &lt;span style="color:blue"&gt;L&lt;/span&gt;inear
-  - &lt;span style="color:blue"&gt;U&lt;/span&gt;nbiased (e(B) = B)
+  - &lt;span style="color:blue"&gt;U&lt;/span&gt;nbiased
   - &lt;span style="color:blue"&gt;E&lt;/span&gt;stimator
 
-of population parameters _if_ errors uncorrelated with equal variance and a mean of zero.
+of population parameters _if_ errors:
 
+  - have a mean expectation of zero, `\(E[\epsilon_i] = 0\)` (i.e. are unbiased)
+  - have equal variance, `\(Var(\epsilon_i) = \sigma^2 &lt; \infty, \forall i\)` (i.e. homoskedastic)
+  - are uncorrelated, `\(Cov(\epsilon_i, \epsilon_j) = 0, \forall i \neq j\)` (i.e. exogeneity)
+  
+'Best' here means giving the lowest variance of the estimate, i.e. is _efficient_.
+
+'Efficiency' is a statistical concept that compares the quality of the estimates calculated by different procedures while holding the sample size constant. 
 ]
 
-If these assumptions hold true, GM shows that, of all possible estimators which are linear functions of the dependent variable and unbiased, OLS has the lowest variance. 
+--
+.pull-right-1[
+### Why you should care?
+
+If these assumptions hold true, GM _proves_ that, 
+of all possible estimators which are linear functions of the dependent variable and unbiased, 
+OLS has the lowest variance.
+
+As the sample size increases to infinity, the coefficient estimates converge on the actual population parameters.
+]
 
 --
 
-Which means you can relax.
-
---
+.pull-right-1[
+Which means you can _relax_: you've got the best possible estimates.
 
 So it's worth checking these assumptions in particular.
 
+]
+
+---
+background-image: url(https://media.giphy.com/media/nDcu1RPFSz36o/giphy.gif)
+background-size: contain
+
+---
+
+### What about normality
+
+Note that for OLS to be .blue[BLUE], the residuals do not need to:
+
+- follow a normal (Gaussian) distribution, `\(\epsilon_1, ..., \epsilon_n \sim Normal\)`
+- be .red[independent and identically distributed] (IID)
+
 --
 
-'Unbiased' means gives least biased estimates of population parameters.
-'Best' means resulting in the lowest variance of the estimate, i.e. is _efficient_.
+But if they _do_, then:
+
+- can safely use hypothesis testing to determine whether explanatory variables statistically significant
+- can safely use hypothesis testing to determine whether entire model statistical significant
+- can produce reliable confidence intervals and prediction intervals
+- `\(\hat\beta_{OLS}\)` is mathematically equivalent to `\(\hat\beta_{MLE}\)`
 
 --
 
-Note that for OLS to be BLUE, the residuals do not need to follow normal (Gaussian) distribution, nor do they need to be _independent and identically distributed_ (IID).
-
-If error term also follows the normal distribution, you can safely use hypothesis testing to determine whether the independent variables and the entire model are statistically significant and produce reliable confidence intervals and prediction intervals.
+In summary, we should care about all these issues to the appropriate degree. 
+Unless one grossly misjudges the data-structure, can fix many issues.
 
 --
 
-In summary, we should care about all these issues to the appropriate degree (like with the coronavirus...). Unless one grossly misjudges the data-structure, can fix many issues.
-Things to worry about: heteroskedasticity, influential outliers, endogeneity, and autocorrelation.
-
-???
-
-Efficiency is a statistical concept that compares the quality of the estimates calculated by different procedures while holding the sample size constant. OLS is the most efficient linear regression estimator when the assumptions hold true.
-
-Another benefit of satisfying these assumptions is that as the sample size increases to infinity, the coefficient estimates converge on the actual population parameters.
+Real things to worry about: heteroskedasticity, influential outliers, endogeneity, autocorrelation, coronavirus...
 
 ---
 
@@ -1624,8 +1662,9 @@ In case you have not undestood everything, no worries. You can find the exact pr
 ---
 ## Now for the cheat sheet...
 
-.pull-left-1[
-
+.panelset[
+.panel[
+.panel-name[Visual]
 
 ```r
 library(ggfortify)
@@ -1633,10 +1672,11 @@ autoplot(cath)
 ```
 
 &lt;img src="STAT_L3_Assumptions_files/figure-html/autoplot-1.png" width="504" /&gt;
+
 ]
 
-.pull-right-2[
-
+.panel[
+.panel-name[Text]
 
 ```r
 gvlma::gvlma(cath)
@@ -1666,6 +1706,8 @@ gvlma::gvlma(cath)
 ## Link Function      10.445 1.230e-03 Assumptions NOT satisfied!
 ## Heteroscedasticity  8.796 3.020e-03 Assumptions NOT satisfied!
 ```
+
+]
 
 ]
 
@@ -1762,11 +1804,15 @@ What if our DV is not continuous?
 
 --
 
-Introduction to Maximum Likelihood Estimation (MLE).
+What if some of these assumptions _seriously_ violated?
 
 --
 
-Why can’t we just use OLS?
+Can't I just use OLS for everything?
+
+--
+
+Introduction to .red[Maximum Likelihood Estimation] (MLE)...
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="libs/remark-latest.min.js"></script>
@@ -1776,7 +1822,7 @@ Why can’t we just use OLS?
 "highlightStyle": "github",
 "highlightLines": true,
 "countIncrementalSlides": false,
-"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>` "
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>`\n"
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
