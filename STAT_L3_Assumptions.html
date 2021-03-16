@@ -5,6 +5,14 @@
     <meta charset="utf-8" />
     <meta name="author" content="James Hollway" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/clipboard/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
     <link rel="stylesheet" href="https://cdn.githubraw.com/jhollway/iheidmyninja/7b9e9101/iheid-xaringan-style.css" type="text/css" />
   </head>
   <body>
@@ -57,7 +65,7 @@ An oft-cited assumption of OLS regression is that:
 
 &gt; The error term is normally distributed
 
-**Note there is no assumption or requirement that the _features_ or _response_ are normally distributed.**
+**Note there is no assumption or requirement that the _features_ or _response_ themselves are normally distributed.**
 It is the conditional distribution *y* that should be normal.
 
 --
@@ -126,7 +134,9 @@ tab_model(cath)
 
 .pull-right-1[
 
-Note that we don't need to worry about the assumption that the error term has a population mean of zero, because the constant is automatically included. This forces the mean of the residuals to equal zero.
+Note that we don't usually need to worry about the assumption that the error term has a population mean of zero, 
+because the constant is automatically included. 
+This forces the mean of the residuals to equal zero.
 
 
 ```r
@@ -155,8 +165,8 @@ This plot compares two probability distributions by plotting their quantiles aga
 Some guidelines for interpretation:
 - residuals following \\(45^\circ\\) line means perfectly normal
   - some deviation expected at ends, but should be .small[small]
-- bow-shaped pattern means excessive skewness (i.e., the distribution is not symmetrical, with too many large residuals in one direction)
-- s-shaped pattern means excessive kurtosis of the residuals — either too many or two few large errors in both directions
+- bow-shaped pattern means excessive .red[skewness] (i.e., the distribution is not symmetrical, with too many large residuals in one direction)
+- s-shaped pattern means excessive .red[kurtosis] of the residuals — either too many or two few large errors in both directions
 
 ]
 
@@ -186,8 +196,6 @@ The alternative might be to plot two histograms side by side, but this is a litt
 The other way to approach this is to use formal tests of the 'normality' of the residuals.
 
 There are a bunch of different tests:
-- _Shapiro-Wilk test_
-  - shown to be most powerful
 - _Kolmogorov-Smirnov (KS) test_
   - oldest: distance between EDF and CDF
   - only works if mean and variance of the normal are assumed known under the null hypothesis
@@ -197,10 +205,14 @@ There are a bunch of different tests:
   - _Anderson-Darling test_
 - _Jarque-Bera test_
   - low power for distributions with short tails, especially for bimodal distributions
+- _Shapiro-Wilk test_
+  - shown to be most powerful
 
 ]
 
 .pull-right[
+.panelset[
+.panel[.panel-name[Normality tests]
 
 
 ```r
@@ -219,6 +231,11 @@ ols_test_normality(cath)
 ## -----------------------------------------------
 ```
 
+]
+
+.panel[.panel-name[Jarque-Bera]
+
+
 ```r
 library(tseries)
 jarque.bera.test(cath$residuals)
@@ -231,33 +248,37 @@ jarque.bera.test(cath$residuals)
 ## data:  cath$residuals
 ## X-squared = 17.464, df = 2, p-value = 0.0001613
 ```
+]]
 
-Seems like we can reject the null hypothesis that EDF corresponds to CDF of the normal distribution...
+.red[What can we tell about this?]
 
 ]
 
 ???
 
-Looks like people pair up to write normality tests...
+1. Seems like we can reject the null hypothesis that EDF corresponds to CDF of the normal distribution...
+
+2. Looks like people pair up to write normality tests...
 
 Note that KS test in `ols_test_normality()` does not run the `two-sided` version of the test
   
 ---
 ## So what if errors aren't normal?
 
-This assumption is actually _not_ as important as that of linearity (last week).
-
+This assumption is actually _not as important_ as that of linearity (last week):
 Normality is _not_ required to obtain unbiased estimates of the regression coefficients with the minimum variance. 
 
-So, technically, we can omit this assumption if we assume instead that the model equation is correct and our goal is to estimate the coefficients and generate predictions (in the sense of minimizing mean squared error).
+So, technically, we can omit this assumption if we believe we can assume that the model equation is correct and our goal is to estimate coefficients and generate predictions (in the sense of minimizing mean squared error).
 
 --
 
-However, normally we are interested in making valid inferences from the model or estimating the probability that a given prediction error will exceed some threshold in a particular direction. To do so, the assumption about the normality of residuals must be satisfied.
+But... we are often interested in making valid inferences from the model or estimating the probability that a given prediction error will exceed some threshold in a particular direction. 
+To do so, the assumption about the normality of residuals must be satisfied:
 
-When this assumption is violated, it causes problems with calculating confidence intervals and various significance tests for coefficients. When the error distribution significantly departs from Gaussian, confidence intervals may be too wide or too narrow.
+- when the error distribution departs from the Gaussian, confidence intervals may be too wide or too narrow
+- that is, violations of this assumption causes problems for various significance tests for coefficients...
 
-So satisfying this assumption allows you to perform statistical hypothesis testing and generate reliable confidence intervals and prediction intervals. So if your research relies on the p-values or overall test of significance, check this assumption.
+So if your research relies on statistical hypothesis testing, for coefficients or the model as a whole, then need to check/satisfy this assumption.
 
 ---
 
@@ -267,17 +288,20 @@ So satisfying this assumption allows you to perform statistical hypothesis testi
 
 ...depends on what is causing the non-normality (kurtosis) in the residuals.
 
-1. outliers
-  - if outliers are the drivers of kurtosis, these will need to be removed/treated (later)
-1. different components
-  - it two or more subsets of the data have different statistical properties, separate models might be considered
 1. nonlinearity
   - nonlinear transformation of response or features
+1. different components
+  - it two or more subsets of the data have different statistical properties, separate models might be considered
+1. outliers
+  - if outliers are the drivers of kurtosis, these will need to be removed/treated (later)
 1. specification
   - sometimes just a better specified model will be enough...
 ]
 
 .pull-right[
+
+.panelset[
+.panel[.panel-name[Cath + Ed]
 
 
 ```r
@@ -288,6 +312,11 @@ p + stat_qq() + stat_qq_line()
 ```
 
 &lt;img src="STAT_L3_Assumptions_files/figure-html/model2-1.png" width="504" /&gt;
+
+]
+
+.panel[.panel-name[Test]
+
 
 ```r
 ols_test_normality(cathe)
@@ -304,7 +333,7 @@ ols_test_normality(cathe)
 ## -----------------------------------------------
 ```
 
-]
+]]]
 
 ---
 class: center, middle
