@@ -347,17 +347,21 @@ class: center, middle
 ---
 ## Defining heteroskedasticity
 
-A more important assumption is that 
+.pull-left-2[A more important assumption is that 
 
 &gt; The error term has equal variance
 
 Not only should the errors be normally distributed and have a mean of 0, but the variance of the errors should not change for each observation or for a range of observations. 
 
-This preferred condition is known as _ho-mo-sce-das-ti-ci-ty_ (same scatter). 
+This preferred condition is known as _ho-mo-sce-das-ti-ci-ty_ (same scatter).
 
 .right[ /ˌhoʊmoʊskəˈdæstɪk/ ]
 
-If Y is more variable at some levels of X than others, we call this _het-e-ro-sce-das-ti-ci-ty_ (different scatter).
+If _Y_ is more variable at some levels of _X_ than others, we call this _het-e-ro-sce-das-ti-ci-ty_ (different scatter).
+]
+
+.pull-right-1[![](https://api.time.com/wp-content/uploads/2019/11/icecream.jpg?w=800&amp;quality=85)]
+
 
 ---
 
@@ -394,21 +398,21 @@ autoplot(cathl, which = c(1,3))
 
 &lt;img src="STAT_L3_Assumptions_files/figure-html/predfit-1.png" width="504" /&gt;
 
-Spread of residuals seems to decrease as fitted value increases.
+Spread of residuals seems to increase as fitted value increases.
 
 ]
 
 ???
 
-Standardized residuals are very similar to the kind of standardization you perform earlier on in statistics with z-scores.
+Standardized residuals are very similar to the kind of standardization you perform earlier on in statistics with _z_-scores.
 
-A standardized residual is a ratio: The difference between the observed count and the expected count and the standard deviation of the expected count in chi-square testing.
+A standardized residual is a ratio: The difference between the observed count and the expected count and the standard deviation of the expected count in `\(\chi^2\)` testing.
 
 ---
 ### 2. Breusch-Pagan test
 
 The _Breusch-Pagan_ tests the null hypothesis that the variance of the residuals is homogenous.
-A p-value below a certain level (like 0.05) indicates we should reject the null in favor of heteroskedasticity.
+A _p_-value below a certain level (like 0.05) indicates we should reject the null in favor of heteroskedasticity.
 
 .pull-left[
 
@@ -455,76 +459,89 @@ Note there is also another test, the _Goldfeld-Quandt test_, but _Breusch-Pagan_
 ---
 ## So what if there's heteroskedasticity?
 
-Unfortunately, **this matters**.
+.pull-left-2[Unfortunately, **this matters**. If residuals more spread out for some values of _X_ than others (heteroskedasticity):
 
-If residuals more spread out for some values of X than others (heteroskedasticity), standard errors will not be correct.
+1. standard errors incorrect/confidence intervals too wide or narrow, leading to results that look statistically significant but are not (or vice versa)
 
-This impacts the precision of the estimates, resulting in confidence intervals that are too wide/narrow, as well as potentially messing with out-of-sample predictions.
+2. messes with out-of-sample predictions: 
+puts too much weight on a subset of the data (where the error variance was largest) 
+when estimating coefficients,
+leading to poor inference...
+]
 
-Another effect of heteroskedasticity might be putting too much weight to a subset of the data when estimating coefficients: the subset in which the error variance was largest.
-
-If you don’t treat this, you could have results which look statistically significant but are not.
+.pull-right-1[![](https://api.time.com/wp-content/uploads/2019/11/icecream.jpg?w=800&amp;quality=85)]
 
 ---
 ## Dealing with heteroskedasticity
 
 ### 1. Deflate time series
 
-Sometimes the heteroskedasticity is due to the effects of time.
+Sometimes the heteroskedasticity is due to the effects of _time_.
 
 E.g. if dependent variable relates to money, then need to manage inflation somehow on the variable.
 
-Can do this by normalising the variable, or using using ARCH (auto-regressive conditional heteroskedasticity) models to model the error variance.
+Can do this by normalising the variable, or using using ARCH (.red[auto-regressive conditional heteroskedasticity]) models to model the error variance.
 
 ---
 ### 2. Log transform dependent variable
 
-If variance in residuals are increasing with regression predictions, taking the log of dependent and/or independent variables may eliminate heteroskedasticity.
+.pull-left[If variance in residuals are increasing with regression predictions, taking the log of dependent and/or independent variables may eliminate heteroskedasticity.
 
-Note that if you have logs on both sides (LHS, RHS) of the equation, a 'log-log model', you are dealing with _elasticities_:
-how a percentage change in x affects the percentage change in y.
+Note that if you have logs on both sides (LHS, RHS) of the equation, a .red[log-log model], 
+you are dealing with _elasticities_:
+how a percentage change in `\(x\)` affects the percentage change in `\(y\)`.
+]
+
+.pull-right[![](https://www.telegraph.co.uk/multimedia/archive/02722/DFGYTF-elastic_2722497b.jpg)]
+
+---
+#### A note on link functions
+
+Note that log transformation of either or both of `\(x\)` and `\(y\)` is _not the same_ as using a .red[log link function], which you may have heard about and will certainly hear more of through this course.
+
+$$  \ln(y_i) = \alpha + \beta_1 x_1 + \beta_2 x_2 + ... \hspace{3em} \neq \hspace{3em} \ln(\mu_y) = \alpha + \beta_1 x_1 + \beta_2 x_2 + ... $$
 
 --
 
-Note though that log transformation of either or both of x and y is not the same as using a log link function.
+A log transformation of, say, `\(y_i\)` means we take the log of each observation and then relate _x_ variables to the mean of those logged observations.
 
-A link function connects its model's predictors to the outcome variable.
+A link function is how a model connects its explanatory variable to the outcome variable.
+A log link function relates the linear combination of `\(x\)` variables to a log function of the mean of `\(y\)`, `\(\mu_y\)`.
 
-$$  ln(\mu_y) = \alpha + \beta_1 x_1 + \beta_2 x_2 + ... \neq ln(y_i) = \alpha + \beta_1 x_1 + \beta_2 x_2 + ... $$
+--
 
-In the former, a function of the mean of y (the natural log) is related to a linear combination of x variables.
-In the latter, we are not taking the log of the mean but the log of each observation and then relating the x variables to the mean for that.
+**Why use a log link function then?**
 
-???
+With a log transformed variable, you cannot simply take the exponent of the mean of `\(\ln(y)\)` to get the mean of `\(y\)`
 
-Why use a log link function then?
+`$$\exp(\overline{\ln(y)}) \neq \overline{y}$$`
 
-Part of what makes generalized linear models so useful is that they allow you to back-transform means and regression coefficients to a more intuitive scale.
-
-With a log transformed variable, you cannot simply take the exponent of the mean of ln(y) to get the mean of y.
+Part of what makes .red[generalized linear models] (GLMs) so useful is that they allow you to back-transform means and regression coefficients to a more intuitive scale... (more on this next time)
 
 ---
 
 .pull-left-1[
 ### 3. Robust standard errors
 
-A popular way to treat heteroskedasticity is using _robust standard errors_.
+A popular way to treat heteroskedasticity is using .red[robust standard errors].
 
-Most table packages allow you to report robust standard errors by manipulating the variance-covariance (VCV) matrix. 
+Most table packages allow you to report robust standard errors by manipulating the .red[variance-covariance matrix] (VCV). 
 
-Heteroskedastic-consistent errors are generally larger than normal standard errors, and compensate for how at some levels of X there is more variation. 
+Heteroskedastic-consistent errors are generally larger than normal standard errors, and compensate for how at some levels of `\(X\)` there is more variation. 
 
-Because they offer a more conservative estimate, they are by now standard practice (like always opting for two-tailed t-test).
+Because they offer a more conservative estimate, they are by now standard practice (like always opting for two-tailed _t_-test).
 
 However, their blanket use raises issues (see King and Peters 2015), and they are not recommended for small sample sizes.
 ]
 
 .pull-right-2[
 
+.panelset[
+.panel[
+.panel-name[Normal SEs]
 
 ```r
-library(sandwich)
-tab_model(cath2, show.obs = F, show.r2 = F, show.se = T, show.stat = T)
+tab_model(cath2, show.se = T, show.stat = T)
 ```
 
 &lt;table style="border-collapse:collapse; border:none;"&gt;
@@ -550,10 +567,10 @@ tab_model(cath2, show.obs = F, show.r2 = F, show.se = T, show.stat = T)
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.67&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;0.67&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.23&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.13&amp;nbsp;&amp;ndash;&amp;nbsp;-0.20&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-2.90&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;1.13&amp;nbsp;&amp;ndash;&amp;nbsp;-0.20&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;2.90&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.006&lt;/strong&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -564,11 +581,26 @@ tab_model(cath2, show.obs = F, show.r2 = F, show.se = T, show.stat = T)
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;3.55&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.001&lt;/strong&gt;&lt;/td&gt;
 &lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="5"&gt;47&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="5"&gt;0.389 / 0.362&lt;/td&gt;
+&lt;/tr&gt;
 
 &lt;/table&gt;
 
+]
+
+.panel[
+.panel-name[Robust SEs]
+
 ```r
-tab_model(cath2, vcov.fun = "HC", vcov.type = "HC3", show.obs = F, show.r2 = F, show.se = T, show.stat = T)
+library(sandwich)
+tab_model(cath2, vcov.fun = "HC", vcov.type = "HC3", 
+          show.se = T, show.stat = T)
 ```
 
 &lt;table style="border-collapse:collapse; border:none;"&gt;
@@ -594,32 +626,42 @@ tab_model(cath2, vcov.fun = "HC", vcov.type = "HC3", show.obs = F, show.r2 = F, 
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.67&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;0.67&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.43&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.53&amp;nbsp;&amp;ndash;&amp;nbsp;0.19&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.57&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;1.53&amp;nbsp;&amp;ndash;&amp;nbsp;0.19&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;1.57&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.123&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic^2&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.01&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.00&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.00&amp;nbsp;&amp;ndash;&amp;nbsp;0.02&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;0.00&amp;nbsp;&amp;ndash;&amp;nbsp;0.02&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.90&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.064&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm; border-top:1px solid;"&gt;Observations&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left; border-top:1px solid;" colspan="5"&gt;47&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; padding-top:0.1cm; padding-bottom:0.1cm;"&gt;R&lt;sup&gt;2&lt;/sup&gt; / R&lt;sup&gt;2&lt;/sup&gt; adjusted&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; padding-top:0.1cm; padding-bottom:0.1cm; text-align:left;" colspan="5"&gt;0.389 / 0.362&lt;/td&gt;
 &lt;/tr&gt;
 
 &lt;/table&gt;
 
 ]
+]
+]
 
 ???
 
-By default vcovHC() estimates a heteroskedasticity consistent (HC) variance covariance matrix for the parameters. 
+By default `vcovHC()` estimates a heteroskedasticity consistent (HC) variance covariance matrix for the parameters. 
 
 There are several ways to estimate such a HC matrix, and by default vcovHC() estimates the “HC3” one. 
 
-Note that STATA uses HC1 by default... but the `sandwich` package recommends HC3.
+Note that STATA uses HC1 by default... but the `{sandwich}` package recommends HC3.
 
 You can refer to Zeileis (2004) for more details.
 
@@ -628,22 +670,27 @@ You can refer to Zeileis (2004) for more details.
 .pull-left-1[
 ### 4. Clustering
 
-Lastly, heteroskedasticity can also be explained by data clustering by actor, geographical location, country, etc.
+Lastly, heteroskedasticity can also be explained by data that clusters variance by actor, geographical location, country, etc.
 
 That is, there might be a bunch of covariance structures that vary by a certain characteristic – a “cluster” – but are homoskedastic within each cluster. 
 
-The result is clustered standard errors, a.k.a. cluster-robust.
+We can manage such expected covariance structures with “cluster-robust” or .red[clustered standard errors].
 
-Extends to multi-level/mixed models...
-
+Similar to heteroskedasticity-robust standard errors, you want to allow more flexibility in your variance-covariance (VCV) matrix.
 ]
 
 .pull-right-2[
 
+.panelset[
+.panel[
+.panel-name[CL on Ed]
 
 ```r
 library(sandwich)
-tab_model(cath2, vcov.fun = "CL", vcov.args = ~ Education, show.obs = F, show.r2 = F, show.se = T, show.stat = T)
+tab_model(cath2, vcov.fun = "CL", 
+          vcov.args = ~ Education, 
+          show.obs = F, show.r2 = F, 
+          show.se = T, show.stat = T)
 ```
 
 &lt;table style="border-collapse:collapse; border:none;"&gt;
@@ -669,25 +716,34 @@ tab_model(cath2, vcov.fun = "CL", vcov.args = ~ Education, show.obs = F, show.r2
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.67&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;0.67&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.56&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.79&amp;nbsp;&amp;ndash;&amp;nbsp;0.46&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.20&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;1.79&amp;nbsp;&amp;ndash;&amp;nbsp;0.46&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;1.20&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.237&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic^2&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.01&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.01&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.00&amp;nbsp;&amp;ndash;&amp;nbsp;0.02&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;0.00&amp;nbsp;&amp;ndash;&amp;nbsp;0.02&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.45&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.153&lt;/td&gt;
 &lt;/tr&gt;
 
 &lt;/table&gt;
 
+]
+
+.panel[
+.panel-name[CL on Ex]
+
 ```r
-tab_model(cath2, vcov.fun = "CL", vcov.args = ~ Examination, show.obs = F, show.r2 = F, show.se = T, show.stat = T)
+library(sandwich)
+tab_model(cath2, vcov.fun = "CL", 
+          vcov.args = ~ Examination, 
+          show.obs = F, show.r2 = F, 
+          show.se = T, show.stat = T)
 ```
 
 &lt;table style="border-collapse:collapse; border:none;"&gt;
@@ -713,17 +769,17 @@ tab_model(cath2, vcov.fun = "CL", vcov.args = ~ Examination, show.obs = F, show.
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.67&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;0.67&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.41&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.50&amp;nbsp;&amp;ndash;&amp;nbsp;0.16&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-1.62&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;1.50&amp;nbsp;&amp;ndash;&amp;nbsp;0.16&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;1.62&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.113&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;Catholic^2&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.01&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.00&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-0.00&amp;nbsp;&amp;ndash;&amp;nbsp;0.02&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;0.00&amp;nbsp;&amp;ndash;&amp;nbsp;0.02&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;1.90&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;0.064&lt;/td&gt;
 &lt;/tr&gt;
@@ -731,13 +787,14 @@ tab_model(cath2, vcov.fun = "CL", vcov.args = ~ Examination, show.obs = F, show.
 &lt;/table&gt;
 
 ]
-
-???
-
-Similar to heteroskedasticity-robust standard errors, you want to allow more flexibility in your variance-covariance (VCV) matrix.
+]
 
 Note that you want to think about clusters [theoretically](https://blogs.worldbank.org/impactevaluations/when-should-you-cluster-standard-errors-new-wisdom-econometrics-oracle),
 not just include them where they prove to make a difference.
+
+Extends to multi-level/mixed models...
+
+]
 
 ---
 class: center, middle
