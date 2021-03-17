@@ -206,7 +206,8 @@ There are a bunch of different tests:
 - _Jarque-Bera test_
   - low power for distributions with short tails, especially for bimodal distributions
 - _Shapiro-Wilk test_
-  - shown to be most powerful
+  - **shown to be most powerful**
+  - basically [pay most attention to this one](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3693611/)
 
 ]
 
@@ -795,6 +796,21 @@ not just include them where they prove to make a difference.
 Extends to multi-level/mixed models...
 
 ]
+
+???
+
+More details can be gleaned in the help pages of the `{sandwich}` package,
+e.g. `?vcovCL`.
+
+Unless the variable has an inherent clustering structure, e.g. a categorical variable,
+every observation will be assumed to be its own cluster.
+
+In case this seems conceptually incoherent, you may wish to divide a continuous variable
+with a median or quartile split, which might offer a more conceptually coherent clustering variable.
+
+Note again though that if there's something _theoretically_ interesting in how observations cluster
+then it may pay to go further than just treating the heteroskedasticity post-estimation,
+but rather incorporate this into the model specification somehow (e.g. a multilevel model).
 
 ---
 class: center, middle
