@@ -475,7 +475,14 @@ leading to poor inference...
 ---
 ## Dealing with heteroskedasticity
 
-### 1. Deflate time series
+### 1. Better specification
+
+In many cases, the heteroscedasticity is _impure_ in the sense that 
+an incorrect model specification is responsible for the non-constant variance in the residuals.
+
+While _pure heteroscedasticity_ might appear when a correctly specified model still 
+
+### 2. Deflate time series
 
 Sometimes the heteroskedasticity is due to the effects of _time_.
 
@@ -484,7 +491,7 @@ E.g. if dependent variable relates to money, then need to manage inflation someh
 Can do this by normalising the variable, or using using ARCH (.red[auto-regressive conditional heteroskedasticity]) models to model the error variance.
 
 ---
-### 2. Log transform dependent variable
+### 3. Log transform dependent variable
 
 .pull-left[If variance in residuals are increasing with regression predictions, taking the log of dependent and/or independent variables may eliminate heteroskedasticity.
 
@@ -522,7 +529,7 @@ Part of what makes .red[generalized linear models] (GLMs) so useful is that they
 ---
 
 .pull-left-1[
-### 3. Robust standard errors
+### 4. Robust standard errors
 
 A popular way to treat heteroskedasticity is using .red[robust standard errors].
 
@@ -669,7 +676,7 @@ You can refer to Zeileis (2004) for more details.
 ---
 
 .pull-left-1[
-### 4. Clustering
+### 5. Clustering
 
 Lastly, heteroskedasticity can also be explained by data that clusters variance by actor, geographical location, country, etc.
 
@@ -835,6 +842,15 @@ Ultimately, investigator's best judgment required to decide:
 - whether there are any outliers
 - whether it is _necessary_ to treat them
 - how to treat them
+
+--
+
+Way forward will depend on what you think (and can justify) the outliers represent:
+
+- mistakes, i.e. measurement error
+- normal variation
+- conditional exceptions
+- evidence of two, mixed distributions
 
 ---
 
@@ -1245,17 +1261,16 @@ In other words, check the robustness of your results to how outliers are treated
 ---
 ## Dealing with outliers
 
-### Treating the data
-
-If outliers represent measurement errors or otherwise lead to problematic influence, 
-we can try to "correct" the data.
+### Treating the data by "correcting" e.g. measurement error
 
 .pull-left[
 #### 1. Deleting
 
-The first option is to delete the outliers.
-This is generally not a good idea unless you have a reason to think this whole observation is an error.
-It’s a real observation after all and may have important information on other variables (too).
+Perhaps you realise that the observation represents a different population.
+This may require updating study's scope conditions.
+If the observation is legitimate though,
+omission not generally a good idea:
+it’s a real observation after all and may have important information on other variables too.
 
 #### 2. Imputation
 
