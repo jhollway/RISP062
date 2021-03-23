@@ -511,7 +511,7 @@ class: center, middle
 ---
 ## Back to our data
 
-Ok, let's get back to our main example for today: CO2 emissions.
+Ok, let's get back to our main example for today: `\(CO_2\)` emissions.
 
 
 ```r
@@ -540,23 +540,23 @@ Note the presence of _h(y)_, an _unknown_ scaling factor that is a function of t
 
 Because it is unknown and cannot be estimated, the likelihood is only defined up to this multiplicative constant and does not have a direct interpretation as a probability; we have to interpret likelihoods relative to one another.
 
-_But_ the _likelihood principle_ states that, after the data have been collected, 
+_But_ the .red[likelihood principle] states that, after the data have been collected, 
 all information relevant for inference about \\(\theta\\) is contained in the likelihood function for the observed data under the assumed probability model.
 Two likelihood functions that are proportional to one another contain the same information about theta.
 
-Because it is unknown and cannot be estimated, and just adds notational complexity, we're going to ignore it,
-and just say that the likelihood is '_proportional to_' \\( \propto \Pr(y|\theta) \\)
+Because it is unknown and cannot be estimated, and just adds notational complexity, we’re going to ignore it,
+and just say that the likelihood is ‘_proportional to_’ \\( \propto \Pr(y|\theta) \\)
 
 $$ L(\theta|x) = h(x) f(x|\theta) \propto f(x|\theta)    $$
 
 ---
 ## Two decisions
 
-Using maximum likelihood estimation means making two decisions:
-1. residuals: what probability distribution are we assuming govern our data generating process?
-  - also called the _stochastic component_: \\( Y_i \sim f(\theta) \\)
+Using maximum likelihood estimation means making two decisions (this relates back to our discussion about [partitioning the data into pattern and residuals](https://jhollway.github.io/RISP062/STAT_L1_Refresher.html?panelset5=r-code6&amp;panelset6=r-code7&amp;panelset7=r-code8&amp;panelset8=r-code9&amp;panelset9=r-code10#55)...):
 1. pattern: what is our model for the parameters of the assumed probability distribution?
   - also called the _systematic component_: \\( \theta_i = \beta_0 + \beta_1 x_i \\)
+1. residuals: what probability distribution are we assuming govern our data generating process?
+  - also called the _stochastic component_: \\( Y_i \sim f(\theta) \\)
   
 --
 
@@ -564,20 +564,20 @@ Addressed the systematic component in previous classes, but now much more flexib
 
 --
 
-In \\( Y_i \sim f(\theta) \\) , \\(f\\) could be one of a range of probability distribution or mass functions.
+In \\( Y_i \sim f(\theta) \\) , \\(f\\) could be one of a pretty wide range of probability distribution or mass functions.
 - tackle a number this semester: e.g. the binomial, Poisson, or Weibull, or even a mixture (NB: mixture ≠ mixed)
 
 ---
 ### Gaussian
 
-Here we choose the _Gaussian_, where residuals are expected to be normally distributed around the mean.
+Here we choose the .red[Gaussian], where residuals are expected to be normally distributed around the mean.
 
 We therefore consider a model that looks like \\(Y_i \sim f_N(\mu, \sigma^2)\\), where \\(E(Y) = \mu\\) and \\(\operatorname{Var}(Y) = \sigma^2\\), giving a PDF:
 
 $$ \Pr(Y_i = y_i) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp[-\frac{(Y_i - \mu)^2}{2 \sigma ^2}]      $$
 
 \\( \theta_i = (\mu_i, \sigma^2) \\) are the parameters we'll be estimating, 
-with \\( \mu_i = \beta_0 + \beta_1 x_i \\) our systematic component
+with \\( \mu_i = \beta_0 + \beta_1 x_i \\) representing our systematic component
 
 \\(\exp[-\frac{(Y_i - \mu)^2}{2 \sigma ^2}]\\) ensures the variable is symmetric around the mean
 
@@ -608,11 +608,11 @@ So, we work with the _log_ of this function.
 The log is a monotonic transformation which preserves important properties (i.e. extrema occur in the same place), 
 but turns a product into a sum, which is easier to work with:
 
-Whereas \\(L(\theta|x_1, x_2) = f(x_1|\theta)f(x_2|\theta)\\), the *log-likelihood* is \\(\log L(\theta|x_1, x_2) = \log f(x_1|\theta) + \log f(x_2|\theta)\\), or 
+Whereas \\(L(\theta|x_1, x_2) = f(x_1|\theta)f(x_2|\theta)\\), the .red[log-likelihood] is \\(\log L(\theta|x_1, x_2) = \log f(x_1|\theta) + \log f(x_2|\theta)\\), or 
 
 $$ \log(\prod_i^N \Pr(X_i = x_i)) = \sum_i^N \log(\Pr(X_i = x_i))  $$
 
-That is because one of the main _logarithmic identities_ or _logarithmic laws_ is that the logarithm of a product is the sum of the logarithms of the numbers being multiplied:
+That is because one of the main .red[logarithmic identities] or .red[logarithmic laws] is that the logarithm of a product is the sum of the logarithms of the numbers being multiplied:
 
 $$ \log(xy) = \log(x) + \log(y)  $$
 
@@ -636,9 +636,9 @@ $$ -2 \log L(\mu, \sigma^2|y) = \sum_i^n [ \log(2\pi) + \log(\sigma^2) + \frac{1
 
 ### Eliminating unknown parameters
 
-Since the first term, \\(log(2\pi)\\), is just a constant unrelated to any of the parameters to be estimated, it can be safely dropped, leaving us with:
+Since the first term, \\(\log(2\pi)\\), is just a constant unrelated to any of the parameters to be estimated, it can be safely dropped, leaving us with:
 
-$$ -2logL(\mu, \sigma^2|y) = \sum_i^n [log(\sigma^2) + \frac{1}{\sigma^2} (y_i - (\beta_0 + \beta_1 x_i))^2]  $$
+$$ -2logL(\mu, \sigma^2|y) = \sum_i^n [\log(\sigma^2) + \frac{1}{\sigma^2} (y_i - (\beta_0 + \beta_1 x_i))^2]  $$
 
 ---
 ## Find the extrema of this expression
@@ -647,9 +647,11 @@ Therefore, the maximum likelihood estimator \\(\hat\theta\\), is:
 
 $$  \hat\theta = \arg \max_n L(\theta|x) $$
 
-It is easy to estimate linear normal regression in R using MLE. Here are the main steps, showing you how to program the likelihood directly so that you might understand what is happening 'under the hood'.
+It is easy to estimate linear normal regression in R using MLE. 
+Here are the main steps, showing you how to program the likelihood directly 
+so that you might understand what is happening ‘under the hood’.
 
-First let's write up a custom log-likelihood function for calculating the log-likelihood for our data.
+First let’s write up a custom log-likelihood function for calculating the log-likelihood for our data.
 
 
 ```r
@@ -666,27 +668,35 @@ loglik.my &lt;- function(par, X, y){
 ---
 ### Marco Polo
 
-To find the \\(\hat\theta\\) that maximises the likelihood, we could just try many values of \\(\theta\\).
-But this is tedious and carries no guarantee that the maximum found is the global maximum.
+To find the \\(\hat\theta\\) that maximises the likelihood, we could just try many values of \\(\theta\\) 
+(i.e. grid search, if evenly spaced).
+But this is tedious and carries no guarantee that the maximum found will actually be the .red[global maximum].
 
 --
 
-Instead we can play a sophisticated game of 'Marco Polo' or 'hotter-colder'.
+.pull-left[![](https://external-content.duckduckgo.com/iu/?u=http%3A%2F%2Fpbs.twimg.com%2Fmedia%2FCoyZEnbWIAAIegl.jpg&amp;f=1&amp;nofb=1)]
 
-Rather than a grid search, we're going to get feedback on whether we are close to the maximum and which way we should go.
+.pull-right[
+Instead we can play a sophisticated game of ‘Marco Polo’ or ‘hotter-colder’.
 
-The ‘hotter/colder’ information these algorithms utilize comes from the way in which the likelihood function changes as we move across the parameter space.
+Rather than a grid search, we’re going to check where we are at each estimate,
+get feedback on whether we are close to the maximum and which way we should go,
+move in that direction, and then check again.
+
+The ‘hotter/colder’ information such algorithms utilize comes from the way 
+in which the likelihood function changes as we move across the parameter space.
+]
 
 ---
-### Skiing
+### Alpine Skiing/Climbing
 
 .pull-left[
 
 The intuition of Newton-Raphson is pretty simple: you pick a starting point and look around for the steepest slope. 
-- if you are minimising the function, ski downhill a little way, check again, ski again, etc until you can't go any lower
-- if you are maximising the function, climb uphill until you can't get any higher
+- if you are trying to minimise a function, ski downhill a little way, check again, ski again, etc until you can't go any lower
+- if you are trying to maximise a function, climb uphill until you can't get any higher
 
-We need two pieces of information to do this:
+We need two pieces of information at each check point to do this:
 - whether on a plateau or not
 - which way to go if not
 
@@ -704,15 +714,15 @@ The neat thing about this approach is that it will work for any family of models
 ---
 ### Regularity
 
-So long as some 'regularity conditions' are met...
+So long as some .red[regularity conditions] are met...
 - \\(L\\) should be smooth without any kinks or holes (i.e. continuous), at least in the neighbourhood of \\(\hat\theta\\)
 - \\(\hat\theta\\) should not fall on some edge or boundary of the parameter space
-- the support of the distribution or mass function for X should not depend on the value of \\(\theta\\)
-- likelihoods with a single maximum, rather than many small, local hills or plateaus, are easier to work with.
+- the support of the distribution or mass function for `\(X\)` should not depend on the value of \\(\theta\\)
+- likelihoods with a single maximum, rather than many small, local hills or plateaus, are easier to work with
 
-...the log-likelihood should be twice differentiable around the MLE:
-- the _first derivative_, \\(f'(y)\\), gives us information about whether we are on a plateau and which direction to move in to maximise/minimise log-likelihood
-- the _second derivative_, \\(f''(y)\\), gives us information about whether we are at a maximum or minimum, and how much uncertainty there is
+...then the log-likelihood should be twice differentiable around the MLE:
+- the .red[first derivative], \\(f'(y)\\), gives us information about whether we are on a plateau and which direction to move in to maximise/minimise log-likelihood
+- the .red[second derivative], \\(f''(y)\\), gives us information about whether we are at a maximum or minimum, and how much uncertainty there is
 
 ---
 #### First derivative
@@ -720,15 +730,15 @@ So long as some 'regularity conditions' are met...
 We want to move the vector to the point at which the value of the likelihood is at its highest,
 and to do this we want information about the slope of the likelihood function at each point.
 
-This information is offered by the matrix of first derivatives of the (log-)likelihood w.r.t. the \\(\theta\\)s, called the _gradient_ matrix \\(\nabla\\).
+This information is offered by the matrix of first derivatives of the (log-)likelihood w.r.t. the \\(\theta\\)s, called the .red[gradient] matrix \\(\nabla\\).
 
-The _score function_, \\(S(\theta)\\), is the gradient of the log-likelihood.
+The .red[score function], \\(S(\theta)\\), is the gradient of the log-likelihood.
 Evaluated at a particular point \\(\theta\\), the score function will describe the steepness of the log-likelihood.
-- If the gradient is positive, then the likelihood is increasing in \\(\hat\theta\\), 
-and so we should increase our estimate even more...
+- If the gradient is positive, then increasing \\(\hat\theta\\) is increasing the likelihood, 
+so we should increase our estimate  more...
 
-- If the gradient is negative, then the likelihood is decreasing in \\(\hat\theta\\), 
-and so we should decrease our estimate of \\(\hat\theta\\)
+- If the gradient is negative, then increasing \\(\hat\theta\\) is decreasing the likelihood, 
+so we should decrease our estimate of \\(\hat\theta\\)
 
 - If the function is continuous, then at the maximum or minimum, this vector of first partial derivatives equals 0, telling us when we are at a maximum (or minimum).
 
@@ -749,7 +759,7 @@ and is critical in both estimating the MLE and describing our uncertainty.
 Second derivative gives us the direction in which the slope of the function is changing:
 &lt;!-- - If \\( f''(Y)\\) positive, then slope of \\( f''(Y)\\) is becoming more positive in the variable, indicating a minimum. --&gt;
 - If \\( f''(Y)\\) negative, then slope of \\( f'(Y)\\) becoming less positive, indicating a maximum.
-- The bigger the absolute value of the second derivative, the more 'curved' the function,
+- The bigger the absolute value of the second derivative, the more ‘curved’ the function,
 which tells us the rate at which the slope is changing...
 
 --
@@ -790,11 +800,11 @@ mle.fit &lt;- optim(
 ```
 
 ```
-## initial  value 802.226018 
-## iter  10 value 250.166036
-## iter  10 value 250.166036
-## iter  10 value 250.166036
-## final  value 250.166036 
+## initial  value 814.675620 
+## iter  10 value 251.514767
+## iter  10 value 251.514767
+## iter  10 value 251.514767
+## final  value 251.514767 
 ## converged
 ```
 
@@ -811,9 +821,9 @@ if(mle.fit$convergence != 0) print("WARNING: Convergence Problems; Try again!")
 The second derivative is also important for describing our uncertainty about \\(\hat\theta\\).
 
 The negative of the second derivative tells us how much (a quantity, not a function) information about \\(\theta\\) we have at the MLE.
-This is called _Fisher information_, \\(I(\hat\theta)\\).
+This is called .red[Fisher information], \\(I(\hat\theta)\\).
 
-When \\(\theta\\) is a _k_-dimensional vector, the matrix of second partial derivatives is known as the _Hessian matrix_, \\(H(\theta)\\).
+When \\(\theta\\) is a _k_-dimensional vector, the matrix of second partial derivatives is known as the .red[Hessian matrix], \\(H(\theta)\\).
 
 Inverting the Hessian matrix, \\(-H(\hat\theta)^{-1}\\), will provide the variance-covariance matrix, the square root of the diagonal of which contains the estimated standard errors for the parameters.
 ]
@@ -833,13 +843,13 @@ round(out.table, 2)
 
 ```
 ##    Est   SE    Z pval
-## 1 0.26 1.31 0.20 0.84
-## 2 0.98 0.14 6.97 0.00
+## 1 0.39 1.27 0.30 0.76
+## 2 0.96 0.14 7.08 0.00
 ```
 ]
 
-These results imply that, in the set of countries/year examined, higher levels of GDP are associated with higher levels of CO2 emissions.
-The estimated coefficient for GDP (B1) means that for every order of magnitude increase in GDP per capita, there will be an order of magnitude increase in annual CO2 emissions, on average.
+These results imply that, in the set of countries/year examined, higher levels of GDP are associated with higher levels of `\(CO_2\)` emissions.
+The estimated coefficient for GDP, `\(\beta_1\)`, means that for every order of magnitude increase in GDP per capita, there will be an order of magnitude increase in annual `\(CO_2\)` emissions, on average.
 
 ???
 
@@ -850,14 +860,14 @@ $$  I(\theta) \equiv E[S(\theta)S(\theta)^T] = -E[H(\theta)]   $$
 ---
 ## MLE Properties
 
-_Invariance_
+.red[Invariance]
 - a transformation of the MLE equals the MLE of that transformation
 
-_Large-sample properties_ based on the Law of Large Numbers and the Central Limit Theorem
+.red[Large-sample properties] based on the .red[Law of Large Numbers] and the .red[Central Limit Theorem]
 
-2. _Consistency_: given infinite data, the MLE collapses to the 'true' parameter value
-3. _Asymptotic efficiency_: as sample size increases, they become unbiased minimum variance estimators as the sample size increases
-3. _Asymptotic normality_: as sample size increases, standard error becomes normal
+2. .red[Consistency]: given infinite data, the MLE collapses to the ‘true’ parameter value
+3. .red[Asymptotic efficiency]: as sample size increases, they become unbiased minimum variance estimators
+3. .red[Asymptotic normality]: as sample size increases, standard error becomes normal
   - allowing conventional hypothesis testing and _z_-scores for results
   - enables predictions of yet-to-be observed data
 
