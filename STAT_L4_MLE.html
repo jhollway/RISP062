@@ -892,26 +892,27 @@ class: center, middle
 
 Because we cannot get _h(x)_, the likelihood is itself not meaningful as a raw value but,
 so long as you are basing these calculations on the _exact same data_, 
-we can use it to compare across models through:
-- the likelihood ratio
-- the score test
-- the Wald statistics
-- the Akaike information criterion
-- the Bayesian information criterion
+we can use the likelihood to compare across models through the:
+- likelihood ratio
+- score test
+- Wald statistics
+- Akaike information criterion
+- Bayesian information criterion
 
 NB: Sometimes including a new parameter will mean losing some observations when only non-missing data is retained.
 In this case, it is difficult to compare/contrast likelihoods.
+_Again_, comparing likelihood-based measures only useful if _same data_.
 
 ---
 ### Likelihood ratios
 
 You can simply divide one by the other, canceling out the unknown scaling factor.
 
-The likelihood ratio is used to compare 'nested' models, i.e. when one is a restricted case of the other.
+The likelihood ratio is used to compare ‘nested’ models, i.e. when one is a restricted case of the other.
 
 $$  LR(\theta_R, \theta_G|x) = -2 \log \frac{L(\theta_R|x)}{L(\theta_G|x)}   $$
 
-This likelihood ratio statistics is distributed according to the \\(\chi^2\\) distribution under the null hypothesis that the more restricted model is the "correct" one.
+This likelihood ratio statistics is distributed according to the \\(\chi^2\\) distribution under the null hypothesis that the more restricted model is the “correct” one.
 
 The degrees of freedom of the null distribution equals the number of parameter restrictions imposed as we go from the general to restricted model.
 
@@ -942,61 +943,68 @@ If the constraint is appropriate, then the slope of the log-likelihood near the 
 
 ### Wald tests
 
-We also have the Wald test, which is simply the squared difference of the estimated parameters from some constrained value (typically zero), weighted by the curvature of the log-likelihood.
-The Wald test is a generalised version of the standard t-test.
+The Wald test is simply the squared difference of the estimated parameters from some constrained value (typically 0), weighted by the curvature of the log-likelihood.
+The Wald test is a generalised version of the standard _t_-test.
 
 ---
 ### Information criteria
 
-The maximised likelihood, _L_, also serves as the basis for AIC and BIC, 
-where _k_ is the number of estimated parameters in the fitted model:
+Maximised likelihood, _L_, also serves as basis for AIC and BIC, 
+where _k_ is the number of estimated parameters in the fitted model,
+and _n_ is the number of observations:
 
-AIC
+.pull-left-1[
+$$AIC =  -2\log L + 2k  $$
 
-$$  -2\log L + 2k  $$
+$$AICc =  AIC + \frac{2k^2 = 2k}{n - k - 1}  $$
 
-BIC
+$$BIC =  -2 \log L + k \log n  $$
 
-$$  -2 \log L + k \log n  $$
+]
 
-A lower score indicates a more parsimonious model, 
-relative to a model fit with a higher AIC.
+.pull-left-2[
+As relative measures of model parsimony, 
+only meaningful in comparison to other model specifications _on the exact same data_.
 
-Since it is a relative measure of model parsimony, 
-it is only meaningful if we compare the AIC for alternate hypotheses (i.e. different model specifications).
+Lower score means more parsimonious than fit with higher AIC.
 
-We can compare non-nested models. For instance, we could compare a
-linear to a non-linear model.
+BIC imposes a higher penalty so long as \\(n ≥ 8\\).
 
-Neither are meaningful on their own, only in comparison to other models _on the exact same data_.
-The comparisons are only valid for models that are fit to the same response
-data (ie values of y).
+AICc corrects for small sample sizes.
+]
 
-Model selection conducted with the AIC will choose the same model as
-leave-one-out cross validation (where we leave out one data point
-and fit the model, then evaluate its fit to that point) for large
-sample sizes.
+--
 
-You shouldn’t compare too many models with the AIC. You will run
-into the same problems with multiple model comparison as you would
-with p-values, in that you might by chance find a model with the
-lowest AIC, that isn’t truly the most appropriate model.
+What’s the difference between LR, score, and Wald tests and ICs?
+- ICs can compare non-nested models (e.g. linear to polynomial)
+- ICs penalise models for greater complexity
+
+???
+
+A few pieces of advice:
+
+Model selection conducted with the AIC will choose the same model 
+as leave-one-out cross validation 
+(where we leave out one data point and fit the model, 
+then evaluate its fit to that point) 
+for large sample sizes.
+
+Don't compare too many models with the AIC. 
+You will run into the same problems with multiple model comparison 
+as you would with p-values, 
+in that you might by chance find a model with the lowest AIC, 
+that isn’t truly the most appropriate model.
 
 When using the AIC you might end up with multiple models that
-perform similarly to each other. So you have similar evidence
-weights for different alternate hypotheses.
-
-Both AIC and BIC penalise models for greater complexity, unlike LR and other such tests.
-BIC imposes a higher penalty so long a \\(n ≥ 8\\).
-You should correct for small sample sizes if you use the AIC with
-small sample sizes, by using the AICc statistic.
+perform similarly to each other. 
+So you have similar evidence weights for different alternate hypotheses.
 
 ---
 ## What if L is wrong?
 
 Note that information about \\(\theta\\) comes from both the observed data _and_ our assumptions about the DGP as embodied in the probability model \\(f(x|\theta)\\).
 
-Many of the MLE's desirable properties are predicated on the untestable assumption that our probability model correctly captured some objective, "true" DGP.
+Many of the MLE’s desirable properties are predicated on the untestable assumption that our probability model correctly captured some objective, “true” DGP.
 
 If the model is wrong, then parameter estimates can be (but are not necessarily) biased and inconsistent.
 
@@ -1007,7 +1015,7 @@ We can use AIC and BIC to compare different model specifications, and this inclu
 --
 
 Under certain circumstances we may also want to correct for some misspecification problems. 
-For example, if our estimates are still consistent with respect to theta, then robust standard errors can help.
+For example, if our estimates are still consistent with respect to `\(\theta\)`, then robust standard errors can help.
 
 ---
 ### Model identification issues
@@ -1044,16 +1052,22 @@ Ward and Ahlquist say that OLS is just marketed as the 'ordinary' model, but it 
 
 --
 
-But there are some important conceptual advantages to MLE:
+.pull-left-2[But there are some important conceptual advantages to MLE:
 - more than just a collection of statistical models or even an estimation procedure
 - a unified way of thinking about model construction, estimation and evaluation (Ron Fisher)
-- enables us to custom-design our own statistical estimators for our own research questions
+- enables us to custom-design our own statistical estimators for our own research questions]
+
+.pull-right-1[
+![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Fa%2Faa%2FYoungronaldfisher2.JPG%2F220px-Youngronaldfisher2.JPG&amp;f=1&amp;nofb=1)
+]
 
 ---
 ## Other estimation techniques
 
 MLE is just one family of estimation techniques.
-Others include _general method of moments_ or _Bayesian_ approaches.
+Others include .red[general method of moments] or .red[Bayesian] approaches.
+
+--
 
 Actually MLE and Bayesian estimation quite related.
 
@@ -1071,7 +1085,8 @@ While Bayesian estimation is more involved than MLE (and thus beyond this course
 
 Maximum likelihood is based on the idea that the observed data are more likely to have come about as a result of a particular set of parameters.
 
-That is, rather than consider the data as random and the parameters as fixed, MLE treats the observed data as fixed and asks: 
+That is, rather than consider the data as random and the parameters as fixed, 
+MLE treats the observed data as fixed and asks: 
 What parameter values are most likely to have generated the data?
 
 It is thus quite similar to a Bayesian framework.
@@ -1087,7 +1102,7 @@ MLE is most often used as a flexible estimation technique for .red[Generalized L
 
 Whereas .red[General Linear Models] (I know, I know) require that the errors follow the normal distribution 
 (also known as the bell curve or Gaussian Distribution),
-.red[Generalized Linear Models] allows the specification of models where errors follow different distributions.
+.red[General_ized_ Linear Models] allows the specification of models where errors follow different distributions.
 
 GLMs are one of the most useful modern statistical tools,
 because they can be applied to many different types of data:
@@ -1095,12 +1110,13 @@ e.g. binary, ordinal, categorical, count, and waiting time data.
 
 GLMs use different link functions to 
 denote a different relationship between the linear model and the response variable (e.g. inverse, logit, log, etc). 
-For example for the poisson regression, 
-the link function is the "log".
+For example, for the poisson regression, 
+the link function is the “log”.
 
 The link function is not the same thing as the conditional distribution of the response.
 In R, we often use the `glm()` function for GLMs.
-There one specifies the conditional distribution, e.g. `binomial`, as well as sometimes the link function (there are defaults/canonical link functions), e.g. `link = logit`.
+There we specify the conditional distribution, e.g. `binomial`, 
+as well as sometimes (there are canonical defaults) the link function, e.g. `link = logit`.
 
 
 ```r
@@ -1109,7 +1125,7 @@ There one specifies the conditional distribution, e.g. `binomial`, as well as so
 
 ???
 
-For general linear models, the link function is just a simple identity function, `\(f(z)=z\)`.
+For _general_ linear models, the link function is just a simple identity function, `\(f(z)=z\)`.
 
 See [here](https://www.r-bloggers.com/generalized-linear-models-understanding-the-link-function/).
 
@@ -1123,6 +1139,12 @@ class: center, middle
 .pull-1[.circleon[![](https://www.topratedforexbrokers.com/wp-content/uploads/comparison-list.svg)]]
 
 Try to digest all this a bit before next week...
+
+---
+background-image: url(https://thumbs.gfycat.com/BlackPoisedGiantschnauzer-max-1mb.gif)
+background-size: contain
+
+&lt;!-- url(https://media.giphy.com/media/xUNd9OonKkNhU1mF9e/giphy.gif) --&gt;
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="libs/remark-latest.min.js"></script>
@@ -1132,7 +1154,7 @@ Try to digest all this a bit before next week...
 "highlightStyle": "github",
 "highlightLines": true,
 "countIncrementalSlides": false,
-"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>` "
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>`\n"
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
