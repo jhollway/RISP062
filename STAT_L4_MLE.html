@@ -5,6 +5,14 @@
     <meta charset="utf-8" />
     <meta name="author" content="James Hollway" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/clipboard/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
     <link href="libs/table1/table1_defaults.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.githubraw.com/jhollway/iheidmyninja/7b9e9101/iheid-xaringan-style.css" type="text/css" />
   </head>
@@ -59,7 +67,6 @@ wdi &lt;- WDI(country = "all",
 wdi &lt;- subset(wdi, region != "Aggregates")
 wdi &lt;- na.omit(wdi)
 names(wdi)[4:7] &lt;- c("PopDensity", "CO2", "GDPpc","WB")
-attach(wdi)
 table1::table1(~ CO2 + GDPpc + PopDensity, wdi)
 ```
 
@@ -67,7 +74,7 @@ table1::table1(~ CO2 + GDPpc + PopDensity, wdi)
 <thead>
 <tr>
 <th class='rowlabel firstrow lastrow'></th>
-<th class='firstrow lastrow'><span class='stratlabel'>Overall<br><span class='stratn'>(n=189)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Overall<br><span class='stratn'>(N=192)</span></span></th>
 </tr>
 </thead>
 <tbody>
@@ -77,11 +84,11 @@ table1::table1(~ CO2 + GDPpc + PopDensity, wdi)
 </tr>
 <tr>
 <td class='rowlabel'>Mean (SD)</td>
-<td>176000 (845000)</td>
+<td>172000 (837000)</td>
 </tr>
 <tr>
 <td class='rowlabel lastrow'>Median [Min, Max]</td>
-<td class='lastrow'>9670 [11.0, 1e+07]</td>
+<td class='lastrow'>9420 [11.0, 10000000]</td>
 </tr>
 <tr>
 <td class='rowlabel firstrow'><span class='varlabel'>GDPpc</span></td>
@@ -89,11 +96,11 @@ table1::table1(~ CO2 + GDPpc + PopDensity, wdi)
 </tr>
 <tr>
 <td class='rowlabel'>Mean (SD)</td>
-<td>19000 (21000)</td>
+<td>19000 (22200)</td>
 </tr>
 <tr>
 <td class='rowlabel lastrow'>Median [Min, Max]</td>
-<td class='lastrow'>11400 [720, 127000]</td>
+<td class='lastrow'>11100 [670, 142000]</td>
 </tr>
 <tr>
 <td class='rowlabel firstrow'><span class='varlabel'>PopDensity</span></td>
@@ -101,11 +108,11 @@ table1::table1(~ CO2 + GDPpc + PopDensity, wdi)
 </tr>
 <tr>
 <td class='rowlabel'>Mean (SD)</td>
-<td>338 (1550)</td>
+<td>333 (1540)</td>
 </tr>
 <tr>
 <td class='rowlabel lastrow'>Median [Min, Max]</td>
-<td class='lastrow'>82.3 [1.82, 18900]</td>
+<td class='lastrow'>82.2 [1.82, 18900]</td>
 </tr>
 </tbody>
 </table>
@@ -124,28 +131,28 @@ table1::table1(~ CO2 + GDPpc + PopDensity, wdi)
 
 Recall that inference is making statements about parameter(s), \\(\theta\\), given a sample of data, \\(X_1, X_2, ..., X_n\\)
 
-So what we could do is we could try to estimate the effect of GDP per capita on CO2 emissions using OLS.
+So what we could do is we could try to estimate the effect of GDP per capita on `\(CO_2\)` emissions using OLS.
 
-Recall that to identify the .blue[best linear unbiased estimates],
-assuming that the conditions for the Gauss-Markov Theorem are met,
-all we need to do is plug in the values of _x_ and _y_ into the following equations:
+Recall that, assuming that the conditions for the Gauss-Markov Theorem are met, 
+all we need to do to identify the .blue[best linear unbiased estimates] for the data
+is plug in the values of _x_ and _y_ into the following equations:
 
 $$ \hat{\beta} = \frac{\sum_i^n (x_i - \bar{x}) (y_i - \bar{y})}{\sum_i^n (x_i - \bar{x})^2}       $$
 
 $$  \hat{\alpha} = \bar{y} - \hat{\beta}\bar{x}     $$
 
-This will render the .blue[best linear unbiased estimates] of parameter values based on information from this data.
-
 --
 
-Cool, _but_... what if:
+.pull-left-1[![:scale 60%](https://media.giphy.com/media/JUqiFbumTAPYIeM8yJ/giphy.gif)]
+
+.pull-right-2[Cool, _but_... what if:
 - some assumptions not met, e.g. nonlinear?
-- dependent variable not continuous?
+- dependent variable not continuous?]
 
 ---
-### From OLS to MLE
+### Beyond the bounds of OLS
 
-OLS assumes a linear model and an unbounded, continuous outcome.
+OLS assumes a linear model but also an unbounded, continuous outcome.
 
 .blockquote[The linear model is a good one, but the world around can be both nonlinear and bounded. 
 
@@ -153,20 +160,22 @@ OLS assumes a linear model and an unbounded, continuous outcome.
 
 --
 
-- For example, need to take logs of both CO2 and per capita GDP for the model to work.
+- For example, need to take logs of both `\(CO_2\)` and per capita GDP for the model to work.
 
 - Or want to predict a probability, which varies between 0 and 1.
 (OLS may predict values below 0 or above 1...)
 
-- Or perhaps Y _isn't_ normally distributed around mean for each value of X...
+- Or perhaps `\(Y\)` _isn’t_ normally distributed around mean for each value of `\(X\)`...
 e.g. for a binary or discrete response.
 
 ---
 ## Introduction to MLE
 
-_Maximum likelihood estimation_ (MLE) is an efficient and widely-used approach.
+.red[Maximum likelihood estimation] (MLE) is an efficient and widely-used approach.
 
 It is an iterative process that estimates the best fitting parameter values, \\(\theta\\), _for any probability distribution_.
+
+--
 
 Basically, MLE searches for the value(s) of \\(\theta\\) that _maximises the likelihood_ of observing the sample data collected.
 
