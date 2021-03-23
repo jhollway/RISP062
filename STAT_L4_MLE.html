@@ -187,32 +187,32 @@ Er, what does 'likelihood' mean?
 ]
 
 ---
-## 'Probably' a probability review would be useful
+## ‘Probably’ a probability review would be useful
 
-Concerns the probability of observing events
-- probabilities of different outcomes for a certain event must add up to 1 (_law of total probability_)
-- e.g. if heads = p, then tails = 1-p (the _complement_)
+When we talk about probability (e.g. Stats I), we were talking about the probability of observing events
+- probabilities of different outcomes for a certain event must add up to 1 (.red[law of total probability])
+- e.g. if heads = `\(p\)`, then tails = `\(1-p\)` (the .red[complement])
 
-If events independent, then probability of pairs of outcomes is the product of these probabilities (_joint probability_).
+If events independent, then probability of pairs of outcomes is the product of these probabilities (.red[joint probability]).
 - e.g. probability of observing two heads from an unbiased coin = 0.5 x 0.5 = 0.25
-- useful for expressing more complex problems, as we shall see
+- useful for expressing more complex problems, as we shall see...
 
 --
 
 But events rarely fully independent...
 - e.g. though schizophrenia in population is 1%,
 having sister with schizophrenia greatly increases risk of
-becoming schizophrenic (_conditional probability_)
-- \\(\Pr(X|Y)\\), e.g. Pr(Sz|sister has Sz)
+your becoming schizophrenic (.red[conditional probability])
+- `\(\Pr(X|Y)\)`, e.g. `\(\Pr(\text{Sz}|\text{sister has Sz})\)`
 
-Can abstract proportion of obs. expected with smooth, continuous curve called a _probability density function_ (PDF).
-- Probability that, for any one observation i, Y will take on the particular value y.
-- A function of the expected value of the distribution (e.g. \\(\mu\\)) 
-and the variability of the distribution around that mean (e.g. \\(\sigma^2\\)).
+Can abstract proportion of obs. expected with smooth, continuous curve called a .red[probability density function] (PDF).
+- Probability that, for any one observation `\(i\)`, `\(Y\)` will take on the particular value `\(y\)`.
+- A function of expected value of distribution (e.g. \\(\mu\\)) 
+and variability of distribution around that mean (e.g. \\(\sigma^2\\)).
 
 ???
 
-A PDF also has a corresponding cumulative density function (CDF) that shows the cumulated probability to that point.
+A PDF also has a corresponding .red[cumulative density function] (CDF) that shows the cumulated probability to that point.
 
 ---
 ### PDF, CDF, come again?
@@ -220,12 +220,15 @@ A PDF also has a corresponding cumulative density function (CDF) that shows the 
 - The PDF (Probability Density Function) looks at probability at one point.
 - The CDF (Cumulative Density Function) is the total probability of anything below it.
 
+.center[![:scale 60%](http://www.fekete.com/SAN/WebHelp/FeketeHarmony/Harmony_WebHelp/Content/images/Reference_Material/Analysis_Methods_Theory/Risk/Normal_Distribution_Plot_500x304.png)
+]
+
 ---
 ### Likelihood ≠ Probability
 
-These are not the same.
+Now I want to clear something up: These are not the same.
 
-The _probability_ of an event X depends on model parameters \\(\theta\\) is \\(\Pr(X|\theta)\\)
+The _probability_ of an event `\(X\)` depends on model parameters \\(\theta\\): i.e. \\(\Pr(X|\theta)\\)
 - Knowing parameters ‐&gt; Prediction of outcome.
 
 The _likelihood_ concerns how likely parameter values are given the data: \\(L(\theta|X)\\)
@@ -238,19 +241,19 @@ The likelihood is being maximised with respect to the parameters, not the sample
 .pull-down[
 What does this mean?
 
-Be careful when using the term 'likelihood' when you are talking about model results.
+Be careful when using the term “likelihood” when you are talking about model results.
 
-Don't say "there is a high likelihood that the stock market will crash tomorrow"; that's a probability. 
+Don't say “there is a high likelihood that the stock market will crash tomorrow”; that’s a probability. 
 ]
 
 ---
 ## Intuition
 
-Ok, with that out of the way, let's learn the intuition behind maximum likelihood estimation on a toy example first:
+Ok, with that out of the way, let’s learn the intuition behind MLE on a toy example first:
 
 --
 
-Let's say that you are having a disagreement with your friends about the best beer (or wine, or coffee, or tea).
+Let’s say that you are having a disagreement with your friends about the best beer (or wine, or coffee, or tea).
 You prefer one type of beer, and all three of your friends prefer the other type. You want to show them.
 
 --
@@ -282,7 +285,7 @@ $$ \theta^{1s} (1 - \theta)^{0s} $$
 
 and formulated the eponymous Bernoulli and binomial distributions.]
 
-Let's consider how likely two particular parameters are for each observation: 
+Let's consider how likely three particular parameter values are for each observation: 
 
 $$ L(\theta|x_i) $$
 
@@ -291,7 +294,9 @@ $$ L(\theta|x_i) $$
 --
 
 .pull-right-1[
-.small[
+.panelset[
+.panel[
+.panel-name[Drinks indistinguishable]
 Maybe drinks are indistinguishable (\\(\hat\theta = 0.5\\)):
 
 
@@ -319,6 +324,9 @@ Maybe drinks are indistinguishable (\\(\hat\theta = 0.5\\)):
 ## [1] 0.5
 ```
 
+]
+.panel[
+.panel-name[Friends are right]
 Or maybe your friends are right (\\(\hat\theta = 0\\)):
 
 
@@ -345,29 +353,64 @@ Or maybe your friends are right (\\(\hat\theta = 0\\)):
 ```
 ## [1] 1
 ```
-]]
+
+
+]
+
+.panel[
+.panel-name[I’m right]
+Or maybe I'm right (\\(\hat\theta = 1\\)):
+
+
+```r
+1^1 * (1-1)^0
+```
+
+```
+## [1] 1
+```
+
+```r
+1^1 * (1-1)^0
+```
+
+```
+## [1] 1
+```
+
+```r
+1^0 * (1-1)^1
+```
+
+```
+## [1] 0
+```
+
+
+]
+]
+]
 
 ---
-### i.i.d.
-
-But what is the most likely parameter estimate for _all_ the data?
+### Aggregating individual likelihoods 
 
 &lt;!-- Let \\(X_i\\) be random variables and \\(x_i\\) their realizations (actual observed values). --&gt;
 &lt;!-- Let’s assume \\(X_i\\) are distributed according to a certain probability distribution \\(D\\) (e.g. Bernoulli)  --&gt;
 &lt;!-- with density \\(f(\theta)\\) where \\(\theta\\) is a parameter of said distribution. --&gt;
 
 If we assume that observations are:
-- _independent and identically distributed_ (i.i.d.), i.e. not related to one another), 
-- governed by the same data generating process (DGP), \\(f(x|\theta)\\)
+- .red[independent and identically distributed] (i.i.d.), i.e. not related to one another, and
+- governed by the same .red[data generating process] (DGP), \\(f(x|\theta)\\)
 
-then joint probability of the observations, \\( \Pr(Y_i = y_i \forall_i) \\), is simply the product of the marginals
+then joint probability of the observations, \\( \Pr(Y_i = y_i \forall_i) \\), 
+is simply the product of the marginals
 because unconditional probabilities compound.
 
 $$ f(x_1|\theta)f(x_2|\theta)f(x_3|\theta) = \prod_i^N \Pr(X_i = x_i) = L(\theta|x_1, x_2, x_3) $$
 
 &lt;!-- The joint probability that our observations were generated by our distribution \\(D(\theta)\\) is therefore: --&gt;
 
-This product is our _likelihood function_, \\(L(\theta|x_1, x_2, ..., x_n)\\), the probability of observing all data as a function of \\(\theta\\)!
+This product is our .red[likelihood function], \\(L(\theta|x_1, x_2, ..., x_n)\\), the probability of observing all data as a function of \\(\theta\\)!
 
 Maximizing this function yields \\(\hat\theta\\), the value of the parameter that makes the sample the most probable.
 
@@ -376,18 +419,18 @@ Maximizing this function yields \\(\hat\theta\\), the value of the parameter tha
 .pull-left[
 ### Grid search
 
-To find the most likely estimates \\(\hat\theta\\) for this data, you could use _grid search_: 
+To find the most likely estimates \\(\hat\theta\\) for this data, you could use .red[grid search]: 
 a systematic and evenly spaced grid of points to see which has the higher likelihood.
 
 Since \\(\theta\\) must be between 0 and 1, 
 we check every .1 increment and calculate the likelihood for this data.
 
-If we compare the likelihood function at two parameter points and find \\(L(\theta_1|x) &gt; L(\theta_2|x)\\), 
-then observed data more likely to have occurred if \\(\theta = \theta_1\\) than if \\(\theta = \theta_2\\),
-i.e. \\(\theta_1\\) a more plausible value for \\(\theta\\) than \\(\theta_2\\).
+If we compare likelihood function at two parameter points and find \\(L(\hat\theta_1|x) &gt; L(\hat\theta_2|x)\\), 
+then observed data more likely to have occurred if \\(\theta = \hat\theta_1\\) than if \\(\theta = \hat\theta_2\\),
+i.e. \\(\hat\theta_1\\) more plausible value for \\(\theta\\) than \\(\hat\theta_2\\).
 
-Equiprobable guess of .5 turns out not to have been the most likely to have generated this data,
-and the guess that theirs is always the best beer is completely discredited.
+Their beer totally discredited, but nor are equiprobable guess and
+my supposition that mine is best most likely to have generated this data.
 
 But what about in between .6 and .7? Do we just repeatedly guess?
 ]
@@ -396,10 +439,13 @@ But what about in between .6 and .7? Do we just repeatedly guess?
 
 ```r
 thetahat &lt;- seq(0, 1, .1)
-likelihood &lt;- as.data.frame(t(sapply(thetahat, 
-                function(x) c(x, x^table(drinks)[2] * (1 - x)^table(drinks)[1]))))
-ggplot(likelihood, aes(V1, `1`)) + geom_point() +
-  scale_x_continuous(breaks = seq(0, 1, .1)) + xlab("theta") + ylab("likelihood")
+likeli &lt;- as.data.frame(t(sapply(thetahat, 
+            function(x) c(x,
+                  x^table(drinks)[2] *
+                  (1 - x)^table(drinks)[1]))))
+ggplot(likeli, aes(V1, `1`)) + geom_point() +
+  scale_x_continuous(breaks = seq(0, 1, .1)) + 
+  xlab("theta") + ylab("likelihood")
 ```
 
 &lt;img src="STAT_L4_MLE_files/figure-html/plotintuition-1.png" width="504" /&gt;
@@ -411,25 +457,27 @@ ggplot(likelihood, aes(V1, `1`)) + geom_point() +
 
 --
 
+&lt;!-- But what is the most likely parameter estimate for _all_ the data? (i.e. maybe the parameter is none of those 3...) --&gt;
+
 &lt;!-- We will call the expression that describes the joint probability of the observed data as a function of the parameters the likelihood function: \\(L(y|\theta)\\) --&gt;
 
 Of course, we don’t know \\(\hat\theta\\); that's what we want to figure out. 
-We want to know most likely values of \\(\theta\\), given \\(Y\\):
+We want to know most likely values of \\(\theta\\), given \\(X\\):
 
-$$  L(\hat{\theta}|Y) \propto \Pr(Y|\hat{\theta})    $$
+$$  L(\hat{\theta}|X) \propto \Pr(X|\hat{\theta})    $$
 
 We can get this by treating the likelihood as a function (which it is)
 and use tools from calculus to solve for the maximum:
 
 $$ L = \theta^2(1-\theta)^1  $$
 
-$$ logL = 2 log \theta + 1 log(1-\theta)  $$
+$$ \log L = 2 \log \theta + 1 \log(1-\theta)  $$
 
-$$ \frac{\partial logL}{\partial \theta} = \frac{2}{\theta} - \frac{1}{(1-\theta)} = 0  $$
+$$ \frac{\partial \log L}{\partial \theta} = \frac{2}{\theta} - \frac{1}{(1-\theta)} = 0  $$
 
 $$ \hat\theta = \frac{2}{3}  $$
 
-The value of \\(\theta\\) that maximises the likelihood function is call the _maximum likelihood estimate_ or MLE.
+The value of \\(\theta\\) that maximises the likelihood function is call the .red[maximum likelihood estimate] or MLE.
 
 .footnote[Ward and Ahlquist show how you would get the same result by using the binomial distribution instead of the Bernoulli distribution.]
 
