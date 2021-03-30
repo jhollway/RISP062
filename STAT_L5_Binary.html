@@ -646,10 +646,12 @@ logit models.
 
 Let's say we have a pretty straightforward model for which senators vote for authorizing use of force in Iraq:
 
-$$ \Pr(War_i = 1) = f\bigl[\beta_0 + \beta_1(Republican) + \beta_2(VotedBush) + u_i\bigr]  $$
+$$ \Pr(\text{War}_i = 1) = f\bigl(\beta_0 + \beta_1(\text{Republican}) + \beta_2(\text{VotedBush}) + u_i\bigr)  $$
 
-That is, whether a senator will vote for war depends on some function of their general propensity to vote for war (\\(\beta_0\\)),
-whether they are Republican or not (\\(\beta_1\\), because President Bush was Republican), and what percentage of their constituents voted for Bush over Gore in the last election (\\(\beta_2\\), the rationale being that this reveals how precarious their seat is).
+That is, whether a senator will vote for war depends on some function of 
+- their general propensity to vote for war (\\(\beta_0\\)),
+- whether they are Republican or not (\\(\beta_1\\), because President Bush was Republican), and 
+- what percentage of their constituents voted for Bush over Gore in the last election (\\(\beta_2\\), the rationale being that this reveals how precarious their seat is).
 
 We can estimate this model using (e.g.) the `glm()` function in R.
 
@@ -660,8 +662,8 @@ We can estimate this model using (e.g.) the `glm()` function in R.
 
 ```r
 fullmodel &lt;- glm(War ~ VotedBush + Republican, 
-                 data=iraqVote, 
-                 family=binomial(link="logit"))
+              data = iraqVote, 
+              family = binomial(link="logit"))
 tab_model(fullmodel, transform = NULL)
 ```
 
@@ -678,8 +680,8 @@ tab_model(fullmodel, transform = NULL)
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-5.44&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-10.27&amp;nbsp;&amp;ndash;&amp;nbsp;-1.26&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;5.44&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;10.27&amp;nbsp;&amp;ndash;&amp;nbsp;-1.26&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.017&lt;/strong&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -724,9 +726,10 @@ Note also that I have told `sjPlot` _not_ to transform the coefficients... this 
 .pull-left[
 On the right are the parameter estimates. 
 
-The estimates from logistic regression characterize the relationship between the predictor and response variable on a log-odds scale.
+The estimates from logistic regression characterize the relationship between the predictor and response variable on a .red[log-odds] scale.
 
-For example, this model suggests that for every one unit increase in VotedBush, the log-odds of the senator voting for war increases by 0.11.
+For example, this model suggests that for every one unit increase in VotedBush, 
+the _log-odds_ of the senator voting for war increases by 0.11.
 
 Er, what? What the hell does that mean?
 
@@ -756,8 +759,8 @@ tab_model(fullmodel, transform = NULL)
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-5.44&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-10.27&amp;nbsp;&amp;ndash;&amp;nbsp;-1.26&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;5.44&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;10.27&amp;nbsp;&amp;ndash;&amp;nbsp;-1.26&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.017&lt;/strong&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -802,8 +805,8 @@ tab_model(fullmodel, transform = NULL)
 &lt;/tr&gt;
 &lt;tr&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:left; "&gt;(Intercept)&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-5.44&lt;/td&gt;
-&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;-10.27&amp;nbsp;&amp;ndash;&amp;nbsp;-1.26&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;5.44&lt;/td&gt;
+&lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&amp;#45;10.27&amp;nbsp;&amp;ndash;&amp;nbsp;-1.26&lt;/td&gt;
 &lt;td style=" padding:0.2cm; text-align:left; vertical-align:top; text-align:center;  "&gt;&lt;strong&gt;0.017&lt;/strong&gt;&lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
@@ -834,36 +837,49 @@ tab_model(fullmodel, transform = NULL)
 .pull-right[
 
 One option for interpretation is what I call “sign-ificance”:
-- See whether (and to what extent) \\(\beta\\) statistically differentiable from zero
-- See whether the sign of \\(\beta\\) is:
-  - positive: increases in X correspond to increases in Pr(Y = 1)
-  - negative: increases in X correspond to decreases in Pr(Y = 1)
-]
+1. See whether (and to what extent) \\(\beta\\) statistically differentiable from zero
+1. See whether the sign of \\(\beta\\) is:
+  - +: increases in `\(X\)` increases `\(\Pr(Y = 1)\)`
+  - -: increases in `\(X\)` decreases `\(\Pr(Y = 1)\)`
 
 Together this is sufficient for hypothesis-testing:
-we know that the signal in the data is not just by chance,
-and whether it goes in the same direction as hypothesised.
+it tells us whether there is a “signal” for a pattern in the data
+that goes in the same direction as hypothesised and
+unlikely to appear just by chance.
+]
+
+--
 
 Therefore common to see articles using this approach where authors only focused on hypothesis testing,
-and they are trying to avoid problems with using odds-ratios (and log-odds) to compare effect sizes within and across models (see below).
+and trying to avoid problems with using odds-ratios (and log-odds) to compare effect sizes within and across models (see below).
 
-Not the most useful way to present results though, since no direct, 
-intuitive way to interpret the log-odds coefficients substantively and among each other.
+--
+
+Not the most useful way to present results in a way that might help policy-makers though, 
+since no direct, intuitive way to interpret the log-odds coefficients substantively and among each other.
 
 ---
 ## Odds Ratios
 
 .pull-left[
-Another approach is to transform the logit's log-odds coefficients into 
-something more intuitive to support substantive interpretation: _odds ratios_.
+Another approach is to transform the logit’s log-odds coefficients into 
+something more intuitive to support substantive interpretation.
 
 Recall from Stats I that odds are a different way of thinking about probability:
-- If Pr(Y=1)=0.50, then odds 1 to 1
-- If Pr(Y=1)=0.75, odds 3 to 1, etc. 
+- If `\(Pr(Y=1)=0.50\)`, then odds 1 to 1
+- If `\(Pr(Y=1)=0.75\)`, odds 3 to 1, etc. 
 - Odds range from 0 to \\(\infty\\) (but never negative).
 
-Much more intuitive than log-odds!
-Would you prefer to bet on a horse winning at the track based on log-odds of -1.95 or an odds ratio of 7 to 1?
+The .red[odds ratio] is the change in the odds of Pr(Y=1) associated with a one unit change in our covariate.
+
+Odds much more intuitive than log-odds!
+Would you prefer to bet on a horse winning at the track 
+based on log-odds of -1.95 or an odds ratio of 7 to 1?
+]
+
+.pull-right[
+![](https://www.thetravelmagazine.net/wp-content/uploads/White-Turf-Racing--696x523.jpg)
+
 ]
 
 ???
@@ -875,26 +891,25 @@ background-image: url(https://media.giphy.com/media/tALnlXYyyDJFS/giphy.gif)
 background-size: contain
 
 ---
-.pull-left[
-### Odds Ratios and the Logit Model
+.pull-left-1[
+### Obtaining odds ratios
 
-The odds ratio is the change in the odds of Pr(Y=1) associated with a one unit change in our covariate.
-
-Get by exponentiating logistic regression coefficients: 
+Can obtain odds ratios by simply exponentiating logistic regression coefficients: 
 
 `$$\text{Odds Ratio} = \exp(\hat\beta_k\delta)$$`
-
-Can then also translate into percentage change in odds:
-
-`$$\text{Percentage Change} = 100[\exp(\hat\beta_k\delta) - 1]$$`
 
 Quick Guide:
 - OR&gt;1: \\(\Pr(Y=1) &gt; \Pr(Y=0)\\)
 - OR&lt;1: \\(\Pr(Y=1) &lt; \Pr(Y=0)\\)
 - OR=1: \\(\Pr(Y=1) = \Pr(Y=0)\\)
+
+Can then also translate into percentage change in odds:
+
+`$$\text{Percentage Change} = 100[\exp(\hat\beta_k\delta) - 1]$$`
+
 ]
 
-.pull-right[
+.pull-right-2[
 
 ```r
  # sjPlot reports OR by default
@@ -945,10 +960,10 @@ E.g. logit estimate \\(\hat\beta\\) = 3.02, means being Republican
 - ...increases the log-odds of voting for war by 3.02
 - ...increases the odds by \\(\exp(3.02) = 20.47\\)
 - ...increases the odds by \\(100[\exp(3.02)-1] = 1947\\)%
-]
 
 What you _cannot_ say: Republicans 1947% more likely to vote for war:
-that's a probability statement (risk) not odds.
+that’s a probability statement (risk) not odds.
+]
 
 ???
 
@@ -977,7 +992,7 @@ Other scholars (e.g. Buis 2017) argue that issues of unobserved heterogeneity
 not as problematic if we think of the DV not in terms of a latent variable model (as Mood 2010 does), 
 but as a chance of an event taking place or not.
 
-Take-Away: Whether ORs are problematic or not depends on the theory and the type of research question the researcher has.
+Take-Away: Whether ORs could be problematic or not depends on the theory and the type of research question the researcher has.
 
 ---
 
@@ -985,26 +1000,26 @@ Take-Away: Whether ORs are problematic or not depends on the theory and the type
 ## Predicted Probabilities
 
 What we really care about, in most cases, 
-is the effect of changes in X on the probability of the actual event of interest. 
+is the effect of changes in `\(X\)` on the probability of the actual event of interest. 
 
-To get this is a bit more involved than with OLS,
-since effect of covariates is linear only with respect to the log-odds, not Y itself.
+To get this is a bit more involved than with OLS though,
+since effect of covariates is linear only with respect to the log-odds, not `\(Y\)` itself.
 Because model nonlinear, 
-real net effect of a change in X depends on the constant, other Xs and their parameter estimates.
+real net effect of a change in `\(X\)` depends on the constant, other `\(X\)`s and their parameter estimates.
 
 Unlike in a linear regression model, 
-the first derivative of our (binary) logit function depends on X and \\(\hat\beta\\):
+the first derivative of our (binary) logit function depends on `\(X\)` and \\(\hat\beta\\):
 
 $$  \frac{\partial\Pr(\hat{Y}_i = 1)}{\partial X_k} \equiv \lambda(X) = \frac{\exp(X_i\hat\beta)}{[1 + \exp(X_i\hat\beta)]^2}\hat\beta_k $$
 ]
 
 .pull-right[
-Practically, this means that if you’re interested in the effect of a one-unit change in X on Pr(Yi = 1), 
+Practically, this means that if you’re interested in the effect of a one-unit change in `\(X\)` on `\(Pr(Y_i = 1)\)`, 
 how much change there is depends critically on “where you are on the curve”.
 
 &lt;img src="STAT_L5_Binary_files/figure-html/predprobplot-1.png" width="504" /&gt;
 
-We need to calculate predicted probabilities of Y at specific values of key predictors.
+This means we need to calculate predicted probabilities of `\(Y\)` at specific values of key predictors.
 ]
 
 ---
@@ -1053,13 +1068,14 @@ predict(fullmodel, newdata=test, type="response")
 Marginal effects (ME) are popular in some disciplines (e.g. Economics) 
 because they offer some of the same advantages that the Linear Probability Model (LPM) does:
 a good, single number approximation to the amount of change in \\(\Pr(Y=1)\\) 
-produced by a 1-unit change in X.
+produced by a 1-unit change in `\(X\)`.
 
 These are marginal effects, because they show how \\(\Pr(Y=1)\\) changes after controlling for all other variables in the model.
 
 However, some argue that marginal effects for categorical independent variables are easier to understand and also more useful than marginal effects for continuous variables.
 
-
+Plotting marginal effects is made super easy by the `{sjPlot}` package in R.
+See [here](https://strengejacke.github.io/sjPlot/articles/plot_marginal_effects.html).
 ]
 
 .pull-right[
@@ -1067,21 +1083,18 @@ However, some argue that marginal effects for categorical independent variables 
 ```r
 plot_model(fullmodel, type = "pred", 
      terms = c("VotedBush","Republican"),
-     colors = c("blue","red"))
+     colors = c("blue","red")) + 
+  theme_minimal()
 ```
 
 &lt;img src="STAT_L5_Binary_files/figure-html/plotmargins-1.png" width="504" /&gt;
 ]
 
-???
-
-See [here](https://strengejacke.github.io/sjPlot/articles/plot_marginal_effects.html) for more on `sjPlot`'s `plot_model()`.
-
 ---
 ### Average Marginal Effects
 
 One can also calculate AMEs (average marginal effects), 
-which are the differences in values associated with a unit change in the specified covariate.
+which represent the average differences in values associated with a unit change in the specified covariate.
 
 
 ```r
@@ -1095,7 +1108,7 @@ summary(margins(fullmodel))
 ##             VotedBush 0.0134 0.0043 3.0950 0.0020 0.0049 0.0219
 ```
 
-This suggests that being a Republican senator increases the probability of voting for war by 32 percentage points.
+This suggests that being a Republican senator increases the probability of voting for war by 32 percentage points _on average_.
 
 Each percentage point increase in the proportion that had voted for Bush over Gore in the previous presidential election
 increases the probability of voting for war by ~1 percentage point.
@@ -1103,15 +1116,16 @@ increases the probability of voting for war by ~1 percentage point.
 ---
 ## Summary
 
-So, logit interpretation harder (more involved, actually) than OLS, BUT ...
-- Not that much harder
+So, logit interpretation harder than OLS, BUT ...
+- Not that much harder (actually just “more involved”)
 - Different approaches to support interpretation 
 
 --
 
 For now, remember three key points:
-1. Nearly all of these approaches require one to be cognizant of “where we are on the curve.”
-2. When it comes to any kind of interpretation, a picture really is much more valuable than text or tables.
+1. Nearly all of these approaches require one to be cognizant of “where we are on the curve”.
+2. When it comes to interpretation, a picture really is often more valuable than text or tables,
+and can help guard against misinterpretation.
 3. With very rare exceptions, never a good idea to present quantities of interest without their associated measures of uncertainty.
 
 ---
