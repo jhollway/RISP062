@@ -1152,25 +1152,27 @@ We’ll talk about three general ways of conveying this information:
 - ROC curves.
 
 We must now examine the model to understand how well it fits the data and generalizes to other observations. 
-The evaluation process involves the assessment of three distinct areas – goodness of fit, tests of individual predictors, and validation of predicted values – in order to produce the most useful model. 
-While the following content isn’t exhaustive, it should provide a compact ‘cheat sheet’ and guide for the modeling process.
+The evaluation process involves the assessment of three distinct areas of model utility:
+goodness of fit, tests of individual predictors, and validation of predicted values. 
+While the following content isn’t exhaustive, 
+it should provide a compact ‘cheat sheet’ and guide for the modeling process.
 
 ---
-### Pseudo-R2
+### Pseudo R-squared
 
-One natural place to start would be to ask whether we can just use \\(R^2\\) or the equivalent. 
-But unlike with OLS, there is no \\(R^2\\) statistic that explains the proportion of variance 
-in the dependent variable that is explained by the predictors. 
+One place to start would be to ask whether we can just use the \\(R^2\\). 
+However, there is no \\(R^2\\) statistic that explains the proportion of variance 
+in the dependent variable that is explained by the predictors like with OLS. 
 
-However, there are a number of so-called pseudo-\\(R^2\\) metrics based on some function of the null and model log-likelihoods. 
-Most notable is McFadden’s \\(R^2\\):
+Number of so-called pseudo-\\(R^2\\) metrics based on comparing log-likelihoods though, 
+e.g. McFadden’s \\(R^2\\):
 - defined as \\(1 - \frac{\log L_F}{\log L_0}\\) where \\(\log(L_F)\\) is the log likelihood value for the fitted model and \\(\log(L_0)\\) is the log likelihood for the null model with only an intercept as a predictor. 
 - ranges from 0 to just under 1, with values closer to zero indicating that the model has no predictive power.
 
+.pull-left-1[
 
 ```r
-library(pscl)
-pR2(fullmodel)  # look for 'McFadden'
+pscl::pR2(fullmodel)["McFadden"]
 ```
 
 ```
@@ -1178,19 +1180,18 @@ pR2(fullmodel)  # look for 'McFadden'
 ```
 
 ```
-##         llh     llhNull          G2    McFadden        r2ML        r2CU 
-## -35.9421472 -53.9276341  35.9709740   0.3335115   0.3021211   0.4578199
+##  McFadden 
+## 0.3335115
 ```
+]
 
-Not always all that useful though as they can have odd statistical properties and rarely offer an intuitive substantive interpretation (Maddala 1983):
-- Even for a “perfect fit” model, the pseudo-\\(R^2\\) will be less than 1.0, and sometimes, a lot less...
-- Doesn’t really tell us anything that we can’t also get from the global LR test.
+.pull-right-2[
+Not always all that useful though (Maddala 1983): 
+- Odd statistical propertise: Even for a “perfect fit” model, the pseudo-\\(R^2\\) will be less than 1.0, and sometimes, a lot less...
+- Rarely offers intuitive substantive interpretation and doesn’t really tell us anything that we can’t also get from the global LR test.
 
-???
-
-Frankly, I don’t advise using pseudo-\\(R^2\\)s, though in the end that’s your choice.
-
-There is some discussion of pseudo-\\(R^2\\) [here](https://statisticalhorizons.com/r2logistic).
+Generally, I don’t advise using pseudo-\\(R^2\\)s, see more discussion [here](https://statisticalhorizons.com/r2logistic).
+]
 
 ---
 ### Akaike’s information criterion (AIC)
@@ -1199,8 +1200,7 @@ Better to report the log-likelihood and use AIC and BIC to compare models (as di
 
 
 ```r
-partyonly &lt;- glm(War ~ Republican, data=iraqVote, 
-                 family=binomial(link="logit"))
+partyonly &lt;- glm(War ~ Republican, data=iraqVote, family=binomial(link="logit"))
 tab_model(partyonly, fullmodel, show.loglik = T, show.aic = T, show.r2 = F)
 ```
 
@@ -1272,18 +1272,21 @@ This is good, but it doesn't tell us whether the lower LogL/AIC in the full mode
 
 ### Likelihood Ratio Test
 
-We discussed the likelihood ratio test last week.
+We introduced the likelihood ratio test last week.
 Removing predictor variables from a model will almost always make the model fit less well.
 
 The LRT compares the likelihood scores of the two models to determine 
 if the difference between the two is statistically significant.
-We can thus test whether the predictors are jointly significant.
+We can thus test whether the predictors are _jointly significant_.
 
-The null hypothesis is that the reduced (smaller) model is true, and the alternative is that the complete (larger) model is true.
+`\(H_0\)` is that the reduced/restricted/smaller model is true, 
+and `\(H_a\)` is that complete/general/larger model is true.
 
-Given that H0 holds that the reduced model is true, a p-value for the overall model fit statistic that is less than 0.05 would compel us to reject the null hypothesis. 
+A `\(p\)`-value for the overall model fit statistic less than 0.05 would compel us to reject the null hypothesis. 
 
 It would provide evidence against the reduced model in favor of the current model.
+
+...`fullmodel` fits the data significantly better!
 
 ]
 
@@ -1306,8 +1309,7 @@ anova(partyonly, fullmodel, test ="Chisq")
 ```
 
 ```r
-library(lmtest)
-lrtest(partyonly, fullmodel)
+lmtest::lrtest(partyonly, fullmodel)
 ```
 
 ```
@@ -1322,8 +1324,6 @@ lrtest(partyonly, fullmodel)
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ```
 
-Fullmodel fits the data significantly better!
-
 ]
 
 ???
@@ -1333,18 +1333,18 @@ The likelihood ratio test can be performed in R using the lrtest() function from
 ---
 .pull-left-1[
 
-![](https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Precisionrecall.svg/350px-Precisionrecall.svg.png)
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Sensitivity_and_specificity_1.01.svg/341px-Sensitivity_and_specificity_1.01.svg.png)
 
 ]
 
-## Classification evaluation
+## Classification Evaluation
 
-Sensitivity and specificity are used together as measures of accuracy.
-I.e. sensitivity quantifies the avoidance of false negatives and specificity does the same for false positives. 
-For any test, there is usually a trade-off between the measures – for instance, in airport security.
+Since logistic regression is a classificatory exercise,
+we can also consider the .red[accuracy] of the model in terms of
+- .red[sensitivity] (quantifying the avoidance of false negatives, or probability of detection) and
+- .red[specificity] (the same for false positives, or probability of false alarm).
 
-Precision and recall are used together as measures of relevance.
-I.e. precision is "how useful the model results are", and recall is "how complete the results are".
+Classificatory tests (e.g. airport security, COVID) trade off between these two.
 
 .pull-center[
 
@@ -1363,40 +1363,66 @@ Predicted condition negative | False negative (Type II error) | True negative (T
 
 ### ROC Curves
 
-The “receiver operating characteristic” (ROC) is a measure of classifier performance,
-based on the proportion of positive data points that are correctly considered as positive 
-and the proportion of negative data points that are mistakenly considered as positive. 
+.red[Receiver operating characteristic] (ROC) curve plots classifier performance,
+visualising [trade-off](https://www.r-bloggers.com/roc-curves/) between 
+TPR (Sensitivity) and TNR (1-Specificity).
 
-The ROC is usually visualised as a trade-off between 
-rate of correct predictions versus rate of incorrect predictions.
-But we can also summarise the area under the ROC curve (AUROC or AUC) as a measure. 
-The metric ranges from 0.50 to 1.00, and some good rules of thumb for interpretation are:
-- Area under ROC = 0.90-1.00 = Excellent (A)
-- Area under ROC = 0.80-0.90 = Good (B)
-- Area under ROC = 0.70-0.80 = Fair (C) 
-- Area under ROC = 0.60-0.70 = Poor (D)
-- Area under ROC = 0.50-0.60 = Total Failure (F)
+Basically, ROC traces %TPR as prediction cutoff 1-&gt;0. 
+&lt;!-- As cutoff lowered, model should mark more of actual 1’s as 1 and fewer actual 0’s as 1’s.  --&gt;
+I.e. curve should rise steeply, indicating that TPR (y-axis) rises faster than FPR (x-axis) as cutoff decreases. 
+
+Following the ROC's [nice probabilistic interpretation](https://www.r-bloggers.com/probabilistic-interpretation-of-auc/),
+we can measure the .red[Area under ROC] curve (AUROC or AUC) to summarise overall classifier performance.
+
+AUC ranges from 0.50 to 1.00, with higher better:
+- 0.90-1.00 = Excellent (A)
+- 0.80-0.90 = Good (B)
+- 0.70-0.80 = Fair (C) 
+- 0.60-0.70 = Poor (D)
+- 0.50-0.60 = Total Failure (F)
 
 ]
 
 .pull-right[
 
+.panelset[
+.panel[
+.panel-name[Code]
 
 ```r
 library(plotROC)
 test &lt;- data.frame(resp = c(iraqVote$War), 
-                    PartyOnly = predict(partyonly, iraqVote, type="response"),
-                    FullModel = predict(fullmodel, iraqVote, type="response"))
-test &lt;- melt_roc(test, "resp", c("PartyOnly","FullModel"))
-out &lt;- ggplot(test, aes(d = D, m = M, colour = name)) +
-   geom_roc(n.cuts = 0) + style_roc(theme = theme_grey)
-out + annotate("text", x = .75, y = .25, label = paste(paste(unique(test$name), "AUC =", round(calc_auc(out)$AUC, 2)), collapse = "\n"))
+          PartyOnly = predict(partyonly, 
+                         iraqVote, 
+                         type="response"),
+          FullModel = predict(fullmodel, 
+                         iraqVote, 
+                         type="response"))
+test &lt;- melt_roc(test, "resp", 
+                 c("PartyOnly","FullModel"))
+out &lt;- ggplot(test, 
+              aes(d = D, m = M, 
+                  colour = name)) +
+  geom_roc(n.cuts = 0) + 
+  style_roc(theme = theme_minimal)
+out + annotate("text", x = .75, y = .25, 
+        label = paste(paste(unique(test$name), 
+                      "AUC =", round(calc_auc(
+                        out)$AUC, 2)), 
+                      collapse = "\n"))
 ```
+]
 
-&lt;img src="STAT_L5_Binary_files/figure-html/roc-1.png" width="504" /&gt;
+.panel[
+.panel-name[Plot]
+![](STAT_L5_Binary_files/figure-html/roc-1.png)
+By these criteria, full voting model predicts well,
+but model including only party misses information necessary
+to better distinguish positive and negative cases.
+]
+]
 
-By these criteria, our full voting model predicts well,
-but a model including only party predicts fairly well.
+
 ]
 
 ???
@@ -1404,29 +1430,33 @@ but a model including only party predicts fairly well.
 Another option for plotting ROC curves is the [`MLeval` package](https://www.r-bloggers.com/how-to-easily-make-a-roc-curve-in-r/).
 
 ROC curves were invented during WWII to help radar operators decide whether the signal they were getting indicated the presence of an enemy aircraft or was just noise. 
-The AUC has a [nice probabilistic meaning](https://www.r-bloggers.com/probabilistic-interpretation-of-auc/).
-You can learn more about [the history and the tradeoffs](https://www.r-bloggers.com/roc-curves/) involved with ROC-AUCs.
-
-Receiver Operating Characteristics Curve traces the percentage of true positives accurately predicted by a given logit model as the prediction probability cutoff is lowered from 1 to 0. 
-For a good model, as the cutoff is lowered, it should mark more of actual 1’s as positives and lesser of actual 0’s as 1’s. 
-So for a good model, the curve should rise steeply, indicating that the TPR (Y-Axis) increases faster than the FPR (X-Axis) as the cutoff score decreases. 
-Greater the area under the ROC curve, better the predictive ability of the model.
-Bear in mind that ROC curves can examine both target-x-predictor pairings and target-x-model performance.
-
-Precision recall (PR) curves are useful for model evaluation when there is an extreme imbalance in the data and the analyst is interested particuarly in one class. 
-A good example is credit card fraud, where the instances of fraud are extremely few compared with non fraud.
-PR curves are sensitive to which class is defined as positive, unlike the ROC curve which is a more balanced method.
-PR curves are sensitive to class distribution, so if the ratio of positives to negatives changes across different analyses, then the PR curve cannot be used to compare performance between them. This is because the chance line varies between datasets with different class distributions.
-PR curves, because they use precision, instead of specificity (like ROC) can pick up false positives in the predicted positive fraction. This is very helpful when negatives &gt;&gt; positives. 
-In these cases, the ROC is pretty insensitive and can be misleading, whereas PR curves reign supreme.
-The area under the PR curve does not have a probabilistic interpretation like ROC.
 
 ---
+.pull-left-1[
+## PR Curves
 
+![:scale 70%](https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Precisionrecall.svg/350px-Precisionrecall.svg.png)
+]
 
-```r
-library(MLeval)
-```
+We might also be interested in the .red[relevance] of the model
+through the concepts of
+.red[precision] (how useful positives are) and
+.red[recall] (how complete the results are).
+
+.red[Precision recall] (PR) curves are useful for model evaluation when:
+- there is an extreme imbalance in the data, and 
+- analyst is interested particuarly in one class
+
+E.g. credit card fraud, where fraud extremely rare compared with non fraud.
+
+PR curves are sensitive to: 
+- which class is defined as positive, unlike the ROC curve which is a more balanced method.
+- class distribution, so if the ratio of positives to negatives changes across different analyses, then the PR curve cannot be used to compare performance between them.
+- false positives (because they use precision instead of specificity in combination with recall/sensitivity), which is very helpful when negatives &gt;&gt; positives. 
+
+So if many more negatives than positives, use PR curves instead.
+
+Unfortunately, the area under the PR curve does not have a probabilistic interpretation like ROC.
 
 ---
 background-image: url(https://i2.wp.com/modelplot.github.io/img/cartoonrocplot.jpg?w=456&amp;ssl=1)
