@@ -67,28 +67,43 @@ class: center, middle
 ---
 ## Binary response variables
 
-Some response variables intrinsically binary; 
-others binary “versions” of some other variable...
-- Voting for a Republican or a Democrat
+.pull-left[
+Some response variables are intrinsically binary because they exist or they don’t:
 - Going to war or not
-- Whether a country ratifies a country or not
-- Whether a country is a democracy or not (sort of...)
+- Whether a country ratifies an international agreement or not
+]
 
-How do we deal with such response variables?
+.pull-right[
+Others effectively binary, represented as binary out of convenience,
+or to concentrate on polar choices:
+- Whether a country is a democracy or not (sort of...)
+- Voting for a Republican or a Democrat
+]
+
+--
+
+.pull-left[
+![](https://contentblog.abaenglish.com/wp-content/uploads/2014/10/18141105/throw-the-baby-out-660x200.jpg)
+]
+
+.pull-right[
+Quick rant:
+Dichotomizing continuous variables replaces information 
+with arbitrary assumptions.
+
+Even worse when done with multiple variables.
+If we .red[median split] two variables (e.g. $ and shoe size),
+both will have identical distributions... `\(\mu = .5, \sigma = .252\)`.
+
+Moreover, impossible to “get back to” underlying mean or variance on basis of 0/1 indicators.
+]
+
+--
+
+So binary response variables common and flexible, but we need to be careful. So, how do we model them?
 
 ???
 
-But quickly, a rant: Dichotomizing continuous variables throws away information, and replaces data with assumptions that are arbitrary but necessary (typically a bad combination).
-
-It's even worse when you do this to multiple variables.
-
-Consider two continuous variables: Y = personal income and Z = shoe size.
-
-Let's say we use a median split (dichotomize them so that observations falling above the median get a value of one, and the rest get zeros)
-
-Both dichotomous variables will have mean = 0.5, and identical variances (0.252).
-
-Moreover, it's impossible to “get back to” the mean or the variance of either variable on the basis of the 0/1 indicators alone.
 
 This is why _measurement_ is really one of the most important parts of all statistics... nay, research!
 
