@@ -248,11 +248,17 @@ So here we have some data on senators voting to authorise the use of military fo
 &lt;img src="STAT_L5_Binary_files/figure-html/xyc-1.png" width="504" /&gt;
 ]
 
-One option, called the Linear Probability Model (LPM), is just to do a regular OLS regression of Y on X, but with a binary response variable.
+.pull-right-2[
+One option, called the .red[Linear Probability Model] (LPM), 
+is just to do a regular OLS regression of `\(Y\)` on `\(X\)`, 
+but with a binary response variable.
+]
 
 --
 
-We model the expected value of Y as linear function of X, \\( E(Y) = \beta X \\), 
+.pull-right-2[
+
+We model the expected value of `\(Y\)` as linear function of `\(X\)`, \\( E(Y) = \beta X \\), 
 which in the binary case is:
 
 $$ E(Y) = \Pr(Y = 1) = 1[\Pr(Y = 1)] + 0[\Pr(Y = 0)]   $$
@@ -261,15 +267,15 @@ So we model:
 
 $$  \Pr(Y_i = 1) = \beta X_i $$
 
-The result (in one continuous independent variable) looks like Figure 1.
+The figure shows this result (for one continuous independent variable).
+
+]
 
 --
 
-This is called the linear probability model (LPM).
+.pull-left[
 
---
-
-Can you spot any potential problems with this?
+Can you spot any potential problems with this?]
 
 ---
 ## What's wrong with this?
@@ -279,28 +285,33 @@ Can you spot any potential problems with this?
 &lt;img src="STAT_L5_Binary_files/figure-html/xyc2-1.png" width="504" /&gt;
 ]
 
+.pull-right-2[
 __Nonsensical predictions__ (i.e., probabilities that are &lt; 0 or &gt; 1):
 
-If you call voting yea=1 and nay=0, does it make sense to say they're 0.6, 0.9, or 1.2 for yea?
+If aye=1 and nay=0, what is 0.6, 0.9, or 1.2 aye?
+]
 
 --
 
+.pull-right-2[
 __Heteroskedastic variance__ by construction:
 
-Since Y is binomial, \\(Var(Y) = E(Y)[1 - E(Y)] = X_i\beta(1 - X_i\beta)\\)
+Since `\(Y\)` is binomial, \\(Var(Y) = E(Y)[1 - E(Y)] = X_i\beta(1 - X_i\beta)\\), 
+error term can only take on two values: either \\( 1 - X_i\beta \\) (distance from prediction to 1) or \\(-X_i\beta\\) (distance from prediction to 0).
 
-So error term can only take on two values: either \\( 1 - X_i\beta \\) (distance from prediction to 1) or \\(-X_i\beta\\) (distance from prediction to 0).
-
-So errors can never be normally distributed, implying that traditional t-tests for individual significance and F-tests for overall
+So errors _never_ normally distributed, 
+implying that traditional _t_-tests for individual significance and _F_-tests for overall
 significance are invalid.
+]
 
 --
 
 Wrong __functional form__:
 
-We’d usually expect variables that impact probabilities to exhibit diminishing returns: as their value increases, the impact on Y would decrease.
-We want diminishing returns because 100% certainty something will happen should be rare.
-LPM doesn’t allow this; is constant for all values of X and Y.
+We’d usually expect variables that impact probabilities to exhibit diminishing returns: 
+as their value increases, the impact on `\(Y\)` would decrease.
+We want diminishing returns because 100% certainty something will happen _should_ be rare.
+LPM doesn’t allow this; is constant for all values of `\(X\)` and `\(Y\)`.
 
 ---
 ## So what?
@@ -310,7 +321,7 @@ OLS point estimates \\( \hat\beta \\) remain unbiased estimates of the true para
 
 --
 
-That's why you still sometimes see LPM used in econometrics or experimental studies because:
+That’s why you still LPM used sometimes in econometrics or experimental studies because:
 - **Interpretability**: OLS estimates intuitive to understand and interpret; output from logits/probits less so.
 - **Similar model fit**: If probabilities you are modelling are moderate (say mostly between .2 and .8), then linear and logistic models (next) fit about equally well.
 
@@ -322,7 +333,7 @@ Still, if you submit an LPM to a polisci journal these days, you’ll get __desk
 The rationale is that we have no real excuse not to use more appropriate models,
 which are very common and well understood by now.
 
-What's the alternative?
+So, what’s the alternative?
 ]
 
 .pull-right[
