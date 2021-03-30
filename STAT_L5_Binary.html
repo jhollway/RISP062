@@ -342,63 +342,123 @@ So, what’s the alternative?
 
 ---
 
-.pull-left-2[
 ## Logistic regression
 
-Logistic regression is a linear regression applied to categorical outcomes using a logit _link function_.
-This link function allows us to linearly relate X to Y.
-How does this work? Three steps:
+.red[Logistic regression] is a .red[generalized linear model] (GLM) applied to categorical outcomes 
+using a .red[logit link function].
+Because it represents a way to relate discrete or continuous variables to a discrete outcome,
+it forms the basis for many classification problems, as we shall see.
 
-__First__, binary outcomes are binary, 0 or 1, and we want something continuous.
-The solution is to consider the _probability_ of the outcome being one or the other.
-This gives us \\([0,1]\\).
+--
 
-__Second__, probabilities are bounded between 0 and 1, and we want something unbounded.
-The solution is to get the _odds_ of the probability of something happening: \\(\frac{p}{1-p}\\).
-Since probability can never be less than 0 or greater than 1, 
-this gives us \\([0,+\infty]\\).
+### What’s the difference between the logit and the logistic?
 
-__Third__, odds are still lower bounded at zero and are badly skewed.
-The solution is to take the log of the odds \\(\log(\frac{p}{1-p})\\), commonly called the _logit_.
-This gives us \\([-\infty,+\infty]\\).
+Recall that in GLMs, 
+instead of using Y as the outcome, \\(\mu_Y\\), 
+we use a .red[link function] of the mean of Y, \\(f(\mu_Y)\\).
 
-The logit is therefore best link function for categorical DVs, 
-in which \\(\exp(\beta)\\) is a (biased) estimate for the corresponding odds ratio. 
-]
+The .red[logit] is a link function/transformation of a parameter \\(\pi\\).
+We transform probability, \\(\pi\\), into odds, \\(\frac{\pi}{1-\pi}\\), and then take the log, \\(\log(\frac{\pi}{1-\pi})\\).
+This link function allows us to linearly relate `\(X\)` to `\(Y\)`.
 
-.pull-right-1[
+The .red[logistic] is the inverse of the logit, \\(\frac{\exp(x)}{1 + \exp(X)}\\).
+We get it by exponentialising out of the log-odds framework.
+
+We use the logit link function to linearly relate the RHS to the LHS, \\(\log(\frac{\pi}{1-\pi}) = X\beta\\),
+and the logistic inverse of that to talk about probabilities, \\(\pi = \frac{\exp(x)}{1 + \exp(X)}\\).
+
+--
+
+Huh? I’ll walk you through in four steps...
+
+---
+## Four steps
+
+.pull-left[
 
 &lt;img src="STAT_L5_Binary_files/figure-html/probs-1.png" width="504" /&gt;
+]
+
+.pull-right[
+__First__, binary outcomes are binary, 0 or 1, and we want something continuous
+so that we can relate a continuous left-hand side to a continuous right-hand side.
+The solution is to reconceptualise the outcome or response not as the raw value
+but the _probability_ of the outcome being one or the other.
+This gives us \\([0,1]\\).
+]
+
+--
+
+.pull-left[
 
 &lt;img src="STAT_L5_Binary_files/figure-html/oddsdist-1.png" width="504" /&gt;
+
+]
+
+.pull-right[
+__Second__, probabilities are bounded between 0 and 1, and we want something unbounded.
+The solution is to get the _odds_ of the probability of something happening: \\(\frac{p}{1-p}\\).
+We’ll talk a little more about odds later.
+Since probability can never be less than 0 or greater than 1, 
+this gives us \\([0,+\infty]\\).
+]
+
+---
+
+.pull-left[
 
 &lt;img src="STAT_L5_Binary_files/figure-html/logitdist-1.png" width="504" /&gt;
 
 ]
 
+.pull-right[
+__Third__, odds are still lower bounded at zero and are badly skewed.
+The solution is to take the log of the odds, .red[log-odds] = `\(\log(\frac{p}{1-p})\)`, commonly called the .red[logit].
+This gives us `\([-\infty,+\infty]\)`, 
+which is finally the range that the linear RHS could take.
+]
+
+
+--
+
+.pull-left[
+
+&lt;img src="STAT_L5_Binary_files/figure-html/logistdist-1.png" width="504" /&gt;
+
+]
+
+.pull-right[
+__Lastly__, we take the inverse of the logit to give the .red[logistic] curve.
+This offers a nice sigmoidal curve (i.e. S-shaped).
+
+Log-odds used for a while, e.g. by Charles Sanders Pierce in the late 19th century.
+Logit transformation and logistic regression developed into roughly current form by Sir David Cox in 1960’s. 
+Generalized linear models with various link functions came later.
+]
+
 ???
-
-Think about the binary case: Y can have only values of 1 or 0, and we’re really interested in how a predictor relates to the probability that Y=1. But we can’t use the probability itself as the function above. There are two big reasons:
-
-1. Probability can only have values between 0 and 1, whereas the right hand side of the equation can vary from -∞ to ∞.
-
-2. The relationship between probability and the predictors isn’t linear, it’s sigmoidal (a.k.a., S-shaped).
 
 So we need a function of the probability that does two things: (1) converts a probability into a value that runs from -∞ to ∞ and (2) has a linear relationship with the Xs.
 
-Log-odds have been used for a while, e.g. by Charles Sanders Pierce, the pragmatist, in the late 19th century.
-The logit transformation and the logistic regression model was developed into more or less its current form by Sir David Cox in the 1960’s. 
-The extension of the model to general linear models using various link functions came later.
+---
+## But what does this mean?
 
-There are three ways of conceiving of this transformation:
+Three ways of conceiving of this transformation:
+
 1. As an expression of odds of observing (I personally find this most intuitive)
+
 1. As a continuous/latent/unobservable \\(Y^\*\\) that relates somehow to the observed values of Y (\\(Y^\*\\) is not part of your data, it is part of the model). 
-You assume that Y equals to 1 if the signal of \\(Y^\*\\) is above some threshold, and otherwise Y is equal to zero. 
-Furthermore, assume, without loss of generality, that this threshold is zero.
+I.e. assume that `\(Y=1\)` if the signal of \\(Y^\*\\) is above some threshold, and otherwise `\(Y=0\)`. 
+&lt;!-- Furthermore, assume, without loss of generality, that this threshold is zero. --&gt;
+
 1. As an expression of choice based on some utility function
 
+--
+
+I'll elaborate on this a bit more next time...
+
 ---
-## The Standard Logistic Distribution
+## Logistic PDF
 
 .pull-left[
 If we assume that the error term follows a standard logistic distribution, we get a logit model...
@@ -421,8 +481,9 @@ The standard logistic has the following characteristics:
 
 ```r
 ggplot(data.frame(x = c(-4, 4)), aes(x = x)) +
-stat_function(fun = dlogis, colour = "red") +
-stat_function(fun = dnorm, colour = "blue")
+stat_function(fun = dnorm, colour = "blue") +
+stat_function(fun = dlogis, colour = "red") + 
+  theme_minimal()
 ```
 
 &lt;img src="STAT_L5_Binary_files/figure-html/pdfcompare-1.png" width="504" /&gt;
@@ -439,10 +500,10 @@ The logit function is the inverse of the logistic function, and the logistic fun
 Logistic regression estimation obeys the maximum entropy principle, and thus logistic regression is sometimes called “maximum entropy modeling”, and the resulting classifier the “maximum entropy classifier”.
 
 ---
-## The Standard Logistic Cumulative Distribution Function
+## Logistic CDF
 
 .pull-left[
-Once we assume that error is distributed according to the standard logistic, we can say something about the probability that Y = 1:
+Once we assume that error is distributed according to the standard logistic, we can say something about the probability that `\(Y = 1\)`:
 
 $$ \Pr(Y_i = 1) = Y_i^* &gt; 0 = \Pr(u_i ≥ -X_i\beta)    $$
 
@@ -463,27 +524,15 @@ As an example, consider some values for _u_:
 
 ```r
 ggplot(data.frame(x = c(-4, 4)), aes(x = x)) +
-stat_function(fun = plogis, colour = "red") +
-stat_function(fun = pnorm, colour = "blue")
+stat_function(fun = pnorm, colour = "blue") +
+stat_function(fun = plogis, colour = "red") + 
+  theme_minimal()
 ```
 
 &lt;img src="STAT_L5_Binary_files/figure-html/cdfcompare-1.png" width="504" /&gt;
 
 Notice the sigmoidal curve and the thick tails!
 ]
-
-???
-
-What's the difference between _logistic_ and _logit_?
-
-The _logit_ is a link function/transformation of a parameter \\(\pi\\).
-We transform probability, \\(\pi\\), into odds, \\(\frac{\pi}{1-\pi}\\), and then take the log, \\(\log(\frac{\pi}{1-\pi})\\).
-
-The _logistic_ is the inverse of the logit, \\(\frac{\exp(x)}{1 + \exp(X)}\\).
-We get it by exponentialising out of the log-odds framework.
-
-We use the logit link function to linearly relate the RHS to the LHS, \\(\log(\frac{\pi}{1-\pi}) = X\beta\\),
-and the logistic inverse of that to talk about probabilities, \\(\pi = \frac{\exp(x)}{1 + \exp(X)}\\).
 
 ---
 ## Now we can MLE like last time!
@@ -514,7 +563,7 @@ $$ \Pr(Y_i = 1) = \frac{\exp(X_i\beta)}{1 + \exp(X_i\beta)} $$
 ]
 
 .pull-down[
-This yields a standard binary logit model,
+This yields a .red[standard binary logit model],
 and then all we need to do is maximize this log-likelihood with respect to \\(\beta\\)s to obtain our MLEs!
 ]
 
