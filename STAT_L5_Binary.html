@@ -958,7 +958,7 @@ Can then also translate into percentage change in odds:
 
 E.g. logit estimate \\(\hat\beta\\) = 3.02, means being Republican
 - ...increases the log-odds of voting for war by 3.02
-- ...increases the odds by \\(\exp(3.02) = 20.47\\)
+- ...increases the odds by \\(\exp(3.02) = 20.47\\) (or 20.49)
 - ...increases the odds by \\(100[\exp(3.02)-1] = 1947\\)%
 
 What you _cannot_ say: Republicans 1947% more likely to vote for war:
@@ -1406,7 +1406,7 @@ out &lt;- ggplot(test,
   geom_roc(n.cuts = 0) + 
   style_roc(theme = theme_minimal)
 out + annotate("text", x = .75, y = .25, 
-        label = paste(paste(unique(test$name), 
+        label = paste(paste(unique(test$name)[2:1], 
                       "AUC =", round(calc_auc(
                         out)$AUC, 2)), 
                       collapse = "\n"))
