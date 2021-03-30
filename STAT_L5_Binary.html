@@ -583,25 +583,18 @@ please make an appointment during my office hours!
 
 ### Probit (Probability Logit, though perhaps better called the "normit")
 
-It assumes errors in the underlying latent equation distributed _normally_
-  - That is, probit uses a normal distribution link function, while logit uses a logistic link function
+Main difference theoretical. It assumes errors in the underlying latent equation distributed _normally_. That is,
+  - .red[logit] uses a logistic link function \\(f(\mu_Y) = \log(\frac{\pi}{1-\pi})\\)
+  - .red[probit] uses an inverse normal distribution link function \\(f(\mu_Y) = \Phi^{-1}(P)\\)
 
-Some argue that assuming normal errors is better justified than (standard) logistic errors (because of the central limit theorem, etc.).
-  - Because the standard logistic distribution has a larger variance, it will also yield larger estimated  \\(\hat\beta\\) (and correspondingly larger standard error estimates).
+Some (e.g. some economists) argue assuming normal errors better justified because of the central limit theorem, etc.
+  - Since standard logistic distribution has a larger variance, will also yield larger estimated  \\(\hat\beta\\) (and s.e.).
   - As a result, logit estimates are usually roughly 1.8 times the size of probit ones (which is \\(\approx \sqrt{3.29}\\) - recall that the variance of the standard normal is 1, while that for the standard logistic is 3.29).
 
 BUT, because the CDF of the standard normal has no closed form solution, can’t figure out integral through algebra/calculus, and instead have to approximate it numerically (hence _z_-tables).
 And THOUGH we can approximate it very accurately, we can’t simply figure out probit probabilities using a garden-variety hand calculator.
 
 ???
-
-The real difference between logit and probit is theoretical: they use different link functions.
-
-In generalized linear models, instead of using Y as the outcome, \\(\mu_Y\\), we use a function of the mean of Y, \\(f(\mu_Y)\\). This is the link function.
-
-Logistic regression uses a logit link function: \\(f(\mu_Y) = \log(\frac{\pi}{1-\pi})\\)
-
-Probit regression uses an inverse normal link function: \\(f(\mu_Y) = \Phi^{-1}(P)\\)
 
 In practice, you could use logit or probit (just slightly different log-odds),
 but there are some considerations:
