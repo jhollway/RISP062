@@ -5,6 +5,14 @@
     <meta charset="utf-8" />
     <meta name="author" content="James Hollway" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/clipboard/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
     <link href="libs/table1/table1_defaults.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.githubraw.com/jhollway/iheidmyninja/7b9e9101/iheid-xaringan-style.css" type="text/css" />
   </head>
@@ -31,7 +39,7 @@ class: center, middle
 
 .pull-1[.circleon[![](https://us.123rf.com/450wm/evgen79/evgen791307/evgen79130700021/20661978-seamless-pattern-with-a-binary-code-for-your-design.jpg?ver=6)]]
 .pull-1[.circleon[![](https://pbs.twimg.com/profile_images/981544484684075008/lHu4ogWd_400x400.jpg)]]
-.pull-1[.circleon[![](https://www.coopathome.ch/img/produkte/880_880/RGB/6117246_001.jpg?_=1524058709415)]]
+.pull-1[.circleon[![](https://media1.popsugar-assets.com/files/thumbor/DQR_gcgFpNMyxR9VJyzHcIhDqRE/fit-in/1024x1024/filters:format_auto-!!-:strip_icc-!!-/2014/07/01/913/n/1922564/f9362b9be11d3b4a_suits-new/i/Ill-Fitting-Suits.jpg)]]
 
 ???
 
@@ -54,7 +62,7 @@ class: center, middle
 
 .pull-1[.circleon[![](https://us.123rf.com/450wm/evgen79/evgen791307/evgen79130700021/20661978-seamless-pattern-with-a-binary-code-for-your-design.jpg?ver=6)]]
 .pull-1[.circleoff[![](https://pbs.twimg.com/profile_images/981544484684075008/lHu4ogWd_400x400.jpg)]]
-.pull-1[.circleoff[![](https://www.coopathome.ch/img/produkte/880_880/RGB/6117246_001.jpg?_=1524058709415)]]
+.pull-1[.circleoff[![](https://media1.popsugar-assets.com/files/thumbor/DQR_gcgFpNMyxR9VJyzHcIhDqRE/fit-in/1024x1024/filters:format_auto-!!-:strip_icc-!!-/2014/07/01/913/n/1922564/f9362b9be11d3b4a_suits-new/i/Ill-Fitting-Suits.jpg)]]
 
 ---
 ## Binary response variables
@@ -88,15 +96,15 @@ This is why _measurement_ is really one of the most important parts of all stati
 ## Today's data
 
 .pull-left[
-![](https://static01.nyt.com/images/2020/01/12/us/politics/00biden2002/00biden2002-superJumbo.jpg)
+![:scale 90%](https://static01.nyt.com/images/2020/01/12/us/politics/00biden2002/00biden2002-superJumbo.jpg)
 
 <div class="Rtable1"><table class="Rtable1">
 <thead>
 <tr>
 <th class='rowlabel firstrow lastrow'></th>
-<th class='firstrow lastrow'><span class='stratlabel'>Democrat<br><span class='stratn'>(n=51)</span></span></th>
-<th class='firstrow lastrow'><span class='stratlabel'>Republican<br><span class='stratn'>(n=49)</span></span></th>
-<th class='firstrow lastrow'><span class='stratlabel'>Overall<br><span class='stratn'>(n=100)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Democrat<br><span class='stratn'>(N=51)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Republican<br><span class='stratn'>(N=49)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Overall<br><span class='stratn'>(N=100)</span></span></th>
 </tr>
 </thead>
 <tbody>
@@ -114,9 +122,9 @@ This is why _measurement_ is really one of the most important parts of all stati
 </tr>
 <tr>
 <td class='rowlabel lastrow'>Median [Min, Max]</td>
-<td class='lastrow'>1.00 [0.00, 1.00]</td>
-<td class='lastrow'>1.00 [0.00, 1.00]</td>
-<td class='lastrow'>1.00 [0.00, 1.00]</td>
+<td class='lastrow'>1.00 [0, 1.00]</td>
+<td class='lastrow'>1.00 [0, 1.00]</td>
+<td class='lastrow'>1.00 [0, 1.00]</td>
 </tr>
 <tr>
 <td class='rowlabel firstrow'><span class='varlabel'>VotedBush</span></td>
@@ -491,7 +499,7 @@ class: center, middle
 
 .pull-1[.circleoff[![](https://us.123rf.com/450wm/evgen79/evgen791307/evgen79130700021/20661978-seamless-pattern-with-a-binary-code-for-your-design.jpg?ver=6)]]
 .pull-1[.circleon[![](https://pbs.twimg.com/profile_images/981544484684075008/lHu4ogWd_400x400.jpg)]]
-.pull-1[.circleoff[![](https://www.coopathome.ch/img/produkte/880_880/RGB/6117246_001.jpg?_=1524058709415)]]
+.pull-1[.circleoff[![](https://media1.popsugar-assets.com/files/thumbor/DQR_gcgFpNMyxR9VJyzHcIhDqRE/fit-in/1024x1024/filters:format_auto-!!-:strip_icc-!!-/2014/07/01/913/n/1922564/f9362b9be11d3b4a_suits-new/i/Ill-Fitting-Suits.jpg)]]
 
 ???
 
@@ -980,7 +988,7 @@ class: center, middle
 
 .pull-1[.circleoff[![](https://us.123rf.com/450wm/evgen79/evgen791307/evgen79130700021/20661978-seamless-pattern-with-a-binary-code-for-your-design.jpg?ver=6)]]
 .pull-1[.circleoff[![](https://pbs.twimg.com/profile_images/981544484684075008/lHu4ogWd_400x400.jpg)]]
-.pull-1[.circleon[![](https://www.coopathome.ch/img/produkte/880_880/RGB/6117246_001.jpg?_=1524058709415)]]
+.pull-1[.circleon[![](https://media1.popsugar-assets.com/files/thumbor/DQR_gcgFpNMyxR9VJyzHcIhDqRE/fit-in/1024x1024/filters:format_auto-!!-:strip_icc-!!-/2014/07/01/913/n/1922564/f9362b9be11d3b4a_suits-new/i/Ill-Fitting-Suits.jpg)]]
 
 ???
 
@@ -1320,7 +1328,7 @@ Since p&lt;0.05 for both, it looks like both of these variables are important an
 
 Note that this lecture hardly exhausts the possible approaches for estimating and interpreting binary response models:
 - other methods of model evaluation and (cross-)validation, as well as identifying variable importance
-- residual Analysis, including influence statistics, outlier detection, etc.
+- residual analysis, including influence statistics, outlier detection, etc.
 - problems of identification
 
 --
@@ -1343,7 +1351,7 @@ class: center, middle
 
 .pull-1[.circleon[![](https://us.123rf.com/450wm/evgen79/evgen791307/evgen79130700021/20661978-seamless-pattern-with-a-binary-code-for-your-design.jpg?ver=6)]]
 .pull-1[.circleon[![](https://pbs.twimg.com/profile_images/981544484684075008/lHu4ogWd_400x400.jpg)]]
-.pull-1[.circleon[![](https://www.coopathome.ch/img/produkte/880_880/RGB/6117246_001.jpg?_=1524058709415)]]
+.pull-1[.circleon[![](https://media1.popsugar-assets.com/files/thumbor/DQR_gcgFpNMyxR9VJyzHcIhDqRE/fit-in/1024x1024/filters:format_auto-!!-:strip_icc-!!-/2014/07/01/913/n/1922564/f9362b9be11d3b4a_suits-new/i/Ill-Fitting-Suits.jpg)]]
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="libs/remark-latest.min.js"></script>
@@ -1353,7 +1361,7 @@ class: center, middle
 "highlightStyle": "github",
 "highlightLines": true,
 "countIncrementalSlides": false,
-"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>` "
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>`\n"
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
