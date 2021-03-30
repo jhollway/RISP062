@@ -167,9 +167,73 @@ This is why _measurement_ is really one of the most important parts of all stati
 
 .pull-right[
 
-![](https://www.govtrack.us/congress/votes/107-2002/s237/diagram)
+.panelset[
+.panel[
+.panel-name[Sen Code]
 
-&lt;img src="STAT_L5_Binary_files/figure-html/iraqBar-1.png" width="432" /&gt;
+```r
+library(ggparliament)
+data("election_data")
+us_sen &lt;- election_data %&gt;%
+    filter(country == "USA" &amp;
+               year == 2016 &amp;
+               house == "Senate")
+us_sen &lt;- bind_rows(us_sen,
+                    us_sen[1:2,]) %&gt;%
+  mutate(year = 2002,
+         government = c(1,1,0,0,0),
+         seats = c(48,29,1,1,21))
+us_sen &lt;- parliament_data(
+  election_data = us_sen,
+  type = "semicircle",
+  parl_rows = 4,
+  party_seats = us_sen$seats)
+senate &lt;- ggplot(us_sen, aes(x, y, colour = party_long)) +
+  geom_parliament_seats() + 
+  geom_highlight_government(government == 1) +
+  theme_ggparliament(legend = FALSE) +
+  labs(colour = NULL, 
+       title = "United States Senate",
+       subtitle = "Black circles highlight those who voted for war.") +
+  scale_colour_manual(values = us_sen$colour,
+                      limits = us_sen$party_long)
+senate
+```
+]
+
+.panel[
+.panel-name[Sen Plot]
+![](STAT_L5_Binary_files/figure-html/iraqSenateVote-1.png)
+]
+
+.panel[
+.panel-name[Mosaic Code]
+
+```r
+library(ggplot2)
+# ggplot(iraqVote, aes(x = factor(War))) + geom_bar() + xlab("Voted for War")
+iraqVote$WarVote &lt;- ifelse(iraqVote$War==1, "Aye", "Nay")
+library(ggmosaic)
+ggplot(data = iraqVote) +
+  geom_mosaic(aes(x = product(WarVote, Republican), fill=WarVote)) + 
+  ylab("Vote") + xlab("Party") + theme_minimal()
+```
+]
+
+.panel[
+.panel-name[Mosaic Plot]
+![](STAT_L5_Binary_files/figure-html/iraqBar-1.png)
+]
+
+
+]
+
+
+
+
+&lt;!-- ![](https://www.govtrack.us/congress/votes/107-2002/s237/diagram) --&gt;
+
+
 
 ]
 
