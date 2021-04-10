@@ -5,6 +5,14 @@
     <meta charset="utf-8" />
     <meta name="author" content="James Hollway" />
     <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/clipboard/clipboard.min.js"></script>
+    <link href="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-clipboard/xaringanExtra-clipboard.js"></script>
+    <script>window.xaringanExtraClipboard(null, {"button":"Copy Code","success":"Copied!","error":"Press Ctrl+C to Copy"})</script>
     <link href="libs/table1/table1_defaults.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.githubraw.com/jhollway/iheidmyninja/7b9e9101/iheid-xaringan-style.css" type="text/css" />
   </head>
@@ -22,7 +30,7 @@ class: center, middle
 
 .pull-1[.circleon[![](https://us.123rf.com/450wm/evgen79/evgen791307/evgen79130700021/20661978-seamless-pattern-with-a-binary-code-for-your-design.jpg?ver=6)]]
 .pull-1[.circleon[![](https://pbs.twimg.com/profile_images/981544484684075008/lHu4ogWd_400x400.jpg)]]
-.pull-1[.circleon[![](https://www.coopathome.ch/img/produkte/880_880/RGB/6117246_001.jpg?_=1524058709415)]]
+.pull-1[.circleon[![](https://www.topratedforexbrokers.com/wp-content/uploads/comparison-list.svg)]]
 
 
 
@@ -48,7 +56,7 @@ Of course, not all discrete categorical data is binary/dichotomous,
 and not all polychotomous categorical data is equal.
 
 Ordered response variables are where there is a clear ordering to the categories;
-one category is 'higher' than another (though we don't know by how much).
+one category is ‘higher’ than another (though we don’t know by how much).
 - Some are grouped continuous variables (e.g. age groups, income brackets)
 - Others are assessed items (e.g. Likert scale survey items, warning levels)
 - .red[Can you think of others?]
@@ -72,12 +80,12 @@ Obviously, we need to be sensitive to classification schemes when making such cl
 Different classifications = different results.
 
 Of course, you can model ordered responses as unordered too.
-This would help you get around the "parallel regression" assumption,
-meaning that features can have different effects acros different response categories,
+This would help you get around the “parallel regression” assumption,
+meaning that features can have different effects across different response categories,
 and this might make sense.
-However, it is inefficient, because it doesn't use information about the ordering of categories.
+However, it is inefficient, because it doesn’t use information about the ordering of categories.
 
-And obviously don't use ordinal logistic regression on unordered categories;
+And obviously don’t use ordinal logistic regression on unordered categories;
 garbage in, garbage out.
 
 Main takeaway: make sure you theoretically discuss whether categories truly ordered
@@ -88,7 +96,8 @@ Multinomial choice models are being much more widely used...
 Folks are starting to realize that simply dichotomizing polychotomous variables can be very misleading.
 
 E.g., the Whitten and Palmer article:
-- Voter choice in multi-party elections needs to be modeled as what it is: a choice across a range of options.
+- Voter choice in multi-party elections needs to be modeled as what it is: 
+a choice across a range of options.
 - These models let you extract additional information out of your data.
 - The software is also readily available (more on this in a bit as well).
 
@@ -271,7 +280,7 @@ Define \\(Z_i\\) such that, for any \\(m \in S\\), \\(\Pr(Z_i=m) = p_m\\).
 
 Certain assumptions need to be met to estimate categorical DVs.
 
-I'm using some math from Ward and Ahlquist to make my point on these two statements,
+I’m using some math from Ward and Ahlquist to make my point on these two statements,
 though they are not to be read as proofs or anything.
 
 First, if categories are exhaustive, then the probability of observing some other category not in the set should be 0.
@@ -294,15 +303,15 @@ The second main assumption is about the nature of the choice process:
 
 &gt; An individual's choice should not depend on the availability or characteristics of inaccessible alternatives.
 
-That is, the proportion of choosing one of two alternatives
+That is, the probability of choosing one of two alternatives
 should not change with the introduction of a third alternative
 (and it should definitely not switch).
 
-Take our political parties example: 
-I shouldn't prefer Labour to National if I only choose between the two, 
-but National to Labour if the Green party is also on the ballot.
+Take our political parties example and the .red[spoiler effect]: 
+I shouldn’t prefer Bush to Clinton if I only choose between the two, 
+but Clinton to Bush if Perot is also on the ballot (though see [Lacy and Burden 1999](https://doi.org/10.2307%2F2991792)).
 
-This is called the 'red bus/blue bus' problem (see McFadden 1974): 
+This is called the ‘red bus/blue bus’ problem (see McFadden 1974): 
 Multinomial logit should only be used in cases where outcome categories 
 “can plausibly be assumed to be distinct and weighed independently in the eyes of the decision maker.”
 
@@ -330,13 +339,13 @@ library(mlogit) # note this is a different package than the one we are mostly us
 hmftest()
 ```
 
-**However**, Long and Freese (2006) and [Paul Allison](http://www.statisticalhorizons.com/iia) raise concerns about the use of these tests.
-- These tests often provide conflicting results (e.g. some reject the null while others do not, see also Cheng and Long 2006)
+**However**, Long and Freese (2006) and [Paul Allison](http://www.statisticalhorizons.com/iia) raise concerns about the use of these tests:
+- They often provide conflicting results (e.g. some reject null while others do not, see also Cheng and Long 2006)
 - Various simulation studies have shown these tests are not useful for assessing violations of IIA
 - Multinomial logit works best when alternatives dissimilar and not just substitutes, regardless of whether tests showed it or not.
 
 So only do this if you have a grumpy reviewer, 
-and in the meantime concentrate on there being theoretical differences between the categories.
+and in the meantime concentrate on there being _theoretical differences_ between the categories.
 
 ???
 
@@ -364,16 +373,20 @@ to see whether you get very different results.
 
 Other times, IIA violations can be mitigated by how you choose to collect or represent data.
 
+So (again) pay close attention to the various measurement decisions playing a role in
+how your data was collected (e.g. survey design) or the decisions you make
+when cleaning, preparing, and analysing your data.
+
 ???
 
 Multinomial probit is computationally more intensive, but does not assume IIA.
 Though sometimes even if IIA is violated, the logit is a better model...
 
-We're going to argue that the IIA assumption is met here.
+We’re going to argue that the IIA assumption is met here.
 Though there were actually further third party candidates in 1992,
-for the Libertarian, New Alliance, Natural Law, U.S. Taxpayer's, Populist, Social Workers' parties,
+for the Libertarian, New Alliance, Natural Law, U.S. Taxpayer’s, Populist, Social Workers’ parties,
 and some additional independents in some states,
-we're going to say that their inclusion would not affect the (proportional) choices between those
+we’re going to say that their inclusion would not affect the (proportional) choices between those
 we do currently have in the model.
 
 ---
@@ -404,7 +417,8 @@ To ensure each probability is positive, we use the exponential function, \\(P_{i
 
 `$$\sum_j P_{ij} \neq 1$$`
 
-But it (by definition) has to. So we rescale the probabilities by dividing each by the sum of all them.
+But it (by definition) has to! 
+So we rescale the probabilities by dividing each by the sum of all them.
 
 `$$\Pr(Y_i = j) \equiv P_{ij} = \frac{\exp(X_i\beta_j)}{\sum_{j=1}^J\exp(X_i\beta_j)}\tag{1}\label{1}$$`
 
@@ -427,7 +441,7 @@ Equation `\(\ref{1}\)` provides us with our primary statement of probability for
 #### Identification and Reference Categories
 
 .pull-left[
-But, this model is also *unidentified*: 
+But, this model is also .red[unidentified]: 
 knowing the probability of *J − 1* options, 
 means knowing the probability of choosing the remaining alternative.
 
@@ -437,7 +451,7 @@ not unlike the situation with the constant term in the ordered probit/logit mode
 
 We deal with this by setting the parameters for one of the *J* alternatives to 0 
 (usually the “first” one, i.e., \\(\beta_1\\)). 
-This is then referred to as the baseline, omitted, or reference category.
+This is then referred to as the baseline, omitted, or .red[reference category].
 It is the alternative to which the others are compared when the model’s coefficients are estimated.
 ]
 
@@ -453,7 +467,7 @@ And that for the other _J-1_ alternatives are:
 `$$\frac{\exp(X_i\beta_j')}{1+\sum_{j=2}^J \exp(X_i\beta_j')}$$`
 
 Where \\(\beta_j'=\beta_j-\beta_1\\)) are the “rescaled” parameters 
-(that is, they express the influence of the various Xs on \\(\Pr(Y_i=j)\\) relative to
+(that is, they express the influence of the various `\(X\)`s on \\(\Pr(Y_i=j)\\) relative to
 \\(\Pr(Y_i=1)\\).
 ]
 
@@ -461,7 +475,7 @@ Where \\(\beta_j'=\beta_j-\beta_1\\)) are the “rescaled” parameters
 ### Model of Discrete Choices
 
 An alternative is to say that an individual *i* chooses among *J* alternatives:
-- S/he has a utility \\( U_{ij} \\) associated with each choice *j*.
+- They have a utility \\( U_{ij} \\) associated with each choice *j*.
 - That utility has a stochastic (random) part and a systematic part: 
 
 `$$U_{ij} = \mu_i + \varepsilon_{ij}$$`
@@ -472,16 +486,16 @@ who may give different weights to those characteristics across alternatives (tha
 The individual chooses among the alternatives in such a way that it maximizes his or her utility, so that:
 
 `$$\begin{align}
-\Pr(Y_i=j) &amp; = \Pr(U_{ij} &gt; U_{il} ~\forall~ l \neq j \in J)\\
-&amp; = \Pr(\mu_{i} + \epsilon_{ij} &gt; \mu_i  + \epsilon_{il} ~\forall~ l \neq j \in J)\\
-&amp; = \Pr(X_{i}\beta_j + \epsilon_{ij} &gt; X_{i}\beta_l  + \epsilon_{il} ~\forall~ l \neq j \in J)\\
-&amp; = \Pr(\epsilon_{ij} - \epsilon_{il} &gt; X_{i}(\beta_l - \beta_j)  ~\forall~ l \neq j \in J)\\
+\Pr(Y_i=j) &amp; = \Pr(U_{ij} &gt; U_{il} &amp; ~\forall~ l \neq j \in J)\\
+&amp; = \Pr(\mu_{i} + \epsilon_{ij} &gt; \mu_i  + \epsilon_{il} &amp; ~\forall~ l \neq j \in J)\\
+&amp; = \Pr(X_{i}\beta_j + \epsilon_{ij} &gt; X_{i}\beta_l  + \epsilon_{il} &amp; ~\forall~ l \neq j \in J)\\
+&amp; = \Pr(\epsilon_{ij} - \epsilon_{il} &gt; X_{i}(\beta_l - \beta_j)  &amp; ~\forall~ l \neq j \in J)\\
 \end{align}$$`
 
 In other words, one alternative is chosen over another if
 the difference between their stochastic parts is greater than
 the difference between their systematic parts.
-This can happen because \\(\varepsilon_{ij}\\) is large, \\(X_ij\\) is large, or both...
+This can happen because `\(\varepsilon_{ij}\)` is large, `\(X_{ij}\)` is large, or both...
 
 ???
 
@@ -496,7 +510,7 @@ a Gumbel/type-I extreme value distribution (see Ward and Ahlquist) gives the mul
 A good question.
 --
  Imagine estimating a model where each choice (=1) is contrasted with all others.
-- e.g. whether or not each survey respondent identified as Democrat.
+- e.g. whether or not a voter voted for Clinton, then whether or not they voted for Bush, etc..
 
 --
 
@@ -505,24 +519,22 @@ It can be useful to remember this as we move forward with interpretation.
 
 --
 
-This similarity highlights that multinomial models very demanding of data, as they burn through degrees of freedom rapidly as we estimate M-1 parameters for every new explanatory variable.
-All the problems of perfect separation and rare events are amplified; with so many combinations of predictors and outcomes, small observations in any cells can arise more easily.
+This similarity highlights that multinomial models very demanding of data, 
+as they burn through degrees of freedom rapidly as we estimate `\(M-1\)` parameters for every new explanatory variable.
+All the problems of .red[perfect separation] and rare events are amplified; 
+with so many combinations of predictors and outcomes, 
+small observations in any cells can arise more easily.
 
 --
 
-Unlike binary logit, we constrain the probabilities to sum to unity, gaining efficiency through joint estimation.
+Unlike binary logit though, we constrain the probabilities to sum to unity, gaining efficiency through joint estimation.
 Unlike ordinal logit, does not constrain the \\(\beta\\)s to be constant across categories.
 Any multinomial model can be reestimated with a different reference category.
 
 ???
 
-Multinomial logistic regression is also known as polytomous, polychotomous, or multi-class logistic regression, or just multilogit regression.
+.red[Multinomial logistic regression] is also known as polytomous, polychotomous, or multi-class logistic regression, or just multilogit regression.
 The generalization of binomial logistic regression to multinomial logistic regression is sometimes called a softmax or exponential model.
-
-Since multinomial regression uses a maximum likelihood estimation method, 
-it requires a large sample size. 
-It also uses multiple equations. 
-This implies that it requires an even larger sample size than ordinal or binary logistic regression.
 
 ---
 ## From probability to likelihood, again
@@ -538,7 +550,7 @@ so that we can write the likelihood for a single obseration as:
 
 `$$L_i = \prod_{j=1}^J [\Pr(Y_i=j)]^{\delta_{ij}}$$`
 
-We can take the product across all N observations to get the likelihood for all the data:
+We can take the product across all `\(N\)` observations to get the likelihood for all the data:
 
 `$$L = \prod_{i=1}^{N}\prod_{j=1}^J[\Pr(Y_i=j)]^{\delta_{ij}}$$`
 
@@ -559,10 +571,18 @@ Maddala (1983) shows this likelihood is very well-behaved...
 
 ]
 
+???
+
+Since multinomial regression uses a maximum likelihood estimation method, 
+it requires a large sample size. 
+It also uses multiple equations. 
+This implies that it requires an even larger sample size than ordinal or binary logistic regression.
+
 ---
 ## Estimation
 
-Of course, we don't need to do any of this ourselves; we made computers to maximise log-likelihoods for us.
+Of course, we don’t need to do any of this ourselves; 
+we made computers to maximise log-likelihoods for us.
 
 There are several packages in R that enable multinomial logistic regression,
 including `mlogit` and `mnlogit`,
@@ -748,8 +768,7 @@ confusionMatrix(data=pred, vote92$vote)
 .small[
 
 ```r
-library(texreg)
-htmlreg(list(mnl1, mnl2, mnl3), doctype = F, single.row = T)
+texreg::htmlreg(list(mnl1, mnl2, mnl3), doctype = F, single.row = T)
 ```
 ]
 
@@ -757,11 +776,9 @@ htmlreg(list(mnl1, mnl2, mnl3), doctype = F, single.row = T)
 .small[
 
 ```r
-stargazer::stargazer(mnl1, mnl2, mnl3, type = "html", style = "io",
-                     single.row = T, align = T,
-                     intercept.bottom = F, model.numbers = F,
-                     column.labels = c("Model 1","Model2","Model 3"),
-                     column.separate = c(2,2,2))
+stargazer::stargazer(mnl1, mnl2, mnl3, type = "html", style = "io", single.row = T, align = T,
+                     intercept.bottom = F, model.numbers = F, column.separate = c(2,2,2),
+                     column.labels = c("Model 1","Model2","Model 3"))
 ```
 
 
@@ -1043,7 +1060,7 @@ class: center, middle
 "highlightStyle": "github",
 "highlightLines": true,
 "countIncrementalSlides": false,
-"slideNumberFormat": "<div class=\"progress-bar-container\">   <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">   </div> </div>` "
+"slideNumberFormat": "<div class=\"progress-bar-container\">\n  <div class=\"progress-bar\" style=\"width: calc(%current% / %total% * 100%);\">\n  </div>\n</div>`\n"
 });
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
