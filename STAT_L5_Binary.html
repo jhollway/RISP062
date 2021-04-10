@@ -1432,6 +1432,57 @@ Another option for plotting ROC curves is the [`MLeval` package](https://www.r-b
 ROC curves were invented during WWII to help radar operators decide whether the signal they were getting indicated the presence of an enemy aircraft or was just noise. 
 
 ---
+#### Unrolling the ROC
+
+
+
+.panelset[
+.panel[
+.panel-name[Full Model]
+.pull-left[
+&lt;img src="STAT_L5_Binary_files/figure-html/rocfull-1.png" width="504" /&gt;
+]
+.pull-right[
+&lt;img src="STAT_L5_Binary_files/figure-html/rollfull-1.png" width="504" /&gt;
+
+]
+
+]
+
+.panel[
+.panel-name[Perfect Model]
+.pull-left[
+&lt;img src="STAT_L5_Binary_files/figure-html/rocideal-1.png" width="504" /&gt;
+]
+.pull-right[
+&lt;img src="STAT_L5_Binary_files/figure-html/rollideal-1.png" width="504" /&gt;
+
+]
+
+
+]
+
+.panel[
+.panel-name[Random Model]
+.pull-left[
+&lt;img src="STAT_L5_Binary_files/figure-html/rocrando-1.png" width="504" /&gt;
+]
+.pull-right[
+&lt;img src="STAT_L5_Binary_files/figure-html/rollrando-1.png" width="504" /&gt;
+
+]
+
+
+]
+]
+
+
+???
+
+The ROC is quite informative once trained, but can be rather confusing for beginners.
+What does the ROC tell us? Why is a bigger AUC better? What does it all [_mean_](https://www.r-bloggers.com/2020/08/unrolling-the-roc/)?
+
+---
 .pull-left-1[
 ## PR Curves
 
