@@ -430,9 +430,9 @@ class: center, middle
 
 .pull-left[
 
-Say \\(Y_i=j \in J \\) unordered, mutually exclusive and exhaustive categories.
+Say \\(Y_i=j \in J \\) unordered and independent, mutually exclusive and exhaustive categories.
 
-We want \\(\Pr(Y_i=j) \\) to vary as some \\(f(X_i \beta_j) \\).
+We want \\(\Pr(Y_i=j) \\) to vary by some \\(f(X_i \beta_j) \\).
 
 &lt;!-- to allow the probability of \\(Y_i=j \in J \\) to vary  --&gt;
 &lt;!-- as a function of some *k* independent variables \\(X_i\\), --&gt;
@@ -466,16 +466,20 @@ Equation `\(\ref{1}\)` provides us with our primary statement of probability for
 #### Identification and Reference Categories
 
 .pull-left[
-But, this model is also .red[unidentified]: 
+But, this model is also _nonidentifiable_: 
 knowing the probability of *J − 1* options, 
 means knowing the probability of choosing the remaining alternative.
 
-Put differently, this model can have an infinite number of parameters 
-which will generate the identical set of probabilities – 
-not unlike the situation with the constant term in the ordered probit/logit models.
+.red[Identifiability] refers to the difficulty of distinguishing 
+among two or more explanations of the same empirical phenomena.
+
+If we have a model that includes all options,
+then an infinite number of parameter estimates
+could generate an identical set of probabilities.
 
 We deal with this by setting the parameters for one of the *J* alternatives to 0 
 (usually the “first” one, i.e., \\(\beta_1\\)). 
+
 This is then referred to as the baseline, omitted, or .red[reference category].
 It is the alternative to which the others are compared when the model’s coefficients are estimated.
 ]
