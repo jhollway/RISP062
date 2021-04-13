@@ -894,66 +894,64 @@ confusionMatrix(data=pred, vote92$vote)
 ]
 
 ---
+## Interpreting Re: Reference Categories
 
-???
-
-Unfortunately, while `sjPlot` is really good for most models,
-and *can* do multinomial logits, its default layout for this model makes things more complicated than they need to be.
-
-That's why I'm using `stargazer` today.
-Note that to return the table and not just the html code,
-I needed to choose `results='asis'` in the code chunk options.
-
----
-### Interpreting Re: Reference Categories
-
-Often interpreting MNL coefficients is not especially easy (lots of parameters, nonlinear form, etc.). 
-
-Note separate sets of \\(\hat\beta\\)s for each alternative,
+Often interpreting MNL coefficients is not especially easy: 
+lots of parameters, nonlinear form, but also 
+separate sets of \\(\hat\beta\\)s for each alternative,
 minus the omitted reference category (implicitly restricted to equal zero).
 
 Remember to always bear in mind the **reference category**
-  - R picks a base category for me; all reported results are relative to this (both for DVs and IVs)
-  - Each coefficient reflects the change in the probability of that outcome, *relative to that of the omitted category*, associated with a change in the independent variable.
-  - e.g. if a respondent thinks that the national economy has gotten better over the last year, 
-  then they are more likely to vote for Bush *than Perot* and less likely to vote for Clinton *than Perot*
-  - Similarly, we can only say that there is not a statistically significant effect for a respondent's view of their personal financial situation over the last year *relative to voting for Perot* -- this could still be an important factor between Bush and Clinton...
+  - unless I tell it otherwise, R picks a base category; all reported results are relative to this (both for DVs and IVs)
+  - each coefficient reflects change in prob of outcome, *relative to that of the omitted category*, associated with change in IV
+  - e.g. in Models 1 and 2, if respondent thinks that national economy improved over last year, 
+  then more likely to vote for Bush *than Perot* and less likely to vote for Clinton *than Perot*
+  - Similarly, we can only say that there is not a statistically significant effect for a respondent's view of their personal financial situation over the last year *relative to voting for Perot* -- could still be important between Bush and Clinton...
 
 Changing the “reference” DV changes the coefficients, but yields the same *model*
-- Notice that the AIC is no different between models 2 and 3; nor will the likelihood
-- For Bush and Perot, the coefficients are just the inverse
-- e.g. rather than females more likely to vote for Bush than Perot, they are less likely to vote for Perot than Bush
-
-???
+- notice that the AIC is no different between models 2 and 3; nor will the likelihood
+- e.g. inverse coefs for Bush and Perot: rather than _f_ more likely to vote for _B_ than _P_, _f_ less likely to vote for _P_ than _B_
 
 As a matter of practical advice:
-- Always investigate different outcome specifications; your theorized relationship may hold (or make sense) only in specific comparisons.
-- There is no need to report all possible comparison combinations, however.
+- investigate different outcome specs; theorized relationship may hold (or make sense) only in specific comparisons
+- no need to report all possible comparison combinations, however
 
 ---
+.pull-left[
 ### Odds Ratios
 
-Remember an easy way to interpret logit results is to exponentialise out of log-odds coefficients to odds ratios (OR).
+Since MNL can be thought of as (a set of) logistic regressions,
+we can get change in OR for category *j*
+associated with one-unit change in variable `\(X_k\)`,
+relative to the reference category, by exponentialising out of the log-odds coefficients, `\(\exp(\hat\beta_{jk})\)`.
 
-.small[
+Model 2 tells us that a female voter increases the odds of voting for Bush rather than Perot by \\(100(1.569-1) = 56.9\\)% and for Clinton rather than Perot by \\(100(1.333-1) = 33.3\\)%, but decreases the odds of voting for Clinton rather than Bush by \\(100(0.850-1) = 15\\)%.
+
+It also tells us that there is a \\(100(0.372-1)2 = 125.6\\)% increase in the odds of a person voting for Clinton over Bush if they are dissatisfied with the recent national economy compared to if they are satisfied with it.
+
+Seems like it is the economy, stupid.
+]
+
+.pull-right[
 
 ```r
-stargazer::stargazer(mnl1, mnl2, mnl3, type = "html", style = "io", single.row = T, align = T, 
-*                    apply.coef = exp, intercept.bottom = F, model.numbers = F,
-                     column.labels = c("Model 1","Model2","Model 3"), column.separate = c(2,2,2))
+stargazer::stargazer(mnl2, type = "html", 
+*       single.row = T, apply.coef = exp)
 ```
 
 
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="7" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;td&gt;Bush&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;td&gt;Bush&lt;/td&gt;&lt;td&gt;Perot&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;Model 1&lt;/td&gt;&lt;td colspan="2"&gt;Model2&lt;/td&gt;&lt;td colspan="2"&gt;Model 3&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="7" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;CONSTANT&lt;/td&gt;&lt;td&gt;1.066&lt;sup&gt;***&lt;/sup&gt; (0.178)&lt;/td&gt;&lt;td&gt;1.934&lt;sup&gt;***&lt;/sup&gt; (0.154)&lt;/td&gt;&lt;td&gt;0.533&lt;sup&gt;*&lt;/sup&gt; (0.315)&lt;/td&gt;&lt;td&gt;0.467 (0.363)&lt;/td&gt;&lt;td&gt;2.144&lt;sup&gt;***&lt;/sup&gt; (0.363)&lt;/td&gt;&lt;td&gt;1.143&lt;sup&gt;***&lt;/sup&gt; (0.387)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;FEMALE1&lt;/td&gt;&lt;td&gt;1.639&lt;sup&gt;***&lt;/sup&gt; (0.183)&lt;/td&gt;&lt;td&gt;1.358&lt;sup&gt;***&lt;/sup&gt; (0.194)&lt;/td&gt;&lt;td&gt;1.333&lt;sup&gt;***&lt;/sup&gt; (0.206)&lt;/td&gt;&lt;td&gt;1.569&lt;sup&gt;***&lt;/sup&gt; (0.212)&lt;/td&gt;&lt;td&gt;0.637&lt;sup&gt;***&lt;/sup&gt; (0.212)&lt;/td&gt;&lt;td&gt;0.850&lt;sup&gt;***&lt;/sup&gt; (0.232)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;PERSFINANCE&lt;/td&gt;&lt;td&gt;0.853&lt;sup&gt;***&lt;/sup&gt; (0.113)&lt;/td&gt;&lt;td&gt;1.263&lt;sup&gt;***&lt;/sup&gt; (0.120)&lt;/td&gt;&lt;td&gt;0.915&lt;sup&gt;***&lt;/sup&gt; (0.128)&lt;/td&gt;&lt;td&gt;1.152&lt;sup&gt;***&lt;/sup&gt; (0.131)&lt;/td&gt;&lt;td&gt;0.868&lt;sup&gt;***&lt;/sup&gt; (0.131)&lt;/td&gt;&lt;td&gt;0.795&lt;sup&gt;***&lt;/sup&gt; (0.144)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;NATLECON&lt;/td&gt;&lt;td&gt;0.509&lt;sup&gt;***&lt;/sup&gt; (0.187)&lt;/td&gt;&lt;td&gt;1.651&lt;sup&gt;***&lt;/sup&gt; (0.164)&lt;/td&gt;&lt;td&gt;0.567&lt;sup&gt;***&lt;/sup&gt; (0.209)&lt;/td&gt;&lt;td&gt;1.525&lt;sup&gt;***&lt;/sup&gt; (0.178)&lt;/td&gt;&lt;td&gt;0.656&lt;sup&gt;***&lt;/sup&gt; (0.178)&lt;/td&gt;&lt;td&gt;0.372&lt;sup&gt;*&lt;/sup&gt; (0.219)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;DEM1&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;5.643&lt;sup&gt;***&lt;/sup&gt; (0.293)&lt;/td&gt;&lt;td&gt;0.784&lt;sup&gt;*&lt;/sup&gt; (0.414)&lt;/td&gt;&lt;td&gt;1.275&lt;sup&gt;***&lt;/sup&gt; (0.414)&lt;/td&gt;&lt;td&gt;7.197&lt;sup&gt;***&lt;/sup&gt; (0.405)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;REP1&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;0.392 (0.337)&lt;/td&gt;&lt;td&gt;6.914&lt;sup&gt;***&lt;/sup&gt; (0.358)&lt;/td&gt;&lt;td&gt;0.145 (0.358)&lt;/td&gt;&lt;td&gt;0.057 (0.392)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Akaike information criterion&lt;/em&gt;&lt;/td&gt;&lt;td&gt;1,811.519&lt;/td&gt;&lt;td&gt;1,811.519&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="7" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="6" style="text-align:left"&gt;&lt;sup&gt;***&lt;/sup&gt;p &lt; .01; &lt;sup&gt;**&lt;/sup&gt;p &lt; .05; &lt;sup&gt;*&lt;/sup&gt;p &lt; .1&lt;/td&gt;&lt;/tr&gt;
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;td&gt;Bush&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;female1&lt;/td&gt;&lt;td&gt;1.333&lt;sup&gt;***&lt;/sup&gt; (0.206)&lt;/td&gt;&lt;td&gt;1.569&lt;sup&gt;***&lt;/sup&gt; (0.212)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;persfinance&lt;/td&gt;&lt;td&gt;0.915&lt;sup&gt;***&lt;/sup&gt; (0.128)&lt;/td&gt;&lt;td&gt;1.152&lt;sup&gt;***&lt;/sup&gt; (0.131)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;natlecon&lt;/td&gt;&lt;td&gt;0.567&lt;sup&gt;***&lt;/sup&gt; (0.209)&lt;/td&gt;&lt;td&gt;1.525&lt;sup&gt;***&lt;/sup&gt; (0.178)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;dem1&lt;/td&gt;&lt;td&gt;5.643&lt;sup&gt;***&lt;/sup&gt; (0.293)&lt;/td&gt;&lt;td&gt;0.784&lt;sup&gt;*&lt;/sup&gt; (0.414)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;rep1&lt;/td&gt;&lt;td&gt;0.392 (0.337)&lt;/td&gt;&lt;td&gt;6.914&lt;sup&gt;***&lt;/sup&gt; (0.358)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;0.533&lt;sup&gt;*&lt;/sup&gt; (0.315)&lt;/td&gt;&lt;td&gt;0.467 (0.363)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Akaike Inf. Crit.&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;
 ]
 
@@ -968,18 +966,6 @@ If we set the coefficient of one category (let’s say \\(\hat\beta_{j'}\\)) to 
 
 `$$\log\Biggl[\frac{\Pr(Y_i=j \mid X_i)}{\Pr(Y_i=1 \mid X_i)}\Biggr] = X_i\hat\beta_j$$`
 
-This makes the odds ratios linear in the variables,
-and we can get the change in the odds ratio for category *j*
-associated with a one-unit change in a particular variable \\(X_k\\),
-relative to the reference category, by just examining:
-
-`$$\exp(\hat\beta_{jk})$$`
-
-These tell us that a female voter increases the odds of voting for Bush rather than Perot by \\(100(1.569-1) = 56.9\\)% and for Clinton rather than Perot by \\(100(1.333-1) = 33.3\\)%, but decreases the odds of voting for Clinton rather than Bush by \\(100(0.850-1) = 15\\)%.
-
-It also tells us that there is a \\(100(0.372-1)2 = 125.6\\)% increase in the odds of a person voting for Clinton over Bush if they are dissatisfied with the recent national economy compared to if they are satisfied with it.
-
-Seems like it is the economy, stupid.
 
 ---
 
@@ -987,16 +973,20 @@ Seems like it is the economy, stupid.
 
 ### Marginal Effects
 
-We’re interested in the partial change in \\(\Pr(Y_i=j)\\) for \\(X_i\\).
-
-Note that the marginal effect varies as a function of a bunch of things, including
+Note that marginal effect (partial change in `\(\Pr(Y_i=j)\)` for `\(X_i\)`) varies as a function of:
 - The probability itself,
 - The value of the coefficient estimate,
-- The sums of the other coefficients for that covariate.
+- The sums of other coefficients for that covariate.
 
-This means that the marginal effect may not even have the same sign as the coefficient estimate itself, and the sign may change over the value of the variable in question.
+This means that the marginal effect may not even have the same sign as the coefficient estimate itself, and sign may change over value of the variable in question.
+Note separate plots for each of the *J* possible outcomes.
 
-Note that there are separate plots for each of the *J* possible outcomes.
+What can we learn from this plot?
+- Females prefer both Bush and Clinton over Perot,
+though the difference is smallest for Clinton
+- How a voter feels about state of the economy is an important
+pivot point between Clinton and Bush
+- No real difference whether males are ambivalent or positive about economy in their vote for Perot
 
 ]
 
@@ -1039,13 +1029,6 @@ but be careful as it is not always straightforward.
 
 Actually, sjPlot is calling the `ggeffects` package here,
 but let's not confuse things.
-
-What can we learn from this plot?
-- Females certainly seem to prefer both Bush and Clinton over Perot,
-though the difference is smallest for Clinton
-- How a voter feels about the state of the economy is an important
-pivot point between Clinton and Bush
-- There is no real difference whether males are ambivalent or positive about the state of the economy in their vote for Perot
 
 ---
 
@@ -1111,39 +1094,6 @@ for each predictor and then plotting them together.
 
 Here we learn that, apart from party affiliation,
 the only thing that matters is the **economy**.
-
----
-### Wald tests
-
-Lastly, we can test the hypothesis that some variables are jointly significant.
-
-When might you want to do this? 
-Perhaps you have a theory that it is not so much party affiliation that matters
-in a 3-party election, but that it is the economy that matters...
-
-
-```r
-library(survey)
-regTermTest(mnl2, ~dem+rep)
-```
-
-```
-## Wald test for dem rep
-##  in multinom(formula = vote ~ female + persfinance + natlecon + dem + 
-##     rep, data = vote92)
-## F =  0.4133427  on  2  and  2715  df: p= 0.66148
-```
-
-```r
-regTermTest(mnl2, ~natlecon+persfinance)
-```
-
-```
-## Wald test for natlecon persfinance
-##  in multinom(formula = vote ~ female + persfinance + natlecon + dem + 
-##     rep, data = vote92)
-## F =  6.074215  on  2  and  2715  df: p= 0.0023328
-```
 
 ---
 class: center, middle
