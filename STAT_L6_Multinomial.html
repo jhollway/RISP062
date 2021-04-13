@@ -1050,23 +1050,41 @@ gg3logit(field3logit(mnl2, 'natlecon')) +
 ]
 
 .pull-right[
+.panelset[
+.panel[
+.panel-name[Code]
 
 ```r
 refpoint &lt;- list(c(0.5, 0.5, 0.5))
-natl &lt;- field3logit(mnl2, 'natlecon', label = 'National Economy', p0 = refpoint, narrows = 2)
-pers &lt;- field3logit(mnl2, 'persfinance', label = 'Personal Finance', p0 = refpoint, narrows = 2)
-female &lt;- field3logit(mnl2, 'female1', label = 'Female', p0 = refpoint, narrows = 1)
-dem &lt;- field3logit(mnl2, 'dem1', label = 'Democratic', p0 = refpoint, narrows = 1)
-rep &lt;- field3logit(mnl2, 'rep1', label = 'Republican', p0 = refpoint, narrows = 1)
+natl &lt;- field3logit(mnl2, 'natlecon', 
+             label = 'National Economy', 
+             p0 = refpoint, narrows = 2)
+pers &lt;- field3logit(mnl2, 'persfinance', 
+             label = 'Personal Finance', 
+             p0 = refpoint, narrows = 2)
+female &lt;- field3logit(mnl2, 'female1', 
+             label = 'Female', 
+             p0 = refpoint, narrows = 1)
+dem &lt;- field3logit(mnl2, 'dem1', 
+             label = 'Democratic', 
+             p0 = refpoint, narrows = 1)
+rep &lt;- field3logit(mnl2, 'rep1', 
+             label = 'Republican', 
+             p0 = refpoint, narrows = 1)
 gg3logit(natl + pers + female + dem + rep) + 
   stat_3logit(aes(colour = label))
 ```
 
-&lt;img src="STAT_L6_Multinomial_files/figure-html/ternary2-1.png" width="504" /&gt;
-
 ```
 ## Error in validDetails.segments(x): invalid 'arrow' argument
 ```
+
+]
+.panel[
+.panel-name[Plot]
+![](STAT_L6_Multinomial_files/figure-html/ternary2-1.png)
+]
+]
 ]
 
 ???
