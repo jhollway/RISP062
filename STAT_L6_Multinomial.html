@@ -489,25 +489,32 @@ It is the alternative to which the others are compared when the model’s coeffi
 .pull-right[
 When we do this, the formula for \\(\Pr(Y_i=1)\\) reduces to:
 
-`$$\frac{1}{1+\sum_{j=2}^J \exp(X_i\beta_j')}$$`
+`$$\frac{1}{1+\sum_{j=2}^J \exp(X_i\beta_j')}\tag{2}\label{2}$$`
 
-And that for the other _J-1_ alternatives are: 
+Where `\(\beta_j'=\beta_j-\beta_1\)` are the “rescaled” parameters; 
+I.e., they express the influence of the various `\(X\)`s on `\(\Pr(Y_i=j)\)` relative to
+`\(\Pr(Y_i=1)\)`.
+This means for all the other _J-1_ alternatives the equation is: 
 
-`$$\frac{\exp(X_i\beta_j')}{1+\sum_{j=2}^J \exp(X_i\beta_j')}$$`
+`$$\frac{\exp(X_i\beta_j')}{1+\sum_{j=2}^J \exp(X_i\beta_j')}\tag{3}\label{3}$$`
 
-Where \\(\beta_j'=\beta_j-\beta_1\\)) are the “rescaled” parameters 
-(that is, they express the influence of the various `\(X\)`s on \\(\Pr(Y_i=j)\\) relative to
-\\(\Pr(Y_i=1)\\).
+Any multinomial model can be reestimated with a different reference category.
+The results will remain proportional, but will differ.
+
+Choose a reference category so that you can concentrate
+on the ‘effect’ or choice that makes theoretical sense.
 ]
+
+???
+
+This is not unlike the situation with the constant term in the ordered probit/logit models.
 
 ---
 ### Model of Discrete Choices
 
-An alternative is to say that an individual *i* chooses among *J* alternatives:
+An alternative conception is to say that an individual *i* chooses among *J* alternatives:
 - They have a utility \\( U_{ij} \\) associated with each choice *j*.
-- That utility has a stochastic (random) part and a systematic part: 
-
-`$$U_{ij} = \mu_i + \varepsilon_{ij}$$`
+- That utility has a systematic part and a stochastic (random) part, `\(U_{ij} = \mu_i + \varepsilon_{ij}\)`
 
 - The systematic part is a function of some variables associated with the individual, 
 who may give different weights to those characteristics across alternatives (that is, \\(\mu_i = X_i\beta_j\\))
@@ -534,38 +541,6 @@ A multivariate normal distribution results in the multinomial probit;
 a Gumbel/type-I extreme value distribution (see Ward and Ahlquist) gives the multinomial logit.
 
 ---
-#### What's the difference to binary logistic regression?
-
-A good question.
---
- Imagine estimating a model where each choice (=1) is contrasted with all others.
-- e.g. whether or not a voter voted for Clinton, then whether or not they voted for Bush, etc..
-
---
-
-Such a series of models are effectively equivalent to the MNL we’ve talked about so far.
-It can be useful to remember this as we move forward with interpretation.
-
---
-
-This similarity highlights that multinomial models very demanding of data, 
-as they burn through degrees of freedom rapidly as we estimate `\(M-1\)` parameters for every new explanatory variable.
-All the problems of .red[perfect separation] and rare events are amplified; 
-with so many combinations of predictors and outcomes, 
-small observations in any cells can arise more easily.
-
---
-
-Unlike binary logit though, we constrain the probabilities to sum to unity, gaining efficiency through joint estimation.
-Unlike ordinal logit, does not constrain the \\(\beta\\)s to be constant across categories.
-Any multinomial model can be reestimated with a different reference category.
-
-???
-
-.red[Multinomial logistic regression] is also known as polytomous, polychotomous, or multi-class logistic regression, or just multilogit regression.
-The generalization of binomial logistic regression to multinomial logistic regression is sometimes called a softmax or exponential model.
-
----
 ## From probability to likelihood, again
 
 .pull-left[
@@ -577,11 +552,11 @@ Either way we motivate the model, we can estimate it using MLE. Remember equatio
 Then we define an indicator variable \\(\delta_{ij}=1\\) if \\(Y_i=j\\) and 0 otherwise, 
 so that we can write the likelihood for a single obseration as:
 
-`$$L_i = \prod_{j=1}^J [\Pr(Y_i=j)]^{\delta_{ij}}$$`
+`$$L_i = \prod_{j=1}^J \bigg[\Pr(Y_i=j)\bigg]^{\delta_{ij}}$$`
 
 We can take the product across all `\(N\)` observations to get the likelihood for all the data:
 
-`$$L = \prod_{i=1}^{N}\prod_{j=1}^J[\Pr(Y_i=j)]^{\delta_{ij}}$$`
+`$$L = \prod_{i=1}^{N}\prod_{j=1}^J\bigg[\Pr(Y_i=j)\bigg]^{\delta_{ij}}$$`
 
 ]
 
@@ -590,7 +565,7 @@ We can take the product across all `\(N\)` observations to get the likelihood fo
 
 Then take the log of this, noting the formula for \\(\Pr(Y_i=j)\\) from above:
 
-`$$\log L = \sum_{i=1}^{N}\sum_{j=1}^{J}\delta_{ij}\log\Bigl(\frac{\exp(X_i\beta_j)}{\sum_{j=1}^{J}\exp(X_i\beta_j)}\Bigr)$$`
+`$$\log L = \sum_{i=1}^{N}\sum_{j=1}^{J}\delta_{ij}\log\Bigg(\frac{\exp(X_i\beta_j)}{\sum_{j=1}^{J}\exp(X_i\beta_j)}\Bigg)$$`
 
 Maddala (1983) shows this likelihood is very well-behaved...
 - First and second derivatives are easily calculated.
@@ -598,14 +573,11 @@ Maddala (1983) shows this likelihood is very well-behaved...
 - Therefore Newton-Raphson will always converge to a global maximum (so N-R almost always used).
 - Producing (in the limit) estimates that are consistent, normal, and efficient.
 
+Yay!
 ]
 
 ???
 
-Since multinomial regression uses a maximum likelihood estimation method, 
-it requires a large sample size. 
-It also uses multiple equations. 
-This implies that it requires an even larger sample size than ordinal or binary logistic regression.
 
 ---
 ## Estimation
@@ -615,7 +587,7 @@ we made computers to maximise log-likelihoods for us.
 
 There are several packages in R that enable multinomial logistic regression,
 including `mlogit` and `mnlogit`,
-but we're going to use the easiest (though most limited) one from `nnet`:
+but we’re going to use the easiest (though most limited) one from `nnet`:
 
 
 ```r
