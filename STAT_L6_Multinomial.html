@@ -282,22 +282,29 @@ See `?vote92` for more details
 ---
 ## Assumptions
 
+Modelling multiple categories works only under two additional conditions.
+
 ### Assumption 1: Mutually exclusive and exhaustive
 
 Let _S_ be some finite set with cardinality _M_.
 Define \\(Z_i\\) such that, for any \\(m \in S\\), \\(\Pr(Z_i=m) = p_m\\).
 
+.pull-left[
 &gt; Categories should be _exhaustive_; i.e. they should cover the entire set of possibilities
 
 `$$\Pr(Z_i = l) = 0 \forall l \notin S$$`
+]
 
+.pull-right[
 &gt; Categories should be _mutually exclusive_; i.e. each possible value/response should belong to only one category
 
 `$$\sum_{m\in S} p_m = 1$$` 
 
-???
+]
 
-Certain assumptions need to be met to estimate categorical DVs.
+Diagnosis is generally a question of theory, concept, or research design.
+
+???
 
 I’m using some math from Ward and Ahlquist to make my point on these two statements,
 though they are not to be read as proofs or anything.
@@ -322,21 +329,23 @@ The second main assumption is about the nature of the choice process:
 
 &gt; An individual's choice should not depend on the availability or characteristics of inaccessible alternatives.
 
-That is, the probability of choosing one of two alternatives
-should not change with the introduction of a third alternative
-(and it should definitely not switch).
+Called “red bus/blue bus” problem (see McFadden 1974): 
+Multinomial logit should only be used where outcome categories 
+“can plausibly be assumed to be distinct and weighed independently in the eyes of the decision maker.”
+
+Choice between two alternatives should not change with the introduction of a third alternative.
+I.e. preferences should be .red[transitive] or acylic and not .red[intransitive].
+That is, it is inconsistent to choose `\(A\)` from `\(\{A,B\}\)` but `\(B\)` from `\(\{A,B,X\}\)`, 
+because then how
+is `\(A &gt; B\)` in choice 1 but `\(B &gt; A\)` in choice 2?
+&lt;!-- The choice ratio should at least stay the same. --&gt;
 
 Take our political parties example and the .red[spoiler effect]: 
 I shouldn’t prefer Bush to Clinton if I only choose between the two, 
 but Clinton to Bush if Perot is also on the ballot (though see [Lacy and Burden 1999](https://doi.org/10.2307%2F2991792)).
 
-This is called the ‘red bus/blue bus’ problem (see McFadden 1974): 
-Multinomial logit should only be used in cases where outcome categories 
-“can plausibly be assumed to be distinct and weighed independently in the eyes of the decision maker.”
 
 ???
-
-IIA is closely related to the notion of transitive (or acylic) preferences.
 
 Roughly, the IIA assumption means that adding or deleting alternative outcome categories does not affect the odds among the remaining outcomes.
 
@@ -347,10 +356,10 @@ A violation of the IIA assumption is basically a case of correlation between the
 for the equations predicting each of the _J−1_ categories 
 (excluding the baseline) of the response variable.
 - E.g. if two options are similar (buses of any colour), there may be unmeasured characteristics
-that make them likely to choose either relative to other options (e.g. I like public transportation).
+that make them likely to choose either relative to other options (e.g. I prefer public transportation over driving a car).
 
 Since it is just correlated residuals, 
-we can test for them using the Hausman-McFadden (HM) test or the Small-Hsaio (SH) test.
+we can test for them using the .red[Hausman-McFadden] (HM) or Small-Hsaio (SH) test.
 
 
 ```r
@@ -359,7 +368,7 @@ hmftest()
 ```
 
 **However**, Long and Freese (2006) and [Paul Allison](http://www.statisticalhorizons.com/iia) raise concerns about the use of these tests:
-- They often provide conflicting results (e.g. some reject null while others do not, see also Cheng and Long 2006)
+- Often provide conflicting results (e.g. some reject null while others do not, see also Cheng and Long 2006)
 - Various simulation studies have shown these tests are not useful for assessing violations of IIA
 - Multinomial logit works best when alternatives dissimilar and not just substitutes, regardless of whether tests showed it or not.
 
@@ -378,12 +387,12 @@ This is discussed in more detail in Ward and Ahlquist.
 Wald and Ahlquist outline several options that either partially relax IIA assumptions,
 or allow for unequal variance or correlation across the outcome categories.
 
+1. Multinomial probit (but computationally more intensive...)
 1. Heteroskedastic multinomial logit
 1. Nested logit
-1. Multinomial probit
 1. Random coefficients and mixed logit
 
-I won't be covering these today, 
+I won’t be covering these today, 
 but if you do diagnose IIA and want to try one of these solutions, 
 compare them (via AIC/LRtest) to the standard multinomial logit 
 to see whether you get very different results.
@@ -397,9 +406,6 @@ how your data was collected (e.g. survey design) or the decisions you make
 when cleaning, preparing, and analysing your data.
 
 ???
-
-Multinomial probit is computationally more intensive, but does not assume IIA.
-Though sometimes even if IIA is violated, the logit is a better model...
 
 We’re going to argue that the IIA assumption is met here.
 Though there were actually further third party candidates in 1992,
