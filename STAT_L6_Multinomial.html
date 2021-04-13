@@ -600,18 +600,70 @@ mnl2 &lt;- multinom(vote ~ female + persfinance + natlecon + dem + rep, vote92)
 
 ???
 
-Complete or quasi-complete separation: 
-Complete separation means that the outcome variable separate a predictor variable completely, 
-leading to perfect prediction by the predictor variable.
-Perfect prediction means that only one value of a predictor variable is associated with only one value of the response variable. 
-You can usually tell from the output of the regression coefficients that something is wrong. 
-You can then do a two-way tabulation of the outcome variable with the problematic variable to confirm this 
-and then rerun the model without the problematic variable.
+---
+#### What’s the difference to binary logistic regression?
 
-You should check for empty or small cells 
-by doing a cross-tabulation between categorical predictors and the outcome variable. 
-If a cell has very few cases (a small cell), 
-the model may become unstable or it might not even run at all.
+A good question.
+--
+ Imagine estimating a model where each choice (=1) is contrasted with all others.
+- e.g. whether or not a voter voted for Clinton, then whether or not they voted for Bush, etc..
+
+Such a series of models are effectively equivalent to the MNL we’ve talked about so far.
+We even estimate MNL by maximum likelihood too.
+It can be useful to remember this as we move forward with interpretation...
+
+--
+
+Unlike binary logistic regression though,
+with MNL we constrain the probabilities to sum to unity,
+gaining efficiency through joint estimation.
+
+--
+
+.pull-left[
+However, this joint estimation has a drawback:
+since we estimate `\(M-1\)` parameters for every new explanatory variable,
+multinomial models burn through degrees of freedom rapidly and 
+are thus very demanding of data (require larger `\(n\)`).
+]
+
+.pull-right[![:scale 80%](https://i.insider.com/5e56d205fee23d343655401f?width=700)]
+
+---
+#### Perfect separation
+
+.pull-left[
+
+Moreover, problems of .red[perfect separation] and rare events are amplified with MNL.
+
+- .red[Complete separation] means that only one value of a predictor variable is associated with only one value of the response variable.
+  - Leads to increasing coefficients.
+  - Can usually diagnose from results table, but cross-tabulation to confirm.
+  - Rerun without problematic variable
+- Since so many combinations of predictors and outcomes, 
+small observations in any cells can arise more easily,
+exacerbating such information issues.
+  - Check for empty or small cells in cross-tabulation 
+between categorical predictors and the outcome variable. 
+  - If a cell is small (has very few cases), 
+the model may become unstable or might not  run at all.
+  - Drop or merge offending categories.
+
+]
+
+.pull-right[
+![](https://i.stack.imgur.com/cblrK.png)
+
+]
+
+
+
+???
+
+.red[Multinomial logistic regression] is also known as polytomous, polychotomous, or multi-class logistic regression, or just multilogit regression.
+The generalization of binomial logistic regression to multinomial logistic regression is sometimes called a softmax or exponential model.
+
+Unlike ordinal logit, does not constrain the \\(\beta\\)s to be constant across categories.
 
 ---
 class: center, middle
