@@ -52,21 +52,32 @@ class: center, middle
 ---
 ## Multiple category (nominal) data
 
-Of course, not all discrete categorical data is binary/dichotomous, 
-and not all polychotomous categorical data is equal.
+Of course, not all discrete categorical data is binary/dichotomous.
+Nor is all polychotomous categorical data equal...
 
-Ordered response variables are where there is a clear ordering to the categories;
+.pull-left[
+`$$j_1 &lt; j_2 &lt; j_3$$`
+
+**Ordered response variables** are where there is a clear ordering to the categories;
 one category is ‘higher’ than another (though we don’t know by how much).
 - Some are grouped continuous variables (e.g. age groups, income brackets)
 - Others are assessed items (e.g. Likert scale survey items, warning levels)
-- .red[Can you think of others?]
+- _Can you think of others?_
 
-Unordered response variables are where there is no clear ordering to the categories;
+Typically model with .red[ordinal logistic regression].
+]
+
+.pull-right[
+`$$j_1 \; , \; j_2 \; , \; j_3$$`
+
+**Unordered response variables** are where there is no clear ordering to the categories;
 they are just different possibilities.
 - Some are aggregates (e.g. occupational categories, international interactions)
-- Others are "natural" types (e.g. electoral votes, institutional choices, political strategies)
-- .red[Can you think of others?]
+- Others are “natural” types (e.g. electoral votes, institutional choices, political strategies)
+- _Can you think of others?_
 
+Typically model with .red[multinomial logistic regression].
+]
 
 --
 
@@ -245,14 +256,22 @@ To illustrate the multinomial logit model, we’ll look at old 3-party electoral
 Note that is _Bill_ Clinton, not _Hillary_,
 and George *H. W.* Bush, not George *W.* Bush.
 
-We are interested in when respondents vote for each of these three options (Y).
+We are interested in `\(Y\)`, when respondents vote for each of these three options.
+
+To reduce number of categories, use e.g.:
+
+
+```r
+forcats::fct_collapse(vote92$vote,
+      est = c("Clinton","Bush"),
+      other = "Perot")
+```
 
 Covariates:
 - *female* - dummy
-- *dem* - Democratic party affiliation, dummy
-- *rep* - Republican party affiliation, dummy
-- *persfinance* - sign of personal financial situation in last year
-- *natlecon* - sign of national economy in last year
+- *dem*, *rep* - party affiliation, dummy
+- *persfinance* - personal situation last year
+- *natlecon* - national economy last year
 
 ]
 
