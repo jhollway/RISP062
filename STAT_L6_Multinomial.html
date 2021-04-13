@@ -675,20 +675,65 @@ class: center, middle
 .pull-1[.circleon[![](https://cdn.shopify.com/s/files/1/0080/8372/products/tattly_triangle_yoko_sakao_ohama_00_1024x1024@2x.png?v=1575322215)]]
 
 ---
+## Reporting
+
+.small[
+
+```r
+texreg::htmlreg(list(mnl1, mnl2, mnl3), doctype = F, single.row = T)
+```
+]
+
+
+.small[
+
+```r
+stargazer::stargazer(mnl1, mnl2, mnl3, type = "html", style = "io", single.row = T, align = T,
+                     intercept.bottom = F, model.numbers = F, column.separate = c(2,2,2),
+                     column.labels = c("Model 1","Model2","Model 3"))
+```
+
+
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="7" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;td&gt;Bush&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;td&gt;Bush&lt;/td&gt;&lt;td&gt;Perot&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;Model 1&lt;/td&gt;&lt;td colspan="2"&gt;Model2&lt;/td&gt;&lt;td colspan="2"&gt;Model 3&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="7" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;CONSTANT&lt;/td&gt;&lt;td&gt;0.064 (0.178)&lt;/td&gt;&lt;td&gt;0.660&lt;sup&gt;***&lt;/sup&gt; (0.154)&lt;/td&gt;&lt;td&gt;-0.629&lt;sup&gt;**&lt;/sup&gt; (0.315)&lt;/td&gt;&lt;td&gt;-0.762&lt;sup&gt;**&lt;/sup&gt; (0.363)&lt;/td&gt;&lt;td&gt;0.762&lt;sup&gt;**&lt;/sup&gt; (0.363)&lt;/td&gt;&lt;td&gt;0.133 (0.387)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;FEMALE1&lt;/td&gt;&lt;td&gt;0.494&lt;sup&gt;***&lt;/sup&gt; (0.183)&lt;/td&gt;&lt;td&gt;0.306 (0.194)&lt;/td&gt;&lt;td&gt;0.288 (0.206)&lt;/td&gt;&lt;td&gt;0.450&lt;sup&gt;**&lt;/sup&gt; (0.212)&lt;/td&gt;&lt;td&gt;-0.450&lt;sup&gt;**&lt;/sup&gt; (0.212)&lt;/td&gt;&lt;td&gt;-0.163 (0.232)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;PERSFINANCE&lt;/td&gt;&lt;td&gt;-0.159 (0.113)&lt;/td&gt;&lt;td&gt;0.234&lt;sup&gt;*&lt;/sup&gt; (0.120)&lt;/td&gt;&lt;td&gt;-0.089 (0.128)&lt;/td&gt;&lt;td&gt;0.141 (0.131)&lt;/td&gt;&lt;td&gt;-0.141 (0.131)&lt;/td&gt;&lt;td&gt;-0.230 (0.144)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;NATLECON&lt;/td&gt;&lt;td&gt;-0.675&lt;sup&gt;***&lt;/sup&gt; (0.187)&lt;/td&gt;&lt;td&gt;0.501&lt;sup&gt;***&lt;/sup&gt; (0.164)&lt;/td&gt;&lt;td&gt;-0.568&lt;sup&gt;***&lt;/sup&gt; (0.209)&lt;/td&gt;&lt;td&gt;0.422&lt;sup&gt;**&lt;/sup&gt; (0.178)&lt;/td&gt;&lt;td&gt;-0.422&lt;sup&gt;**&lt;/sup&gt; (0.178)&lt;/td&gt;&lt;td&gt;-0.990&lt;sup&gt;***&lt;/sup&gt; (0.219)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;DEM1&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;1.730&lt;sup&gt;***&lt;/sup&gt; (0.293)&lt;/td&gt;&lt;td&gt;-0.243 (0.414)&lt;/td&gt;&lt;td&gt;0.243 (0.414)&lt;/td&gt;&lt;td&gt;1.974&lt;sup&gt;***&lt;/sup&gt; (0.405)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;REP1&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.938&lt;sup&gt;***&lt;/sup&gt; (0.337)&lt;/td&gt;&lt;td&gt;1.934&lt;sup&gt;***&lt;/sup&gt; (0.358)&lt;/td&gt;&lt;td&gt;-1.934&lt;sup&gt;***&lt;/sup&gt; (0.358)&lt;/td&gt;&lt;td&gt;-2.871&lt;sup&gt;***&lt;/sup&gt; (0.392)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Akaike information criterion&lt;/em&gt;&lt;/td&gt;&lt;td&gt;1,811.519&lt;/td&gt;&lt;td&gt;1,811.519&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="7" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="6" style="text-align:left"&gt;&lt;sup&gt;***&lt;/sup&gt;p &lt; .01; &lt;sup&gt;**&lt;/sup&gt;p &lt; .05; &lt;sup&gt;*&lt;/sup&gt;p &lt; .1&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+]
+
+???
+
+Unfortunately, while `sjPlot` is really good for most models,
+and *can* do multinomial logits, its default layout for this model makes things more complicated than they need to be.
+
+That's why I'm using `stargazer` today.
+Note that to return the table and not just the html code,
+I needed to choose `results='asis'` in the code chunk options.
+
+---
 .pull-left-1[
 
-## Model Fit
+## Selecting a fit to interpret
 
 ### Likelihood ratio test
-The “Global” Likelihood Ratio Test is a test vs. the global null (that is, a test for whether all coefficients \\(\hat\beta = 0 \forall j,k\\)
 
-It is distributed \\(\chi^2_{(J-1)(k-1)}\\)
-where *J* is the number of possible outcomes and *k* is the number of covariates, including the constant term.
+The “Global” Likelihood Ratio Test is a test vs. the global null 
+(that is, a test for whether all coefficients `\(\hat\beta = 0 \forall j,k\)`,
+i.e. not particularly interesting or useful).
 
-It tells you if you can reject this null (not often very interesting or useful).
+Distributed \\(\chi^2_{(J-1)(k-1)}\\)
+where *J* is number of possible outcomes and *k* is number of covariates, including the constant.
 
-We can also use `lrtest()` to examine whether we should prefer the
+Can also use `lrtest()` to examine whether to prefer the
 more parsimonous or more elaborate of two nested models.
+
+_What about an LRT on models 2 and 3?_
 
 ]
 
@@ -743,12 +788,44 @@ it is not as straightforward to do diagnostics with multinomial logistic regress
 For the purpose of detecting outliers or influential data points, 
 one can run separate logit models and use the diagnostics tools on each model.
 
-And what would happen if you did a likelihood ratio test on model 2 and 3?
+---
+### Wald tests
 
-We can also do a Wald test here, though Brian Ripley 
+We can also test the hypothesis that some variables are jointly significant.
+E.g. perhaps you have a theory that it is not so much party affiliation that matters
+in a 3-party election, but that it is the economy that matters...
+
+
+```r
+survey::regTermTest(mnl2, ~dem+rep)
+```
+
+```
+## Wald test for dem rep
+##  in multinom(formula = vote ~ female + persfinance + natlecon + dem + 
+##     rep, data = vote92)
+## F =  0.4133427  on  2  and  2715  df: p= 0.66148
+```
+
+```r
+survey::regTermTest(mnl2, ~natlecon+persfinance)
+```
+
+```
+## Wald test for natlecon persfinance
+##  in multinom(formula = vote ~ female + persfinance + natlecon + dem + 
+##     rep, data = vote92)
+## F =  6.074215  on  2  and  2715  df: p= 0.0023328
+```
+
+???
+
+Note though that Brian Ripley 
 (who led R development for a while before he got sick and wrote books on neural networks)
 argued:
-"it is also a mistake to use Wald tests for multinom fits, since they suffer from the same (potentially severe) problems as binomial fits. Use profile-likelihood confidence intervals (for which the package does provide software), or if you must test, likelihood-ratio tests (ditto)."
+“it is also a mistake to use Wald tests for multinom fits, since they suffer from the same (potentially severe) problems as binomial fits. 
+Use profile-likelihood confidence intervals (for which the package does provide software), 
+or if you must test, likelihood-ratio tests (ditto).”
 
 ---
 
@@ -757,7 +834,8 @@ argued:
 ### Confusion matrices
 
 When developing models for prediction, 
-a critical metric is how well the model does in predicting the target variable. 
+a critical metric is accuracy. 
+
 The process involves using the model estimates to predict values on the training set, 
 then compare the predicted target variable versus the observed values for each observation. 
 
@@ -816,37 +894,6 @@ confusionMatrix(data=pred, vote92$vote)
 ]
 
 ---
-## Reporting
-
-.small[
-
-```r
-texreg::htmlreg(list(mnl1, mnl2, mnl3), doctype = F, single.row = T)
-```
-]
-
-
-.small[
-
-```r
-stargazer::stargazer(mnl1, mnl2, mnl3, type = "html", style = "io", single.row = T, align = T,
-                     intercept.bottom = F, model.numbers = F, column.separate = c(2,2,2),
-                     column.labels = c("Model 1","Model2","Model 3"))
-```
-
-
-&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="7" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;td&gt;Bush&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;td&gt;Bush&lt;/td&gt;&lt;td&gt;Perot&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;Model 1&lt;/td&gt;&lt;td colspan="2"&gt;Model2&lt;/td&gt;&lt;td colspan="2"&gt;Model 3&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="7" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;CONSTANT&lt;/td&gt;&lt;td&gt;0.064 (0.178)&lt;/td&gt;&lt;td&gt;0.660&lt;sup&gt;***&lt;/sup&gt; (0.154)&lt;/td&gt;&lt;td&gt;-0.629&lt;sup&gt;**&lt;/sup&gt; (0.315)&lt;/td&gt;&lt;td&gt;-0.762&lt;sup&gt;**&lt;/sup&gt; (0.363)&lt;/td&gt;&lt;td&gt;0.762&lt;sup&gt;**&lt;/sup&gt; (0.363)&lt;/td&gt;&lt;td&gt;0.133 (0.387)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;FEMALE1&lt;/td&gt;&lt;td&gt;0.494&lt;sup&gt;***&lt;/sup&gt; (0.183)&lt;/td&gt;&lt;td&gt;0.306 (0.194)&lt;/td&gt;&lt;td&gt;0.288 (0.206)&lt;/td&gt;&lt;td&gt;0.450&lt;sup&gt;**&lt;/sup&gt; (0.212)&lt;/td&gt;&lt;td&gt;-0.450&lt;sup&gt;**&lt;/sup&gt; (0.212)&lt;/td&gt;&lt;td&gt;-0.163 (0.232)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;PERSFINANCE&lt;/td&gt;&lt;td&gt;-0.159 (0.113)&lt;/td&gt;&lt;td&gt;0.234&lt;sup&gt;*&lt;/sup&gt; (0.120)&lt;/td&gt;&lt;td&gt;-0.089 (0.128)&lt;/td&gt;&lt;td&gt;0.141 (0.131)&lt;/td&gt;&lt;td&gt;-0.141 (0.131)&lt;/td&gt;&lt;td&gt;-0.230 (0.144)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;NATLECON&lt;/td&gt;&lt;td&gt;-0.675&lt;sup&gt;***&lt;/sup&gt; (0.187)&lt;/td&gt;&lt;td&gt;0.501&lt;sup&gt;***&lt;/sup&gt; (0.164)&lt;/td&gt;&lt;td&gt;-0.568&lt;sup&gt;***&lt;/sup&gt; (0.209)&lt;/td&gt;&lt;td&gt;0.422&lt;sup&gt;**&lt;/sup&gt; (0.178)&lt;/td&gt;&lt;td&gt;-0.422&lt;sup&gt;**&lt;/sup&gt; (0.178)&lt;/td&gt;&lt;td&gt;-0.990&lt;sup&gt;***&lt;/sup&gt; (0.219)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;DEM1&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;1.730&lt;sup&gt;***&lt;/sup&gt; (0.293)&lt;/td&gt;&lt;td&gt;-0.243 (0.414)&lt;/td&gt;&lt;td&gt;0.243 (0.414)&lt;/td&gt;&lt;td&gt;1.974&lt;sup&gt;***&lt;/sup&gt; (0.405)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;REP1&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;-0.938&lt;sup&gt;***&lt;/sup&gt; (0.337)&lt;/td&gt;&lt;td&gt;1.934&lt;sup&gt;***&lt;/sup&gt; (0.358)&lt;/td&gt;&lt;td&gt;-1.934&lt;sup&gt;***&lt;/sup&gt; (0.358)&lt;/td&gt;&lt;td&gt;-2.871&lt;sup&gt;***&lt;/sup&gt; (0.392)&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Akaike information criterion&lt;/em&gt;&lt;/td&gt;&lt;td&gt;1,811.519&lt;/td&gt;&lt;td&gt;1,811.519&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td colspan="7" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Notes:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="6" style="text-align:left"&gt;&lt;sup&gt;***&lt;/sup&gt;p &lt; .01; &lt;sup&gt;**&lt;/sup&gt;p &lt; .05; &lt;sup&gt;*&lt;/sup&gt;p &lt; .1&lt;/td&gt;&lt;/tr&gt;
-&lt;/table&gt;
-]
 
 ???
 
