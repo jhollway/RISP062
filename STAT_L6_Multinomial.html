@@ -680,14 +680,6 @@ class: center, middle
 .small[
 
 ```r
-texreg::htmlreg(list(mnl1, mnl2, mnl3), doctype = F, single.row = T)
-```
-]
-
-
-.small[
-
-```r
 stargazer::stargazer(mnl1, mnl2, mnl3, type = "html", style = "io", single.row = T, align = T,
                      intercept.bottom = F, model.numbers = F, column.separate = c(2,2,2),
                      column.labels = c("Model 1","Model2","Model 3"))
@@ -715,6 +707,13 @@ and *can* do multinomial logits, its default layout for this model makes things 
 That's why I'm using `stargazer` today.
 Note that to return the table and not just the html code,
 I needed to choose `results='asis'` in the code chunk options.
+
+.small[
+
+```r
+texreg::htmlreg(list(mnl1, mnl2, mnl3), doctype = F, single.row = T)
+```
+]
 
 ---
 .pull-left-1[
@@ -921,18 +920,23 @@ As a matter of practical advice:
 ### Odds Ratios
 
 Since MNL can be thought of as (a set of) logistic regressions,
-we can get change in OR for category *j*
+`\(\exp(\hat\beta_{jk})\)` gives change in OR for category *j*
 associated with one-unit change in variable `\(X_k\)`,
-relative to the reference category, by exponentialising out of the log-odds coefficients, `\(\exp(\hat\beta_{jk})\)`.
+relative to the reference category.
 
-Model 2 tells us that a female voter increases the odds of voting for Bush rather than Perot by \\(100(1.569-1) = 56.9\\)% and for Clinton rather than Perot by \\(100(1.333-1) = 33.3\\)%, but decreases the odds of voting for Clinton rather than Bush by \\(100(0.850-1) = 15\\)%.
+Model 2 tells us that being female increases the odds of voting for Bush rather than Perot by \\(100(1.569-1) = 56.9\\)% and for Clinton rather than Perot by \\(100(1.333-1) = 33.3\\)%.
 
-It also tells us that there is a \\(100(0.372-1)2 = 125.6\\)% increase in the odds of a person voting for Clinton over Bush if they are dissatisfied with the recent national economy compared to if they are satisfied with it.
+Model 3 shows us another perspective. 
+Being female decreases odds of voting for Clinton rather than Bush by \\(100(0.850-1) = 15\\)%.
+Also, there is a \\(100(0.372-1)2 = 125.6\\)% increase in the odds of a person voting for Clinton over Bush if _dissatisfied_ with the national economy.
 
 Seems like it is the economy, stupid.
 ]
 
 .pull-right[
+.panelset[
+.panel[
+.panel-name[Model 2]
 
 ```r
 stargazer::stargazer(mnl2, type = "html", 
@@ -953,6 +957,31 @@ stargazer::stargazer(mnl2, type = "html",
 &lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Akaike Inf. Crit.&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;/tr&gt;
 &lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
 &lt;/table&gt;
+]
+.panel[
+.panel-name[Model 3]
+
+```r
+stargazer::stargazer(mnl3, type = "html", 
+*       single.row = T, apply.coef = exp)
+```
+
+
+&lt;table style="text-align:center"&gt;&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td colspan="2"&gt;&lt;em&gt;Dependent variable:&lt;/em&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;td colspan="2" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;Perot&lt;/td&gt;&lt;td&gt;Clinton&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;/td&gt;&lt;td&gt;(1)&lt;/td&gt;&lt;td&gt;(2)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;female1&lt;/td&gt;&lt;td&gt;0.637&lt;sup&gt;***&lt;/sup&gt; (0.212)&lt;/td&gt;&lt;td&gt;0.850&lt;sup&gt;***&lt;/sup&gt; (0.232)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;persfinance&lt;/td&gt;&lt;td&gt;0.868&lt;sup&gt;***&lt;/sup&gt; (0.131)&lt;/td&gt;&lt;td&gt;0.795&lt;sup&gt;***&lt;/sup&gt; (0.144)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;natlecon&lt;/td&gt;&lt;td&gt;0.656&lt;sup&gt;***&lt;/sup&gt; (0.178)&lt;/td&gt;&lt;td&gt;0.372&lt;sup&gt;*&lt;/sup&gt; (0.219)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;dem1&lt;/td&gt;&lt;td&gt;1.275&lt;sup&gt;***&lt;/sup&gt; (0.414)&lt;/td&gt;&lt;td&gt;7.197&lt;sup&gt;***&lt;/sup&gt; (0.405)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;rep1&lt;/td&gt;&lt;td&gt;0.145 (0.358)&lt;/td&gt;&lt;td&gt;0.057 (0.392)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td style="text-align:left"&gt;Constant&lt;/td&gt;&lt;td&gt;2.144&lt;sup&gt;***&lt;/sup&gt; (0.363)&lt;/td&gt;&lt;td&gt;1.143&lt;sup&gt;***&lt;/sup&gt; (0.387)&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;Akaike Inf. Crit.&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;td&gt;1,298.571&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;td colspan="3" style="border-bottom: 1px solid black"&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td style="text-align:left"&gt;&lt;em&gt;Note:&lt;/em&gt;&lt;/td&gt;&lt;td colspan="2" style="text-align:right"&gt;&lt;sup&gt;*&lt;/sup&gt;p&lt;0.1; &lt;sup&gt;**&lt;/sup&gt;p&lt;0.05; &lt;sup&gt;***&lt;/sup&gt;p&lt;0.01&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+]
+]
 ]
 
 ???
