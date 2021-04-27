@@ -1,0 +1,39 @@
+dataImport	data1
+crosssectional	crosss
+unnamed-chunk-1	
+dataStructure	data1	.STAT_PanelOutcomes_cache/html/dataStructure_6d0867618ae15d704881ed446b5436fb_meta
+dataPlot	
+long	
+wide	
+OLS	ols
+simpsons1	
+simpsons2	i	opar
+simpsons3	
+LSDV	lsdv
+compOLSandLSDV	
+polsPlot	
+lsdvPlot1	
+lsdvPlot2	
+fe	fe
+unnamed-chunk-2	
+re	rei	rep	res
+plotRES	
+plotREP	
+Comp3	
+hausman	hausman_test
+residuals heteroscedasticity	
+autocorrelation	
+predplots	
+lag	data_w_lag	data1
+olsPlot2	
+fetable	
+hausmantest	
+long code	
+long table	
+wide code	
+wide table	
+lag table	data_w_lag	data1
+lag code	
+re code	
+re table	rei	rep	res
+simpsons4	

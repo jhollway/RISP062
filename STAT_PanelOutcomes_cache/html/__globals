@@ -1,0 +1,39 @@
+dataImport	library	read_excel
+crosssectional	==	aes	data1	filter	geom_bar	ggplot	id	labs	sstaxes	theme_classic	year
+unnamed-chunk-1	~	data1	library	plotmeans
+dataStructure	::	~	$	$<-	idn	label<-	library	panel_data	year
+dataPlot	%>%	aes	data1	geom_line	ggplot	id	idn	sstran	theme_classic	year
+long	%>%	data1	idn	leftvot	print	rgdpecap	select	sstran	tbl_df	year
+wide	%>%	c	data1	idn	leftvot	pivot_wider	print	rgdpecap	select	sstran	tbl_df	year
+OLS	~	data1	lm	tab_model
+simpsons1	apply	c	mosaicplot	sum	UCBAdmissions
+simpsons2	c	expression	for	LETTERS	mosaicplot	mtext	par	paste	UCBAdmissions
+simpsons3	~	aes	dataset	facet_wrap	geom_point	geom_smooth	ggplot	library	simpsons_paradox	theme	x	y
+LSDV	~	data1	lm	tab_model
+compOLSandLSDV	c	F	lsdv	ols	T	tab_model
+polsPlot	c	ols	plot_model
+lsdvPlot1	c	lsdv	plot_model
+lsdvPlot2	c	lsdv	plot_model	T
+fe	~	data1	library	lm
+unnamed-chunk-2	~	data1	plotmeans
+re	::	~	c	data1	T	tab_model
+plotRES	c	plot_model	res
+plotREP	c	plot_model	rep
+Comp3	c	fe	lsdv	ols	rei	rep	res	T	tab_model
+hausman	$	abs	as.matrix	class<-	coef	deparse	fe	fixef	getCall	length	list	names	names<-	pchisq	res	return	solve	t	vcov
+residuals heteroscedasticity	ols	plot
+autocorrelation	%>%	aes	c	data1	filter	geom_line	ggplot	id	idn	sstran	theme_classic	year
+predplots	c	fe	lsdv	plot_model
+lag	::	$	$<-	id	Lag	leftvot	library	print	sstran	sstran_lag	year
+olsPlot2	c	ols	plot_model	T
+fetable	c	fe	lsdv	T	tab_model
+hausmantest	$	abs	as.matrix	class<-	coef	deparse	fe	fixef	getCall	length	list	names	names<-	pchisq	res	return	solve	t	vcov
+long code	%>%	data1	idn	leftvot	print	rgdpecap	select	sstran	tbl_df	year
+long table	%>%	data1	idn	leftvot	print	rgdpecap	select	sstran	tbl_df	year
+wide code	%>%	c	data1	idn	leftvot	pivot_wider	print	rgdpecap	select	sstran	tbl_df	year
+wide table	%>%	c	data1	idn	leftvot	pivot_wider	print	rgdpecap	select	sstran	tbl_df	year
+lag table	::	$	$<-	head	Lag	leftvot	library	sstran	sstran_lag	year
+lag code	::	$	$<-	head	Lag	leftvot	library	sstran	sstran_lag	year
+re code	::	~	c	data1	T	tab_model
+re table	::	~	c	data1	T	tab_model
+simpsons4	~	aes	datasaurus_dozen	dataset	facet_wrap	geom_abline	geom_point	ggplot	theme	theme_void	x	y
