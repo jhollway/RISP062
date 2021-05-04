@@ -879,6 +879,130 @@ then given a reciprocity parameter of 2,
 ---
 
 
+
+---
+.pull-left[
+## Diagnostics and Goodness of Fit
+
+What does good mean? Can't we just use `\(R^2\)`?
+
+Could simulate individual networks and compare their graphs to that of the observed network,
+but perhaps just _that particular_ simulated network looks similar/different in that way?
+
+Alternative is to simulate _lots_ of networks and test how macro features of the simulated networks, 
+e.g. degree distribution, compare to empirical network(s).
+
+There are some important differences between .red[goodness of fit] (GOF) and `\(R^2\)`:
+- must be some unmodelled (macro) feature
+- no single GOF score, but there are different features you could be interested in
+- one semi-useful summary is the `\(p\)`-value, but .red[which way do you want it here]?
+]
+
+--
+
+
+```r
+indegree_gof &lt;- sienaGOF(result, 
+                   IndegreeDistribution, 
+                   varName = "friendship.dependent")
+```
+
+```
+##   &gt; Completed  1000  calculations
+```
+
+```r
+plot(indegree_gof)
+```
+
+&lt;img src="STAT_L9_Networks_files/figure-html/gof-1.png" width="504" /&gt;
+
+???
+
+While MoM aims at creating networks that have statistics close to those of the target network...
+- more formally, parameters `\(\theta = \{\rho, \beta\}\)` that generate networks for which `\(E_\theta = \{Z\}\)` and are stable have converged
+
+
+```r
+RSiena:::getTargets(data = mySienaData,
+                  effects = mySienaEffects)
+```
+
+```
+##             [,1]
+##  [1,]  86.000000
+##  [2,]  99.000000
+##  [3,]  72.000000
+##  [4,] 164.000000
+##  [5,]  47.000000
+##  [6,] 403.000000
+##  [7,]   1.620690
+##  [8,]  -6.379310
+##  [9,]  47.000000
+## [10,]  -5.034483
+## [11,]  -4.034483
+## [12,]  90.000000
+```
+
+But it is important to recognise that, with a converged model, we approximate these targets very closely _by design_ (of the estimation procedure).
+So we don't actually know anything about what kind of residual variance is left...
+
+---
+## Extensions
+
+SAOMs have been around for a good decade or two by now, 
+and are very popular in sociology and increasingly used in political science.
+
+&gt; E.g. Snijders et al (2010) has been cited nearly 2000 times
+
+--
+
+Extensions have been developed for all sorts of special cases...
+
+--
+
+.pull-right[
+- single -&gt; multiplex
+- binary -&gt; ordered
+- directed -&gt; undirected
+- one-mode -&gt; two-mode
+- change -&gt; creation/deletion
+- single network -&gt; multiple networks
+- network -&gt; behaviour
+]
+
+---
+## Network modelling
+
+Where to go from here?
+
+--
+
+Well, first stop is **Social Networks Theories and Methods** next semester.
+
+--
+
+There we go into _much_ more detail about social networks theories and methods.
+This includes more detail about how to create, describe, and visualise networks in different ways,
+as well as all sorts of different models that involve networks:
+- networks as dependent variable (as here)
+- networks as independent variable (e.g. diffusion)
+- networks and behaviour as coevolving dependent variables...
+
+
+ | Panels | Events
+--------|---------|---------
+Tie-based | (ST)ERGMs | REMs
+Actor-oriented | SAOMs | DyNAMs
+
+---
+class: center, middle
+## Some helpful packages (I think...)
+
+![:scale 25%](https://raw.githubusercontent.com/snlab-nl/rsiena/main/inst/rsienalogo.png)
+![:scale 25%](https://raw.githubusercontent.com/snlab-ch/migraph/main/inst/migraph.png)
+![:scale 25%](https://raw.githubusercontent.com/snlab-ch/goldfish/main/inst/hexlogo_goldfish.png)
+
 ---
 ## Social Networks Recap
 
