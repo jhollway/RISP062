@@ -329,6 +329,107 @@ At each mini-step an actor receives an opportunity to toggle a tie
 They decide what action is most appealing and act accordingly
 
 ---
+## Two processes in each ministep
+
+.pull-left[
+.red[Rate Function]
+  - essentially _who gets how many opportunities to make changes_ between waves (periods)
+
+  `$$\lambda_i(x) = \exp\bigl(\sum_k \rho_k r_{ik} (x) \bigr)$$`
+  - `\(\rho_k\)` weights statistics `\(r_{ik}(x)\)` that express local configurations 
+  that may correlate with more, `\(\rho_k&gt;0\)`, or less, `\(\rho_k&lt;0\)`, change
+  - technically, `\(\lambda_i(x)\)` a (non-homog) .red[Poisson process]
+    - models how much change between `\(t_1\)` and `\(t_2\)`
+    - more change requires more ministeps
+    - can mean more ministeps than changes
+  - call actor offered oppt .red[ego] or focal actor
+    - studies typically assume a period-wise constant rate (though see [Hollway 2020](https://link.springer.com/chapter/10.1007/978-3-030-46769-2_4)...)
+]
+
+&lt;!-- Some actors, although given the opportunity to make a tie change, may decide they are actually satisfied --&gt;
+&lt;!-- Some actors may revert earlier tie changes once their local neighbourhood changes again as a result of others’ choices --&gt;
+
+--
+
+.pull-right[
+.red[Evaluation Function]
+  - essentially, once ego chosen, _who/what_ -- alters could be people or something else -- _do they choose_?
+
+  `$$f_i(x) = \sum_k \beta_k s_{ik} (x)$$`
+  
+  - `\(\beta_k\)` weights statistics `\(s_{ik}\)` that express local configurations 
+  that may be desired, `\(\beta_k&gt;0\)`, or avoided, `\(\beta_k&lt;0\)`
+  - technically, `\(f(i(x))\)` is part of a .red[multinomial logit] model for discrete,
+  probabilistic choice
+    - models attractiveness of different network states `\(x\)` to actor `\(i\)` 
+    reachable within one step of the current network
+    - this is where the action typically is. Helps us answer whether we prefer happy friends or avoid depressed people...
+]
+
+???
+
+SAOMs' secret sauce is really in joining these two functions in a simulation framework to enable estimation.
+
+---
+## Example of an actor's decision
+
+.pull-left[
+&lt;img src="STAT_L9_Networks_files/figure-html/example-1.png" width="504" /&gt;
+]
+
+.pull-right[
+
+|           | outdg| recip| trans| cycle| color|
+|:----------|-----:|-----:|-----:|-----:|-----:|
+|Status quo |     3|     2|     2|     2|     0|
+|Drop A     |     2|     1|     0|     1|     0|
+|Drop B     |     2|     1|     0|     1|     0|
+|Drop C     |     2|     2|     2|     2|     0|
+|Add D      |     4|     3|     2|     2|     1|
+|Add E      |     4|     2|     2|     3|     0|
+|Add F      |     4|     2|     2|     3|     1|
+|Add G      |     4|     2|     2|     3|     1|
+]
+
+---
+## Evaluating the options
+
+.pull-left[
+
+Now, let's say that we know that the average focal actor weights the options as follows:
+
+`$$\beta_{\text{outdg}} = -2.6$$`
+
+`$$\beta_{\text{recip}} = 1.8$$`
+`$$\beta_{\text{trans}} = 0.4$$`
+`$$\beta_{\text{cycle}} = -0.7$$`
+`$$\beta_{\text{color}} = 0.8$$`
+
+Using the underlying multinomial, we can ultimately calculate the probability our focal actor makes each choice...
+
+`$$p_{i\leadsto j}(x, \beta) = \frac{\exp(f(x^{i\leadsto j}, \beta))}{\sum_{k=1}^n \exp(f(x^{i\leadsto j}, \beta))}$$`
+
+]
+
+.pull-right[
+
+|           | Evaluation|   Exp|Prob |
+|:----------|----------:|-----:|:----|
+|Status quo |       -4.8| 0.008|5%   |
+|Drop A     |       -4.1| 0.017|10%  |
+|Drop B     |       -4.1| 0.017|10%  |
+|Drop C     |       -2.2| 0.111|68%  |
+|Add D      |       -4.8| 0.008|5%   |
+|Add E      |       -8.1| 0.000|0%   |
+|Add F      |       -7.3| 0.001|1%   |
+|Add G      |       -7.3| 0.001|1%   |
+]
+
+???
+
+Therefore dropping tie to alter 3 is the most likely choice for ego in this context.
+
+---
 ## Social Networks Recap
 
 Social networks includes .red[network theory], .red[network analysis] and .red[network modelling]
