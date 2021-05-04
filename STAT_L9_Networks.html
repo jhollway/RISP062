@@ -170,6 +170,99 @@ Competing explanations tend to involve dynamic mechanisms:
 - because depression is contagious along friendships
 
 ---
+.panelset[
+.panel[
+.panel-name[Reading in data]
+
+```r
+friendship.t1 &lt;- as.matrix(read.table(file = "friendship.network.t1.dat"))
+friendship.t1[friendship.t1 &gt;= 1] &lt;- 1
+friendship.t2 &lt;- as.matrix(read.table(file = "friendship.network.t2.dat"))
+friendship.t2[friendship.t2 &gt;= 1] &lt;- 1
+nActors &lt;- dim(friendship.t1)[1]
+
+library(igraph)
+graph1 &lt;- graph.adjacency(friendship.t1)
+graph2 &lt;- graph.adjacency(friendship.t2)
+```
+]
+
+.panel[
+.panel-name[Visualising networks]
+
+```r
+graph12 &lt;- graph.adjacency(friendship.t1 + friendship.t2)
+myLayout &lt;- layout.fruchterman.reingold(graph12)
+
+par(mfrow = c(1, 2))
+igraph::plot.igraph(graph1,
+     vertex.color = "seagreen",
+     edge.color = "black",
+     edge.width = 1.5,
+     edge.arrow.size = 0.6,
+     vertex.size = 10,
+     vertex.label = "",
+     layout = myLayout,
+     main = "Network wave 1")
+igraph::plot.igraph(graph2,
+     vertex.color = "seagreen",
+     edge.color = "black",
+     edge.width = 1.5,
+     edge.arrow.size = 0.3,
+     vertex.size = 10,
+     vertex.label = "",
+     layout = myLayout,
+     main = "Network wave 2")
+```
+]
+.panel[
+.panel-name[Plot]
+![](STAT_L9_Networks_files/figure-html/plotting-1.png)
+]
+
+.panel[
+.panel-name[Now what?]
+.center[.red[Which forces shape this social network's evolution?]]
+]
+]
+
+???
+
+- same group of actors (some composition change allowed)
+- same relational variable (states, not events)
+- some, but not too much change...
+
+The data used are from the Children of Immigrants Study,
+(c) MZES Mannheim, Manfred Kalter. 
+
+- social network ties are costly? (low outdegree)
+- individuals form and maintain reciprocal ties?
+- transitivity leads to clustering
+- status hierarchy shapes friendship networks (ties to popular actors)
+- gender/ethnic homophily?
+
+---
+## Maybe gender homophily?
+
+&lt;img src="STAT_L9_Networks_files/figure-html/gender-1.png" width="504" /&gt;&lt;img src="STAT_L9_Networks_files/figure-html/gender-2.png" width="504" /&gt;
+
+---
+## Maybe ethnic homophily?
+
+&lt;img src="STAT_L9_Networks_files/figure-html/ethnic-1.png" width="504" /&gt;&lt;img src="STAT_L9_Networks_files/figure-html/ethnic-2.png" width="504" /&gt;
+
+---
+## Modelling thoughts
+
+A _statistical approach_ is necessary here to control for alternative explanations
+
+A _complete network approach_ is necessary because selection can only be studied when the complete pool of candidates is known
+
+A _longitudinal approach_ is necessary to link antecedents with consequences
+
+A (weak: see Udehn 2002) _methodologically individualist approach_ is useful for bringing the model close to theory
+
+---
 ## Social Networks Recap
 
 Social networks includes .red[network theory], .red[network analysis] and .red[network modelling]
