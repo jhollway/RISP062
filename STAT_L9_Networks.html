@@ -42,6 +42,134 @@ class: center, middle
 .pull-1[.circleoff[![](https://www.guidesiena.it/wp-content/uploads/2020/07/piazza-del-campo-siena-610x610.jpg)]]
 
 ---
+## What is/are “social networks”?
+
+.pull-left[
+.center[
+![](https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Graph_betweenness.svg/220px-Graph_betweenness.svg.png)
+]]
+
+--
+- Not **a** social network
+  - not a type of actor, but structures
+
+--
+- Not a social **network**
+  - not a type of structure, but any structure
+
+--
+- Not a **social** network
+  - not any structure of a specific type of relation, but structures of any relations
+
+--
+
+Social networks concerns the abstraction, theorising, and analysis of relations into structures.
+
+These relations can be key to understanding (changes in) macro-structures or micro-structures,
+the distribution of attributes within those structures, or even what those structures consist of.
+
+---
+## Terminology
+
+.pull-left[
+
+- .red[Graph] or .red[network], `\(G = (V, E)\)`
+- .red[Vertices] or .red[nodes] from a .red[node set] or .red[mode], `\(V = \{a,b,c,...\}\)`
+- .red[Edges] or .red[ties] (also links, lines, connections, arcs), `\(E = \{\{a,b\}, \{b,c\}, ...\}\)`
+
+![:scale 75%](STAT_L9_Networks_files/figure-html/example-1.png)
+]
+
+
+--
+
+.pull-right[
+- undirected
+- weighted
+- signed
+- labelled
+- directed
+- multiplex
+- complex
+- two-mode
+- multilevel
+]
+
+---
+.pull-left-3[
+- .red[graphs] pretty and easy to interpret
+- quickly difficult to discern though and results may vary...
+]
+
+.center[![:scale 55%](GraphMat.png)]
+
+.pull-left[
+- .red[edgelists] 2(+) (ordered) columns of numbered/labelled pairs
+- easy in Excel, incl. attributes, and memory efficient
+- more complicated data, statistics, and analysis difficult though
+]
+
+.pull-right[
+- .red[matrices]' rows are senders and cols recipients
+- memory inefficient for sparse networks and somewhat incomprehensible
+- encodes all relational info and quick, flexible analysis
+]
+
+???
+
+- dimensions
+- density
+- outdegrees
+- indegrees
+- isolates
+- reciprocity
+- transitivity
+
+---
+## Dependency
+
+.pull-left[![:scale 75%](GraphDep.png)]
+
+A lot of emphasis has been put on networks' pretty graphs
+and identifying nodes that are central and/or in groups together.
+
+--
+
+These aspects of .red[social network analysis] are important and powerful tools...
+
+--
+
+...but the real opportunity in social networks is the ability to identify, theorise, and estimate structures of social .red[dependence].
+
+--
+
+.pull-right[.pull-down[
+Some examples:
+- outdegrees
+- indegrees
+- reciprocity
+- transitivity
+- homophily
+- etc.
+]]
+
+---
+## Network modelling
+
+We want to know the degree to which such mechanisms are responsible for the structures we see.
+
+### Why network _dynamics_ then?
+
+Because we want to know _why_ there are associations
+- say, why are depressed people more likely to have depressed friends (Schaefer et al 2012) or why democratic countries are unlikely to be at war with one another...
+
+Competing explanations tend to involve dynamic mechanisms:
+- because depressed adolescents prefer depressed friends
+- because they are avoided by non-depressed people
+- because they withdraw from friendly interactions which destroys all other friendships
+- because depression is contagious along friendships
+
+---
 ## Social Networks Recap
 
 Social networks includes .red[network theory], .red[network analysis] and .red[network modelling]
